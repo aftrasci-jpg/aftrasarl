@@ -1,8 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Target, Eye, Rocket } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export const About = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="bg-white">
       {/* Hero */}
@@ -20,7 +23,7 @@ export const About = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-5xl font-bold mb-2"
           >
-            À Propos d'AFTRAS CI
+            {t('about.title')}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -28,7 +31,7 @@ export const About = () => {
             transition={{ delay: 0.1 }}
             className="text-sm font-medium text-aftras-orange tracking-[0.2em] uppercase mb-8"
           >
-            Transparence-Fiabilité-Croissance
+            {t('common.slogan')}
           </motion.p>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -36,7 +39,7 @@ export const About = () => {
             transition={{ delay: 0.2 }}
             className="text-xl text-blue-100 max-w-3xl mx-auto"
           >
-            Votre partenaire stratégique pour le négoce international et l'intermédiation commerciale.
+            {t('about.subtitle')}
           </motion.p>
         </div>
       </section>
@@ -46,13 +49,13 @@ export const About = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="text-3xl font-bold text-aftras-blue-border mb-6">Qui sommes-nous ?</h2>
+              <h2 className="text-3xl font-bold text-aftras-blue-border mb-6">{t('about.who_are_we.title')}</h2>
               <div className="space-y-6 text-gray-600 leading-relaxed">
                 <p>
-                  Africa Trading Solutions Côte d'Ivoire SARL (AFTRAS CI) est une société de négoce international spécialisée dans l'intermédiation commerciale et le sourcing de produits de haute qualité. Basés stratégiquement pour servir les marchés africains et internationaux, nous agissons comme un pont fiable entre les producteurs mondiaux et les acheteurs exigeants.
+                  {t('about.who_are_we.p1')}
                 </p>
                 <p>
-                  Notre expertise repose sur une connaissance approfondie des chaînes d'approvisionnement mondiales et une capacité unique à naviguer dans les complexités du commerce international. Nous ne nous contentons pas de trouver des produits ; nous bâtissons des relations durables basées sur la confiance et la performance.
+                  {t('about.who_are_we.p2')}
                 </p>
               </div>
             </div>
@@ -72,27 +75,27 @@ export const About = () => {
               <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Eye className="w-8 h-8 text-aftras-blue-text" />
               </div>
-              <h3 className="text-2xl font-bold text-aftras-blue-border mb-4">Notre Vision</h3>
+              <h3 className="text-2xl font-bold text-aftras-blue-border mb-4">{t('about.vision_mission.vision.title')}</h3>
               <p className="text-gray-600">
-                Devenir un acteur panafricain majeur du négoce international, reconnu pour son intégrité et son efficacité opérationnelle.
+                {t('about.vision_mission.vision.desc')}
               </p>
             </div>
             <div className="bg-white p-10 rounded-3xl shadow-sm border border-gray-100 text-center">
               <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Target className="w-8 h-8 text-orange-600" />
               </div>
-              <h3 className="text-2xl font-bold text-aftras-blue-border mb-4">Notre Mission</h3>
+              <h3 className="text-2xl font-bold text-aftras-blue-border mb-4">{t('about.vision_mission.mission.title')}</h3>
               <p className="text-gray-600">
-                Faciliter les échanges commerciaux internationaux en offrant des solutions de sourcing et de logistique optimisées et sécurisées.
+                {t('about.vision_mission.mission.desc')}
               </p>
             </div>
             <div className="bg-white p-10 rounded-3xl shadow-sm border border-gray-100 text-center">
               <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Rocket className="w-8 h-8 text-green-600" />
               </div>
-              <h3 className="text-2xl font-bold text-aftras-blue-border mb-4">Notre Engagement</h3>
+              <h3 className="text-2xl font-bold text-aftras-blue-border mb-4">{t('about.vision_mission.engagement.title')}</h3>
               <p className="text-gray-600">
-                Accompagner nos clients à chaque étape pour garantir des transactions fluides et des résultats concrets.
+                {t('about.vision_mission.engagement.desc')}
               </p>
             </div>
           </div>

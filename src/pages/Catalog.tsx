@@ -1,28 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../firebase';
-import { Product } from '../types';
+import { Product, PRODUCT_CATEGORIES } from '../types';
 import { Search, Filter, ShoppingCart, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ProductSlider } from '../components/ProductSlider';
-
-const CATEGORIES = [
-  'Tous',
-  'Céréales & Grains',
-  'Légumineuses',
-  'Noix & Oléagineux',
-  'Produits d’export',
-  'Épices & Condiments',
-  'Fruits & Légumes',
-  'Produits transformés'
-];
+import { useTranslation } from 'react-i18next';
 
 export const Catalog = () => {
+  const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState('Tous');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+
+  const CATEGORIES = [
+    { id: 'all', label: t('catalog_page.category_list.all') },
+    ...PRODUCT_CATEGORIES.map(cat => ({
+      id: cat,
+      label: t(`catalog_page.category_list.${cat}`)
+    }))
+  ];
 
   useEffect(() => {
     const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
@@ -36,7 +35,7 @@ export const Catalog = () => {
 
   useEffect(() => {
     let filtered = products;
-    if (selectedCategory !== 'Tous') {
+    if (selectedCategory !== 'all') {
       filtered = filtered.filter(p => p.category === selectedCategory);
     }
     if (searchTerm) {
@@ -53,8 +52,8 @@ export const Catalog = () => {
       {featuredProducts.length > 0 && (
         <section className="py-12 bg-blue-50/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-            <h2 className="text-2xl font-bold text-aftras-blue-border">Produits Vedettes</h2>
-            <p className="text-gray-600">Sélection exclusive de produits à fort potentiel.</p>
+            <h2 className="text-2xl font-bold text-aftras-blue-border">{t('catalog_page.featured')}</h2>
+            <p className="text-gray-600">{t('catalog_page.featured_desc')}</p>
           </div>
           <ProductSlider products={featuredProducts} />
         </section>
@@ -70,20 +69,20 @@ export const Catalog = () => {
               <div className="sticky top-24 space-y-8">
                 <div>
                   <h3 className="text-lg font-bold text-aftras-blue-border mb-4 flex items-center">
-                    <Filter className="w-4 h-4 mr-2 text-aftras-orange" /> Catégories
+                    <Filter className="w-4 h-4 mr-2 text-aftras-orange" /> {t('catalog_page.categories')}
                   </h3>
                   <div className="space-y-2">
                     {CATEGORIES.map(cat => (
                       <button
-                        key={cat}
-                        onClick={() => setSelectedCategory(cat)}
+                        key={cat.id}
+                        onClick={() => setSelectedCategory(cat.id)}
                         className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors ${
-                          selectedCategory === cat 
+                          selectedCategory === cat.id 
                             ? 'bg-aftras-blue-text text-white font-bold' 
                             : 'text-gray-600 hover:bg-gray-100'
                         }`}
                       >
-                        {cat}
+                        {cat.label}
                       </button>
                     ))}
                   </div>
@@ -94,12 +93,12 @@ export const Catalog = () => {
             {/* Product Grid */}
             <main className="flex-grow">
               <div className="flex flex-col sm:flex-row justify-between items-center mb-10 gap-4">
-                <h1 className="text-3xl font-bold text-aftras-blue-border">Catalogue Produits</h1>
+                <h1 className="text-3xl font-bold text-aftras-blue-border">{t('catalog_page.title')}</h1>
                 <div className="relative w-full sm:w-80">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <input
                     type="text"
-                    placeholder="Rechercher un produit..."
+                    placeholder={t('catalog_page.search_placeholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-aftras-blue-text focus:border-transparent outline-none"
@@ -123,13 +122,13 @@ export const Catalog = () => {
                           referrerPolicy="no-referrer"
                         />
                         <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-aftras-blue-text uppercase tracking-widest">
-                          {product.category}
+                          {t(`catalog_page.category_list.${product.category}`)}
                         </div>
                       </div>
                       <div className="p-6">
                         <h3 className="text-xl font-bold text-gray-900 mb-2">{product.name}</h3>
                         <p className="text-gray-600 text-sm line-clamp-2 mb-6">
-                          {product.description || "Produit de haute qualité sourcé par nos experts pour vos besoins d'import-export."}
+                          {product.description || t('catalog_page.default_desc')}
                         </p>
                         <Link 
                           to="/loi" 
@@ -137,7 +136,7 @@ export const Catalog = () => {
                           className="w-full flex items-center justify-center bg-aftras-orange text-white py-3 rounded-xl font-bold hover:bg-opacity-90 transition-colors"
                         >
                           <ShoppingCart className="w-4 h-4 mr-2" />
-                          Demander LOI
+                          {t('catalog_page.request_loi')}
                         </Link>
                       </div>
                     </div>
@@ -145,7 +144,7 @@ export const Catalog = () => {
                 </div>
               ) : (
                 <div className="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
-                  <p className="text-gray-500 text-lg">Aucun produit trouvé pour cette sélection.</p>
+                  <p className="text-gray-500 text-lg">{t('catalog_page.no_products')}</p>
                 </div>
               )}
             </main>

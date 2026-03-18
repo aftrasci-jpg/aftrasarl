@@ -2,40 +2,42 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
-const slides = [
-  {
-    image: 'https://images.unsplash.com/photo-1494412574743-01947f04824d?auto=format&fit=crop&q=80&w=1920',
-    title: 'Votre partenaire de négoce international fiable',
-    subtitle: 'Nous facilitons vos échanges commerciaux globaux.',
-    cta: 'Voir le catalogue',
-    link: '/catalog'
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1920',
-    title: 'Nous identifions les meilleurs fournisseurs',
-    subtitle: 'Un sourcing rigoureux pour garantir la qualité de vos produits.',
-    cta: 'Nos services',
-    link: '/services'
-  },
-  {
-    image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=1920',
-    title: 'Transactions sécurisées et accompagnement complet',
-    subtitle: 'De la négociation à la logistique finale.',
-    cta: 'Créer un compte',
-    link: '/register'
-  }
-];
+import { useTranslation } from 'react-i18next';
 
 export const HeroSlider = () => {
+  const { t } = useTranslation();
   const [current, setCurrent] = useState(0);
+
+  const slides = [
+    {
+      image: 'https://images.unsplash.com/photo-1494412574743-01947f04824d?auto=format&fit=crop&q=80&w=1920',
+      title: t('home.hero.0.title'),
+      subtitle: t('home.hero.0.subtitle'),
+      cta: t('home.hero.0.cta'),
+      link: '/catalog'
+    },
+    {
+      image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1920',
+      title: t('home.hero.1.title'),
+      subtitle: t('home.hero.1.subtitle'),
+      cta: t('home.hero.1.cta'),
+      link: '/services'
+    },
+    {
+      image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=1920',
+      title: t('home.hero.2.title'),
+      subtitle: t('home.hero.2.subtitle'),
+      cta: t('home.hero.2.cta'),
+      link: '/register'
+    }
+  ];
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrent((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [slides.length]);
 
   const next = () => setCurrent((prev) => (prev === slides.length - 1 ? 0 : prev + 1));
   const prev = () => setCurrent((prev) => (prev === 0 ? slides.length - 1 : prev - 1));

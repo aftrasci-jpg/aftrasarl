@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
 import { Mail, Lock, LogIn, AlertCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export const Login = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,7 +21,7 @@ export const Login = () => {
       await signInWithEmailAndPassword(auth, email, password);
       navigate('/dashboard');
     } catch (err: any) {
-      setError("Email ou mot de passe incorrect.");
+      setError(t('login_page.error'));
     } finally {
       setLoading(false);
     }
@@ -35,11 +37,11 @@ export const Login = () => {
               <span className="text-2xl font-bold text-orange-500 ml-1">CI</span>
             </div>
             <span className="text-[10px] font-medium text-gray-500 -mt-1 tracking-wider uppercase">
-              Transparence-Fiabilité-Croissance
+              {t('common.slogan')}
             </span>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">Bon retour !</h1>
-          <p className="text-gray-500 mt-2">Connectez-vous à votre compte entreprise</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('login_page.title')}</h1>
+          <p className="text-gray-500 mt-2">{t('login_page.subtitle')}</p>
         </div>
 
         {error && (
@@ -51,7 +53,7 @@ export const Login = () => {
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Email professionnel</label>
+            <label className="block text-sm font-bold text-gray-700 mb-2">{t('login_page.form.email')}</label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -66,7 +68,7 @@ export const Login = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Mot de passe</label>
+            <label className="block text-sm font-bold text-gray-700 mb-2">{t('login_page.form.password')}</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -89,16 +91,16 @@ export const Login = () => {
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
             ) : (
               <>
-                <LogIn className="w-5 h-5 mr-2" /> Se connecter
+                <LogIn className="w-5 h-5 mr-2" /> {t('login_page.form.submit')}
               </>
             )}
           </button>
         </form>
 
         <p className="text-center mt-8 text-gray-600 text-sm">
-          Pas encore de compte ?{' '}
+          {t('login_page.no_account')}{' '}
           <Link to="/register" className="text-aftras-blue-text font-bold hover:underline">
-            Créer un compte entreprise
+            {t('login_page.create_account')}
           </Link>
         </p>
       </div>

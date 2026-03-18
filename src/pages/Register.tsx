@@ -4,8 +4,10 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase';
 import { Building2, User, Mail, Lock, Globe, Phone, MapPin, Briefcase } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export const Register = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     companyName: '',
     country: '',
@@ -26,7 +28,7 @@ export const Register = () => {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      setError("Les mots de passe ne correspondent pas.");
+      setError(t('register_page.error_password'));
       return;
     }
 
@@ -52,7 +54,7 @@ export const Register = () => {
       navigate('/dashboard');
     } catch (err: any) {
       console.error(err);
-      setError("Une erreur est survenue lors de la création du compte.");
+      setError(t('register_page.error_generic'));
     } finally {
       setLoading(false);
     }
@@ -68,11 +70,11 @@ export const Register = () => {
               <span className="text-3xl font-bold text-orange-500 ml-1">CI</span>
             </div>
             <span className="text-xs font-medium text-gray-500 -mt-1 tracking-wider uppercase">
-              Transparence-Fiabilité-Croissance
+              {t('common.slogan')}
             </span>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Créer un compte entreprise</h1>
-          <p className="text-gray-500 mt-2">Rejoignez notre réseau de partenaires commerciaux</p>
+          <h1 className="text-3xl font-bold text-gray-900">{t('register_page.title')}</h1>
+          <p className="text-gray-500 mt-2">{t('register_page.subtitle')}</p>
         </div>
 
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
@@ -86,11 +88,11 @@ export const Register = () => {
             {/* Section: Entreprise */}
             <div className="space-y-6">
               <h3 className="text-lg font-bold text-aftras-blue-border flex items-center border-b pb-2">
-                <Building2 className="w-5 h-5 mr-2" /> Informations Entreprise
+                <Building2 className="w-5 h-5 mr-2" /> {t('register_page.sections.company')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Nom de l'entreprise *</label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">{t('register_page.form.company_name')}</label>
                   <input
                     required
                     type="text"
@@ -100,7 +102,7 @@ export const Register = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Pays *</label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">{t('register_page.form.country')}</label>
                   <input
                     required
                     type="text"
@@ -110,7 +112,7 @@ export const Register = () => {
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Adresse complète *</label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">{t('register_page.form.address')}</label>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
@@ -123,7 +125,7 @@ export const Register = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Site Web (Optionnel)</label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">{t('register_page.form.website')}</label>
                   <div className="relative">
                     <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
@@ -141,11 +143,11 @@ export const Register = () => {
             {/* Section: Représentant */}
             <div className="space-y-6">
               <h3 className="text-lg font-bold text-aftras-blue-border flex items-center border-b pb-2">
-                <User className="w-5 h-5 mr-2" /> Représentant de l'entreprise
+                <User className="w-5 h-5 mr-2" /> {t('register_page.sections.representative')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Nom complet *</label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">{t('register_page.form.rep_name')}</label>
                   <input
                     required
                     type="text"
@@ -155,7 +157,7 @@ export const Register = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Fonction / Poste *</label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">{t('register_page.form.position')}</label>
                   <div className="relative">
                     <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
@@ -168,7 +170,7 @@ export const Register = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Email professionnel *</label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">{t('register_page.form.email')}</label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
@@ -181,7 +183,7 @@ export const Register = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Téléphone / WhatsApp *</label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">{t('register_page.form.phone')}</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
@@ -199,22 +201,22 @@ export const Register = () => {
             {/* Section: Sécurité */}
             <div className="space-y-6">
               <h3 className="text-lg font-bold text-aftras-blue-border flex items-center border-b pb-2">
-                <Lock className="w-5 h-5 mr-2" /> Sécurité
+                <Lock className="w-5 h-5 mr-2" /> {t('register_page.sections.security')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Mot de passe *</label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">{t('register_page.form.password')}</label>
                   <input
                     required
                     type="password"
                     value={formData.password}
                     onChange={(e) => setFormData({...formData, password: e.target.value})}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-aftras-blue-text outline-none"
-                    placeholder="Min. 6 caractères"
+                    placeholder={t('register_page.form.password_placeholder')}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Confirmer le mot de passe *</label>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">{t('register_page.form.confirm_password')}</label>
                   <input
                     required
                     type="password"
@@ -234,16 +236,16 @@ export const Register = () => {
               {loading ? (
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto" />
               ) : (
-                "Créer mon compte entreprise"
+                t('register_page.form.submit')
               )}
             </button>
           </form>
         </div>
 
         <p className="text-center mt-8 text-gray-600">
-          Vous avez déjà un compte ?{' '}
+          {t('register_page.has_account')}{' '}
           <Link to="/login" className="text-aftras-blue-text font-bold hover:underline">
-            Se connecter
+            {t('register_page.login')}
           </Link>
         </p>
       </div>

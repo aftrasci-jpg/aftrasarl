@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { collection, onSnapshot, query, orderBy, doc, updateDoc, addDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { LOI, Product, STATUS_COLORS, STATUS_LABELS, LOIStatus } from '../types';
+import { LOI, Product, STATUS_COLORS, LOIStatus, PRODUCT_CATEGORIES, ProductCategory } from '../types';
 import { Plus, Trash2, Edit, CheckCircle2, X, Package, FileText, Send, Image as ImageIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 export const Admin = () => {
+  const { t } = useTranslation();
   const { isAdmin } = useAuth();
   const [lois, setLois] = useState<LOI[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -15,10 +17,28 @@ export const Admin = () => {
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
+  const STATUS_LABELS: Record<string, string> = {
+    searching: t('dashboard.status.searching'),
+    negotiating: t('dashboard.status.negotiating'),
+    finalized: t('dashboard.status.finalized'),
+    cancelled: t('dashboard.status.cancelled')
+  };
+
+  const CATEGORIES = PRODUCT_CATEGORIES.map(cat => ({
+    id: cat,
+    label: t(`catalog_page.category_list.${cat}`)
+  }));
+
   // Form states
-  const [productForm, setProductForm] = useState({
+  const [productForm, setProductForm] = useState<{
+    name: string;
+    category: ProductCategory;
+    description: string;
+    imageUrl: string;
+    isFeatured: boolean;
+  }>({
     name: '',
-    category: 'Céréales & Grains',
+    category: PRODUCT_CATEGORIES[0],
     description: '',
     imageUrl: '',
     isFeatured: false
@@ -63,14 +83,14 @@ export const Admin = () => {
       }
       setIsProductModalOpen(false);
       setEditingProduct(null);
-      setProductForm({ name: '', category: 'Céréales & Grains', description: '', imageUrl: '', isFeatured: false });
+      setProductForm({ name: '', category: PRODUCT_CATEGORIES[0], description: '', imageUrl: '', isFeatured: false });
     } catch (error) {
       console.error("Product save error:", error);
     }
   };
 
   const handleDeleteProduct = async (id: string) => {
-    if (window.confirm("Supprimer ce produit ?")) {
+    if (window.confirm(t('admin_page.products.confirm_delete'))) {
       await deleteDoc(doc(db, 'products', id));
     }
   };
@@ -94,12 +114,12 @@ export const Admin = () => {
     }
   };
 
-  if (!isAdmin) return <div className="p-20 text-center">Accès refusé.</div>;
+  if (!isAdmin) return <div className="p-20 text-center">{t('admin_page.access_denied')}</div>;
 
   return (
     <div className="bg-gray-50 min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-aftras-blue-border mb-12">Administration</h1>
+        <h1 className="text-3xl font-bold text-aftras-blue-border mb-12">{t('admin_page.title')}</h1>
 
         {/* Tabs */}
         <div className="flex space-x-4 mb-8">
@@ -109,7 +129,7 @@ export const Admin = () => {
               activeTab === 'lois' ? 'bg-aftras-blue-text text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
             }`}
           >
-            Gestion des LOI ({lois.length})
+            {t('admin_page.tabs.lois')} ({lois.length})
           </button>
           <button
             onClick={() => setActiveTab('products')}
@@ -117,7 +137,7 @@ export const Admin = () => {
               activeTab === 'products' ? 'bg-aftras-blue-text text-white' : 'bg-white text-gray-600 hover:bg-gray-100'
             }`}
           >
-            Gestion Catalogue ({products.length})
+            {t('admin_page.tabs.catalog')} ({products.length})
           </button>
         </div>
 
@@ -169,26 +189,26 @@ export const Admin = () => {
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
                         {/* Details */}
                         <div>
-                          <h4 className="font-bold text-aftras-blue-border mb-4 uppercase text-xs tracking-widest">Détails de la demande</h4>
+                          <h4 className="font-bold text-aftras-blue-border mb-4 uppercase text-xs tracking-widest">{t('admin_page.lois.details_title')}</h4>
                           <div className="grid grid-cols-2 gap-4 text-sm">
-                            <p className="text-gray-500">Budget:</p><p className="font-medium">{loi.budget || 'N/A'}</p>
-                            <p className="text-gray-500">Incoterm:</p><p className="font-medium">{loi.incoterm || 'N/A'}</p>
-                            <p className="text-gray-500">Port:</p><p className="font-medium">{loi.port || 'N/A'}</p>
-                            <p className="text-gray-500">Délai:</p><p className="font-medium">{loi.deadline || 'N/A'}</p>
+                            <p className="text-gray-500">{t('loi_form.form.budget_label')}:</p><p className="font-medium">{loi.budget || 'N/A'}</p>
+                            <p className="text-gray-500">{t('loi_form.form.incoterm_label')}:</p><p className="font-medium">{loi.incoterm || 'N/A'}</p>
+                            <p className="text-gray-500">{t('loi_form.form.port_label')}:</p><p className="font-medium">{loi.port || 'N/A'}</p>
+                            <p className="text-gray-500">{t('loi_form.form.deadline_label')}:</p><p className="font-medium">{loi.deadline || 'N/A'}</p>
                           </div>
                           <div className="mt-4">
-                            <p className="text-gray-500 text-sm mb-1">Infos complémentaires:</p>
+                            <p className="text-gray-500 text-sm mb-1">{t('loi_form.sections.additional')}:</p>
                             <p className="text-gray-700 text-sm italic">{loi.additionalInfo || 'Aucune.'}</p>
                           </div>
                         </div>
 
                         {/* Response Form */}
                         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                          <h4 className="font-bold text-aftras-blue-border mb-6 uppercase text-xs tracking-widest">Réponse automatisée</h4>
+                          <h4 className="font-bold text-aftras-blue-border mb-6 uppercase text-xs tracking-widest">{t('admin_page.lois.response_title')}</h4>
                           <div className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1">Statut</label>
+                                <label className="block text-xs font-bold text-gray-500 mb-1">{t('admin_page.lois.form.status')}</label>
                                 <select 
                                   value={responseForm.status}
                                   onChange={(e) => setResponseForm({...responseForm, status: e.target.value as LOIStatus})}
@@ -200,7 +220,7 @@ export const Admin = () => {
                                 </select>
                               </div>
                               <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1">Quantité proposée</label>
+                                <label className="block text-xs font-bold text-gray-500 mb-1">{t('dashboard.admin_response.proposed_quantity')}</label>
                                 <input 
                                   type="text" 
                                   value={responseForm.proposedQuantity}
@@ -211,7 +231,7 @@ export const Admin = () => {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1">Prix proposé</label>
+                                <label className="block text-xs font-bold text-gray-500 mb-1">{t('dashboard.admin_response.proposed_price')}</label>
                                 <input 
                                   type="text" 
                                   value={responseForm.price}
@@ -220,7 +240,7 @@ export const Admin = () => {
                                 />
                               </div>
                               <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1">Délai (jours)</label>
+                                <label className="block text-xs font-bold text-gray-500 mb-1">{t('dashboard.admin_response.delivery_time')}</label>
                                 <input 
                                   type="text" 
                                   value={responseForm.deliveryTime}
@@ -233,7 +253,7 @@ export const Admin = () => {
                               onClick={() => handleLoiResponse(loi)}
                               className="w-full bg-aftras-orange text-white py-3 rounded-xl font-bold text-sm hover:bg-opacity-90 transition-all flex items-center justify-center"
                             >
-                              <Send className="w-4 h-4 mr-2" /> Mettre à jour & Envoyer
+                              <Send className="w-4 h-4 mr-2" /> {t('admin_page.lois.form.submit')}
                             </button>
                           </div>
                         </div>
@@ -250,16 +270,16 @@ export const Admin = () => {
         {activeTab === 'products' && (
           <div>
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-xl font-bold text-aftras-blue-border">Catalogue Produits</h2>
+              <h2 className="text-xl font-bold text-aftras-blue-border">{t('admin_page.products.title')}</h2>
               <button 
                 onClick={() => {
                   setEditingProduct(null);
-                  setProductForm({ name: '', category: 'Céréales & Grains', description: '', imageUrl: '', isFeatured: false });
+                  setProductForm({ name: '', category: PRODUCT_CATEGORIES[0], description: '', imageUrl: '', isFeatured: false });
                   setIsProductModalOpen(true);
                 }}
                 className="bg-aftras-orange text-white px-6 py-3 rounded-xl font-bold hover:bg-opacity-90 transition-all flex items-center"
               >
-                <Plus className="w-5 h-5 mr-2" /> Ajouter un produit
+                <Plus className="w-5 h-5 mr-2" /> {t('admin_page.products.add_btn')}
               </button>
             </div>
 
@@ -269,11 +289,13 @@ export const Admin = () => {
                   <div className="h-40 overflow-hidden relative">
                     <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                     {product.isFeatured && (
-                      <div className="absolute top-2 right-2 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded-full">VEDETTE</div>
+                      <div className="absolute top-2 right-2 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded-full">{t('catalog_page.featured_badge')}</div>
                     )}
                   </div>
                   <div className="p-4 flex-grow">
-                    <p className="text-xs font-bold text-aftras-blue-text uppercase mb-1">{product.category}</p>
+                    <p className="text-xs font-bold text-aftras-blue-text uppercase mb-1">
+                      {t(`catalog_page.category_list.${product.category}`)}
+                    </p>
                     <h3 className="font-bold text-gray-900">{product.name}</h3>
                   </div>
                   <div className="p-4 border-t border-gray-50 flex justify-end space-x-2">
@@ -282,7 +304,7 @@ export const Admin = () => {
                         setEditingProduct(product);
                         setProductForm({
                           name: product.name,
-                          category: product.category,
+                          category: product.category as ProductCategory,
                           description: product.description || '',
                           imageUrl: product.imageUrl,
                           isFeatured: product.isFeatured
@@ -317,13 +339,13 @@ export const Admin = () => {
                 className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden"
               >
                 <div className="bg-aftras-blue-text p-6 text-white flex justify-between items-center">
-                  <h3 className="text-xl font-bold">{editingProduct ? 'Modifier le produit' : 'Ajouter un produit'}</h3>
+                  <h3 className="text-xl font-bold">{editingProduct ? t('admin_page.products.modal.edit_title') : t('admin_page.products.modal.add_title')}</h3>
                   <button onClick={() => setIsProductModalOpen(false)}><X className="w-6 h-6" /></button>
                 </div>
                 <form onSubmit={handleProductSubmit} className="p-8 space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">Nom du produit</label>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">{t('admin_page.products.modal.name')}</label>
                       <input 
                         required
                         type="text" 
@@ -333,24 +355,20 @@ export const Admin = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">Catégorie</label>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">{t('admin_page.products.modal.category')}</label>
                       <select 
                         value={productForm.category}
-                        onChange={(e) => setProductForm({...productForm, category: e.target.value})}
+                        onChange={(e) => setProductForm({...productForm, category: e.target.value as ProductCategory})}
                         className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text"
                       >
-                        <option value="Céréales & Grains">Céréales & Grains</option>
-                        <option value="Légumineuses">Légumineuses</option>
-                        <option value="Noix & Oléagineux">Noix & Oléagineux</option>
-                        <option value="Produits d’export">Produits d’export</option>
-                        <option value="Épices & Condiments">Épices & Condiments</option>
-                        <option value="Fruits & Légumes">Fruits & Légumes</option>
-                        <option value="Produits transformés">Produits transformés</option>
+                        {CATEGORIES.map(cat => (
+                          <option key={cat.id} value={cat.id}>{cat.label}</option>
+                        ))}
                       </select>
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">URL de l'image (Cloudinary)</label>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">{t('admin_page.products.modal.image_url')}</label>
                     <div className="flex space-x-2">
                       <div className="flex-grow relative">
                         <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -366,7 +384,7 @@ export const Admin = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">Description</label>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">{t('admin_page.products.modal.description')}</label>
                       <textarea 
                         rows={3}
                         value={productForm.description}
@@ -382,10 +400,10 @@ export const Admin = () => {
                       onChange={(e) => setProductForm({...productForm, isFeatured: e.target.checked})}
                       className="w-5 h-5 text-aftras-blue-text rounded border-gray-300 focus:ring-aftras-blue-text"
                     />
-                    <label htmlFor="isFeatured" className="ml-3 text-sm font-bold text-gray-700">Produit Vedette (Slider)</label>
+                    <label htmlFor="isFeatured" className="ml-3 text-sm font-bold text-gray-700">{t('admin_page.products.modal.featured')}</label>
                   </div>
                   <button type="submit" className="w-full bg-aftras-orange text-white py-4 rounded-xl font-bold hover:bg-opacity-90 transition-all">
-                    Enregistrer le produit
+                    {t('admin_page.products.modal.submit')}
                   </button>
                 </form>
               </motion.div>

@@ -67,3 +67,15 @@ export const STATUS_LABELS: Record<LOIStatus, string> = {
   provider_identified: 'Fournisseur identifié',
   finalized: 'Transaction finalisée',
 };
+
+export const PRODUCT_CATEGORIES = [
+  'cereals',
+  'legumes',
+  'nuts',
+  'export',
+  'spices',
+  'fruits',
+  'processed'
+] as const;
+
+export type ProductCategory = typeof PRODUCT_CATEGORIES[number];

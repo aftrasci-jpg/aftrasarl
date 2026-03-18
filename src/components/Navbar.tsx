@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Menu, X, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { Menu, X, User, LogOut, LayoutDashboard, Globe } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { useTranslation } from 'react-i18next';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -15,18 +16,24 @@ export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, profile, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
 
   const handleLogout = async () => {
     await signOut(auth);
     navigate('/');
   };
 
+  const toggleLanguage = () => {
+    const newLang = i18n.language === 'fr' ? 'en' : 'fr';
+    i18n.changeLanguage(newLang);
+  };
+
   const navLinks = [
-    { name: 'Accueil', path: '/' },
-    { name: 'À propos', path: '/about' },
-    { name: 'Services', path: '/services' },
-    { name: 'Catalogue', path: '/catalog' },
-    { name: 'Contact', path: '/contact' },
+    { name: t('common.home'), path: '/' },
+    { name: t('common.about'), path: '/about' },
+    { name: t('common.services'), path: '/services' },
+    { name: t('common.catalog'), path: '/catalog' },
+    { name: t('common.contact'), path: '/contact' },
   ];
 
   return (
@@ -40,7 +47,7 @@ export const Navbar = () => {
                 <span className="text-2xl font-bold text-aftras-orange ml-1">CI</span>
               </div>
               <span className="text-[10px] font-medium text-gray-500 -mt-1 tracking-wider uppercase">
-                Transparence-Fiabilité-Croissance
+                {t('common.slogan')}
               </span>
             </Link>
           </div>
@@ -62,6 +69,15 @@ export const Navbar = () => {
               </NavLink>
             ))}
 
+            {/* Language Switcher */}
+            <button 
+              onClick={toggleLanguage}
+              className="flex items-center text-sm font-bold text-aftras-blue-text hover:text-aftras-orange transition-colors"
+            >
+              <Globe className="w-4 h-4 mr-1" />
+              {i18n.language.toUpperCase().substring(0, 2)}
+            </button>
+
             {user ? (
               <div className="flex items-center space-x-4">
                 <Link
@@ -69,14 +85,14 @@ export const Navbar = () => {
                   className="flex items-center text-sm font-medium text-aftras-blue-text hover:text-aftras-orange"
                 >
                   <LayoutDashboard className="w-4 h-4 mr-1" />
-                  {isAdmin ? "Admin" : "Dashboard"}
+                  {isAdmin ? t('common.admin') : t('common.dashboard')}
                 </Link>
                 <button
                   onClick={handleLogout}
                   className="flex items-center text-sm font-medium text-red-600 hover:text-red-800"
                 >
                   <LogOut className="w-4 h-4 mr-1" />
-                  Déconnexion
+                  {t('common.logout')}
                 </button>
               </div>
             ) : (
@@ -85,20 +101,27 @@ export const Navbar = () => {
                   to="/login"
                   className="text-sm font-medium text-gray-600 hover:text-aftras-blue-text"
                 >
-                  Se connecter
+                  {t('common.login')}
                 </Link>
                 <Link
                   to="/register"
                   className="bg-aftras-blue-text text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-opacity-90 transition-colors"
                 >
-                  Créer un compte
+                  {t('navbar.create_account')}
                 </Link>
               </div>
             )}
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center space-x-4">
+            <button 
+              onClick={toggleLanguage}
+              className="flex items-center text-sm font-bold text-aftras-blue-text"
+            >
+              <Globe className="w-4 h-4 mr-1" />
+              {i18n.language.toUpperCase().substring(0, 2)}
+            </button>
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none"
@@ -135,7 +158,7 @@ export const Navbar = () => {
                   onClick={() => setIsOpen(false)}
                   className="block px-3 py-2 rounded-md text-base font-medium text-aftras-blue-text hover:bg-gray-50"
                 >
-                  {isAdmin ? "Admin Dashboard" : "Tableau de bord"}
+                  {isAdmin ? t('common.admin') : t('common.dashboard')}
                 </Link>
                 <button
                   onClick={() => {
@@ -144,7 +167,7 @@ export const Navbar = () => {
                   }}
                   className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-gray-50"
                 >
-                  Déconnexion
+                  {t('common.logout')}
                 </button>
               </>
             ) : (
@@ -154,14 +177,14 @@ export const Navbar = () => {
                   onClick={() => setIsOpen(false)}
                   className="block px-3 py-2 rounded-md text-base font-medium text-gray-600 hover:bg-gray-50"
                 >
-                  Se connecter
+                  {t('common.login')}
                 </Link>
                 <Link
                   to="/register"
                   onClick={() => setIsOpen(false)}
                   className="block px-3 py-2 rounded-md text-base font-medium text-aftras-blue-text hover:bg-gray-50"
                 >
-                  Créer un compte
+                  {t('navbar.create_account')}
                 </Link>
               </>
             )}

@@ -1,29 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Phone, Mail, MapPin, Send, MessageSquare, Globe } from 'lucide-react';
-
-const representatives = [
-  {
-    region: 'Afrique',
-    name: 'Mr. Evariste Cyr Major Kahiba GNONSKAN',
-    whatsapp: '+225 0141 354 860',
-    icon: Globe
-  },
-  {
-    region: 'Asie',
-    name: 'Mr. Quevin ZOH',
-    whatsapp: '+91 96259 16929',
-    icon: Globe
-  },
-  {
-    region: 'Europe',
-    name: 'Mme. Merfeuh NGUEYEP',
-    whatsapp: '+41 77 920 83 18',
-    icon: Globe
-  }
-];
+import { Phone, Mail, MapPin, Send, MessageSquare, Globe, CheckCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export const Contact = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     companyName: '',
     contactName: '',
@@ -33,6 +14,27 @@ export const Contact = () => {
     message: ''
   });
   const [success, setSuccess] = useState(false);
+
+  const representatives = [
+    {
+      region: t('footer.contacts.africa.region'),
+      name: 'Mr. Evariste Cyr Major Kahiba GNONSKAN',
+      whatsapp: '+225 0141 354 860',
+      icon: Globe
+    },
+    {
+      region: t('footer.contacts.asia.region'),
+      name: 'Mr. Quevin ZOH',
+      whatsapp: '+91 96259 16929',
+      icon: Globe
+    },
+    {
+      region: t('footer.contacts.europe.region'),
+      name: 'Mme. Merfeuh NGUEYEP',
+      whatsapp: '+41 77 920 83 18',
+      icon: Globe
+    }
+  ];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +53,7 @@ export const Contact = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-5xl font-bold mb-6"
           >
-            Contactez nos représentants
+            {t('contact_page.title')}
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -59,7 +61,7 @@ export const Contact = () => {
             transition={{ delay: 0.2 }}
             className="text-xl text-blue-100 max-w-2xl mx-auto"
           >
-            Pour toute demande ou assistance, contactez le représentant dans votre région.
+            {t('contact_page.subtitle')}
           </motion.p>
         </div>
       </section>
@@ -70,7 +72,7 @@ export const Contact = () => {
             
             {/* Representatives List */}
             <div className="lg:col-span-1 space-y-8">
-              <h2 className="text-2xl font-bold text-aftras-blue-border mb-8">Nos Bureaux Régionaux</h2>
+              <h2 className="text-2xl font-bold text-aftras-blue-border mb-8">{t('contact_page.offices')}</h2>
               {representatives.map((rep, i) => (
                 <motion.div 
                   key={i}
@@ -102,19 +104,19 @@ export const Contact = () => {
             {/* Contact Form */}
             <div className="lg:col-span-2">
               <div className="bg-white p-10 rounded-3xl shadow-xl border border-gray-100">
-                <h2 className="text-2xl font-bold text-aftras-blue-border mb-8">Formulaire de contact rapide</h2>
+                <h2 className="text-2xl font-bold text-aftras-blue-border mb-8">{t('contact_page.form_title')}</h2>
                 
                 {success ? (
                   <div className="bg-green-50 p-8 rounded-2xl text-center border border-green-100">
                     <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" />
-                    <h3 className="text-xl font-bold text-green-900 mb-2">Message envoyé !</h3>
-                    <p className="text-green-700">Merci de nous avoir contactés. Un représentant prendra contact avec vous très prochainement.</p>
+                    <h3 className="text-xl font-bold text-green-900 mb-2">{t('contact_page.success_title')}</h3>
+                    <p className="text-green-700">{t('contact_page.success_desc')}</p>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-2">Nom de l'entreprise</label>
+                        <label className="block text-sm font-bold text-gray-700 mb-2">{t('contact_page.form.company')}</label>
                         <input
                           required
                           type="text"
@@ -124,7 +126,7 @@ export const Contact = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-2">Nom du contact</label>
+                        <label className="block text-sm font-bold text-gray-700 mb-2">{t('contact_page.form.name')}</label>
                         <input
                           required
                           type="text"
@@ -134,7 +136,7 @@ export const Contact = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-2">Email</label>
+                        <label className="block text-sm font-bold text-gray-700 mb-2">{t('contact_page.form.email')}</label>
                         <input
                           required
                           type="email"
@@ -144,7 +146,7 @@ export const Contact = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-2">Téléphone / WhatsApp</label>
+                        <label className="block text-sm font-bold text-gray-700 mb-2">{t('contact_page.form.phone')}</label>
                         <input
                           required
                           type="text"
@@ -155,20 +157,20 @@ export const Contact = () => {
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">Région concernée</label>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">{t('contact_page.form.region')}</label>
                       <select
                         value={formData.region}
                         onChange={(e) => setFormData({...formData, region: e.target.value})}
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-aftras-blue-text outline-none"
                       >
-                        <option value="Afrique">Afrique</option>
-                        <option value="Asie">Asie</option>
-                        <option value="Europe">Europe</option>
-                        <option value="Autre">Autre</option>
+                        <option value="Afrique">{t('footer.contacts.africa.region')}</option>
+                        <option value="Asie">{t('footer.contacts.asia.region')}</option>
+                        <option value="Europe">{t('footer.contacts.europe.region')}</option>
+                        <option value="Autre">{t('contact_page.form.other')}</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">Votre message</label>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">{t('contact_page.form.message')}</label>
                       <textarea
                         required
                         rows={4}
@@ -181,7 +183,7 @@ export const Contact = () => {
                         type="submit"
                         className="w-full bg-aftras-orange text-white py-4 rounded-xl font-bold text-lg hover:bg-opacity-90 transition-all flex items-center justify-center shadow-lg shadow-aftras-orange/20"
                       >
-                        <Send className="w-5 h-5 mr-2" /> Envoyer le message
+                        <Send className="w-5 h-5 mr-2" /> {t('contact_page.form.submit')}
                       </button>
                   </form>
                 )}
@@ -193,9 +195,3 @@ export const Contact = () => {
     </div>
   );
 };
-
-const CheckCircle = ({ className }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-);

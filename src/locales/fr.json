@@ -1,0 +1,321 @@
+{
+  "common": {
+    "welcome": "Bon retour !",
+    "login": "Se connecter",
+    "register": "Créer un compte",
+    "logout": "Déconnexion",
+    "dashboard": "Tableau de bord",
+    "admin": "Admin",
+    "home": "Accueil",
+    "about": "À propos",
+    "services": "Services",
+    "catalog": "Catalogue",
+    "contact": "Contact",
+    "slogan": "Transparence-Fiabilité-Croissance",
+    "all_rights_reserved": "Tous droits réservés.",
+    "footer_disclaimer": "AFTRAS CI agit comme intermédiaire. Les contrats et paiements sont réalisés directement entre les parties.",
+    "learn_more": "En savoir plus",
+    "send": "Envoyer",
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue.",
+    "success": "Succès !"
+  },
+  "navbar": {
+    "create_account": "Créer un compte"
+  },
+  "footer": {
+    "company_desc": "Africa Trading Solutions Côte d'Ivoire SARL. Votre partenaire de négoce international fiable. Nous facilitons les échanges commerciaux entre l'Afrique et le reste du monde.",
+    "quick_links": "Liens Rapides",
+    "our_services": "Nos Services",
+    "contact": "Contact"
+  },
+  "home": {
+    "hero": [
+      {
+        "title": "Votre partenaire de négoce international fiable",
+        "subtitle": "Nous facilitons vos échanges commerciaux globaux.",
+        "cta": "Voir le catalogue"
+      },
+      {
+        "title": "Nous identifions les meilleurs fournisseurs",
+        "subtitle": "Un sourcing rigoureux pour garantir la qualité de vos produits.",
+        "cta": "Nos services"
+      },
+      {
+        "title": "Transactions sécurisées et accompagnement complet",
+        "subtitle": "De la négociation à la logistique finale.",
+        "cta": "Créer un compte"
+      }
+    ],
+    "how_we_work": {
+      "title": "Comment nous travaillons",
+      "subtitle": "Un processus structuré pour garantir le succès de vos opérations d'import-export.",
+      "steps": [
+        { "title": "Analyse des besoins", "desc": "Nous étudions vos spécifications techniques et volumes." },
+        { "title": "Sourcing fournisseurs", "desc": "Identification des meilleurs partenaires globaux." },
+        { "title": "Négociation & Sécurisation", "desc": "Optimisation des prix et sécurisation des contrats." },
+        { "title": "Logistique & Livraison", "desc": "Suivi complet jusqu’à destination finale." }
+      ]
+    },
+    "featured_products": {
+      "title": "Produits Vedettes",
+      "subtitle": "Découvrez une sélection de nos produits les plus demandés.",
+      "view_all": "Voir tout le catalogue"
+    },
+    "services_summary": {
+      "title": "Nos Services d'Expertise",
+      "desc": "AFTRAS CI offre un accompagnement de bout en bout pour vos besoins en négoce international.",
+      "cta": "En savoir plus sur nos services",
+      "secure_reliable": "100% Sécurisé & Fiable"
+    },
+    "why_choose_us": {
+      "title": "Pourquoi nous choisir ?",
+      "items": [
+        { "title": "Réseau International", "desc": "Accès privilégié à des fournisseurs en Asie, Europe et Amérique." },
+        { "title": "Expertise & Sécurisation", "desc": "Maîtrise des risques et des procédures internationales." },
+        { "title": "Optimisation des Coûts", "desc": "Négociation agressive pour maximiser vos marges." }
+      ]
+    },
+    "cta": {
+      "title": "Prêt à lancer votre demande ?",
+      "desc": "Créez votre compte entreprise dès aujourd'hui et envoyez votre première Lettre d'Intention (LOI).",
+      "register": "Créer mon compte",
+      "login": "Se connecter"
+    }
+  },
+  "about": {
+    "title": "À Propos d'AFTRAS CI",
+    "subtitle": "Votre partenaire stratégique pour le négoce international et l'intermédiation commerciale.",
+    "who_are_we": {
+      "title": "Qui sommes-nous ?",
+      "p1": "Africa Trading Solutions Côte d'Ivoire SARL (AFTRAS CI) est une société de négoce international spécialisée dans l'intermédiation commerciale et le sourcing de produits de haute qualité. Basés stratégiquement pour servir les marchés africains et internationaux, nous agissons comme un pont fiable entre les producteurs mondiaux et les acheteurs exigeants.",
+      "p2": "Notre expertise repose sur une connaissance approfondie des chaînes d'approvisionnement mondiales et une capacité unique à naviguer dans les complexités du commerce international. Nous ne nous contentons pas de trouver des produits ; nous bâtissons des relations durables basées sur la confiance et la performance."
+    },
+    "vision_mission": {
+      "vision": { "title": "Notre Vision", "desc": "Devenir un acteur panafricain majeur du négoce international, reconnu pour son intégrité et son efficacité opérationnelle." },
+      "mission": { "title": "Notre Mission", "desc": "Faciliter les échanges commerciaux internationaux en offrant des solutions de sourcing et de logistique optimisées et sécurisées." },
+      "engagement": { "title": "Notre Engagement", "desc": "Accompagner nos clients à chaque étape pour garantir des transactions fluides et des résultats concrets." }
+    }
+  },
+  "services_page": {
+    "title": "Nos Services d'Expertise",
+    "subtitle": "Des solutions sur mesure pour optimiser vos opérations de négoce international.",
+    "items": [
+      { "title": "Recherche de Fournisseurs Fiables", "desc": "Nous identifions et auditons des fournisseurs globaux pour garantir la qualité et la fiabilité de vos approvisionnements." },
+      { "title": "Négociation Commerciale", "desc": "Nos experts négocient pour vous les meilleurs prix, délais et conditions de paiement auprès des fournisseurs." },
+      { "title": "Intermédiation Commerciale", "desc": "Nous agissons comme tiers de confiance pour sécuriser les transactions entre acheteurs et vendeurs." },
+      { "title": "Organisation Logistique", "desc": "Suivi complet de l’expédition, de l’enlèvement à la livraison finale, incluant les formalités douanières." },
+      { "title": "Accompagnement Stratégique", "desc": "Conseils sur les marchés internationaux, les incoterms et les régulations commerciales." },
+      { "title": "Sécurisation des Transactions", "desc": "Mise en place de mécanismes de garantie et vérification de la conformité des documents." }
+    ],
+    "approach": {
+      "title": "Notre Approche",
+      "subtitle": "Comment nous garantissons la réussite de vos projets.",
+      "steps": [
+        { "title": "Écoute", "desc": "Compréhension de vos besoins spécifiques." },
+        { "title": "Analyse", "desc": "Étude de faisabilité et sourcing." },
+        { "title": "Action", "desc": "Négociation et contractualisation." },
+        { "title": "Suivi", "desc": "Contrôle qualité et logistique." }
+      ]
+    }
+  },
+  "catalog_page": {
+    "title": "Catalogue Produits",
+    "subtitle": "Découvrez notre sélection de produits de haute qualité.",
+    "search_placeholder": "Rechercher un produit...",
+    "categories": "Catégories",
+    "category_list": {
+      "all": "Tous",
+      "cereals": "Céréales & Grains",
+      "legumes": "Légumineuses",
+      "nuts": "Noix & Oléagineux",
+      "export": "Produits d’export",
+      "spices": "Épices & Condiments",
+      "fruits": "Fruits & Légumes",
+      "processed": "Produits transformés"
+    },
+    "featured": "Produits Vedettes",
+    "featured_desc": "Sélection exclusive de produits à fort potentiel.",
+    "request_loi": "Demander LOI",
+    "no_products": "Aucun produit trouvé pour cette sélection.",
+    "default_desc": "Produit de haute qualité sourcé par nos experts pour vos besoins d'import-export."
+  },
+  "contact_page": {
+    "title": "Contactez nos représentants",
+    "subtitle": "Pour toute demande ou assistance, contactez le représentant dans votre région.",
+    "offices": "Nos Bureaux Régionaux",
+    "form_title": "Formulaire de contact rapide",
+    "success_title": "Message envoyé !",
+    "success_desc": "Merci de nous avoir contactés. Un représentant prendra contact avec vous très prochainement.",
+    "fields": {
+      "company": "Nom de l'entreprise",
+      "contact_name": "Nom du contact",
+      "email": "Email",
+      "phone": "Téléphone / WhatsApp",
+      "region": "Région concernée",
+      "message": "Votre message"
+    },
+    "regions": {
+      "africa": "Afrique",
+      "asia": "Asie",
+      "europe": "Europe",
+      "other": "Autre"
+    }
+  },
+  "loi_form": {
+    "title": "Lettre d'Intention d'Achat (LOI)",
+    "subtitle": "Veuillez remplir ce formulaire avec précision pour nous permettre de trouver le meilleur fournisseur.",
+    "success_title": "LOI Envoyée !",
+    "success_desc": "Votre demande a été enregistrée avec succès. Nos représentants vont l'analyser et vous répondront prochainement.",
+    "redirect": "Redirection vers votre tableau de bord...",
+    "sections": {
+      "product": "Informations sur le produit",
+      "commercial": "Conditions commerciales",
+      "additional": "Informations complémentaires"
+    },
+    "fields": {
+      "product": "Produit demandé *",
+      "product_placeholder": "Ex: Riz long grain, Noix de cajou...",
+      "quantity": "Quantité souhaitée *",
+      "quantity_placeholder": "Ex: 500 MT, 2 conteneurs 40ft...",
+      "budget": "Budget estimé (USD/EUR)",
+      "budget_placeholder": "Ex: 450 USD / MT",
+      "incoterm": "Incoterm souhaité",
+      "port": "Port / Pays de destination",
+      "port_placeholder": "Ex: Port d'Abidjan, Côte d'Ivoire",
+      "deadline": "Délai de livraison souhaité",
+      "deadline_placeholder": "Ex: Sous 30 jours",
+      "additional": "Spécifications techniques, certifications requises, etc.",
+      "serious": "Je déclare que cette demande est sérieuse et que mon entreprise dispose des fonds nécessaires pour conclure la transaction si les conditions sont acceptées."
+    },
+    "submit": "Envoyer la LOI",
+    "confirm_serious": "Veuillez confirmer le sérieux de votre demande."
+  },
+  "auth": {
+    "login_title": "Bon retour !",
+    "login_subtitle": "Connectez-vous à votre compte entreprise",
+    "register_title": "Créer un compte entreprise",
+    "register_subtitle": "Rejoignez notre réseau de partenaires commerciaux",
+    "email": "Email professionnel",
+    "password": "Mot de passe",
+    "confirm_password": "Confirmer le mot de passe",
+    "password_placeholder": "••••••••",
+    "email_placeholder": "email@entreprise.com",
+    "login_btn": "Se connecter",
+    "register_btn": "Créer mon compte entreprise",
+    "no_account": "Pas encore de compte ?",
+    "have_account": "Vous avez déjà un compte ?",
+    "create_account_link": "Créer un compte entreprise",
+    "login_link": "Se connecter",
+    "error_login": "Email ou mot de passe incorrect.",
+    "error_register": "Une erreur est survenue lors de la création du compte.",
+    "password_mismatch": "Les mots de passe ne correspondent pas.",
+    "company_info": "Informations Entreprise",
+    "representative_info": "Représentant de l'entreprise",
+    "security": "Sécurité",
+    "fields": {
+      "company_name": "Nom de l'entreprise *",
+      "country": "Pays *",
+      "address": "Adresse complète *",
+      "website": "Site Web (Optionnel)",
+      "rep_name": "Nom complet *",
+      "position": "Fonction / Poste *",
+      "phone": "Téléphone / WhatsApp *"
+    }
+  },
+  "register_page": {
+    "title": "Créer un compte entreprise",
+    "subtitle": "Rejoignez notre réseau de partenaires commerciaux",
+    "error_password": "Les mots de passe ne correspondent pas.",
+    "error_generic": "Une erreur est survenue lors de la création du compte.",
+    "sections": {
+      "company": "Informations Entreprise",
+      "representative": "Représentant de l'entreprise",
+      "security": "Sécurité"
+    },
+    "form": {
+      "company_name": "Nom de l'entreprise *",
+      "country": "Pays *",
+      "address": "Adresse complète *",
+      "website": "Site Web (Optionnel)",
+      "rep_name": "Nom complet *",
+      "position": "Fonction / Poste *",
+      "email": "Email professionnel *",
+      "phone": "Téléphone / WhatsApp *",
+      "password": "Mot de passe *",
+      "password_placeholder": "Min. 6 caractères",
+      "confirm_password": "Confirmer le mot de passe *",
+      "submit": "Créer mon compte entreprise"
+    },
+    "has_account": "Vous avez déjà un compte ?",
+    "login": "Se connecter"
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "welcome": "Bienvenue",
+    "new_loi": "Nouvelle Demande (LOI)",
+    "my_lois": "Mes Lettres d'Intention",
+    "stats": {
+      "total": "Total Demandes",
+      "ongoing": "En cours",
+      "finalized": "Finalisées"
+    },
+    "status": {
+      "searching": "Recherche",
+      "negotiating": "Négociation",
+      "finalized": "Finalisée",
+      "cancelled": "Annulée"
+    },
+    "loi_card": {
+      "quantity": "Quantité",
+      "not_specified": "Non spécifié",
+      "no_additional": "Aucune information supplémentaire."
+    },
+    "admin_response": {
+      "title": "Réponse d'AFTRAS CI",
+      "proposed_quantity": "Quantité proposée",
+      "proposed_price": "Prix proposé",
+      "incoterm_location": "Incoterm / Lieu",
+      "delivery_time": "Délai de livraison",
+      "days": "jours",
+      "last_update": "Dernière mise à jour le",
+      "waiting": "En attente de réponse de nos représentants..."
+    },
+    "no_lois": {
+      "title": "Aucune LOI envoyée",
+      "desc": "Commencez par envoyer une Lettre d'Intention pour sourcer un produit.",
+      "cta": "Envoyer ma première LOI"
+    }
+  },
+  "admin_page": {
+    "title": "Administration",
+    "access_denied": "Accès refusé.",
+    "tabs": {
+      "lois": "Gestion des LOI",
+      "catalog": "Gestion Catalogue"
+    },
+    "lois": {
+      "details_title": "Détails de la demande",
+      "response_title": "Réponse automatisée",
+      "form": {
+        "status": "Statut",
+        "submit": "Mettre à jour & Envoyer"
+      }
+    },
+    "products": {
+      "title": "Catalogue Produits",
+      "add_btn": "Ajouter un produit",
+      "confirm_delete": "Supprimer ce produit ?",
+      "modal": {
+        "add_title": "Ajouter un produit",
+        "edit_title": "Modifier le produit",
+        "name": "Nom du produit",
+        "category": "Catégorie",
+        "image_url": "URL de l'image (Cloudinary)",
+        "description": "Description",
+        "featured": "Produit Vedette (Slider)",
+        "submit": "Enregistrer le produit"
+      }
+    }
+  }
+}

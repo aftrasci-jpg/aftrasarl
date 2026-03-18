@@ -1,42 +1,45 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Search, Handshake, ShieldCheck, Truck, BarChart3, Globe2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export const Services = () => {
+  const { t } = useTranslation();
+
   const services = [
     {
-      title: 'Recherche de Fournisseurs Fiables',
-      desc: 'Nous identifions et auditons des fournisseurs globaux pour garantir la qualité et la fiabilité de vos approvisionnements.',
+      title: t('services_page.items.0.title'),
+      desc: t('services_page.items.0.desc'),
       icon: Search,
       color: 'bg-blue-50 text-aftras-blue-text'
     },
     {
-      title: 'Négociation Commerciale',
-      desc: 'Nos experts négocient pour vous les meilleurs prix, délais et conditions de paiement auprès des fournisseurs.',
+      title: t('services_page.items.1.title'),
+      desc: t('services_page.items.1.desc'),
       icon: BarChart3,
       color: 'bg-orange-50 text-aftras-orange'
     },
     {
-      title: 'Intermédiation Commerciale',
-      desc: 'Nous agissons comme tiers de confiance pour sécuriser les transactions entre acheteurs et vendeurs.',
+      title: t('services_page.items.2.title'),
+      desc: t('services_page.items.2.desc'),
       icon: Handshake,
       color: 'bg-green-100 text-green-800'
     },
     {
-      title: 'Organisation Logistique',
-      desc: 'Suivi complet de l’expédition, de l’enlèvement à la livraison finale, incluant les formalités douanières.',
+      title: t('services_page.items.3.title'),
+      desc: t('services_page.items.3.desc'),
       icon: Truck,
       color: 'bg-purple-100 text-purple-800'
     },
     {
-      title: 'Accompagnement Stratégique',
-      desc: 'Conseils sur les marchés internationaux, les incoterms et les régulations commerciales.',
+      title: t('services_page.items.4.title'),
+      desc: t('services_page.items.4.desc'),
       icon: Globe2,
       color: 'bg-red-100 text-red-800'
     },
     {
-      title: 'Sécurisation des Transactions',
-      desc: 'Mise en place de mécanismes de garantie et vérification de la conformité des documents.',
+      title: t('services_page.items.5.title'),
+      desc: t('services_page.items.5.desc'),
       icon: ShieldCheck,
       color: 'bg-teal-100 text-teal-800'
     }
@@ -60,7 +63,7 @@ export const Services = () => {
             className="inline-block px-8 py-4 rounded-2xl border-2 border-aftras-orange bg-aftras-blue-text/50 backdrop-blur-sm mb-8"
           >
             <h1 className="text-4xl md:text-5xl font-bold text-white">
-              Nos Services d'Expertise
+              {t('services_page.title')}
             </h1>
           </motion.div>
           <motion.p 
@@ -69,7 +72,7 @@ export const Services = () => {
             transition={{ delay: 0.2 }}
             className="text-xl text-blue-100 max-w-3xl mx-auto"
           >
-            Des solutions sur mesure pour optimiser vos opérations de négoce international.
+            {t('services_page.subtitle')}
           </motion.p>
         </div>
       </section>
@@ -104,16 +107,16 @@ export const Services = () => {
       <section className="py-20 bg-aftras-blue-text text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Notre Approche</h2>
-            <p className="text-blue-200">Comment nous garantissons la réussite de vos projets.</p>
+            <h2 className="text-3xl font-bold mb-4">{t('services_page.approach.title')}</h2>
+            <p className="text-blue-200">{t('services_page.approach.subtitle')}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
             <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-white/10 -translate-y-1/2 z-0" />
             {[
-              { num: '01', title: 'Écoute', desc: 'Compréhension de vos besoins spécifiques.' },
-              { num: '02', title: 'Analyse', desc: 'Étude de faisabilité et sourcing.' },
-              { num: '03', title: 'Action', desc: 'Négociation et contractualisation.' },
-              { num: '04', title: 'Suivi', desc: 'Contrôle qualité et logistique.' },
+              { num: '01', title: t('services_page.approach.steps.0.title'), desc: t('services_page.approach.steps.0.desc') },
+              { num: '02', title: t('services_page.approach.steps.1.title'), desc: t('services_page.approach.steps.1.desc') },
+              { num: '03', title: t('services_page.approach.steps.2.title'), desc: t('services_page.approach.steps.2.desc') },
+              { num: '04', title: t('services_page.approach.steps.3.title'), desc: t('services_page.approach.steps.3.desc') },
             ].map((item, i) => (
               <div key={i} className="relative z-10 bg-aftras-blue-text p-6 text-center">
                 <div className="w-12 h-12 bg-aftras-orange rounded-full flex items-center justify-center mx-auto mb-6 font-bold text-xl">
