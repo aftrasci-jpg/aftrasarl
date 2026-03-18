@@ -29,9 +29,14 @@ export const Login = () => {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white p-10 rounded-3xl shadow-xl border border-gray-100 w-full max-w-md">
         <div className="text-center mb-10">
-          <Link to="/" className="inline-flex items-center mb-6">
-            <span className="text-2xl font-bold text-aftras-blue-text">AFTRAS</span>
-            <span className="text-2xl font-bold text-orange-500 ml-1">CI</span>
+          <Link to="/" className="inline-flex flex-col items-center mb-6">
+            <div className="flex items-center">
+              <span className="text-2xl font-bold text-aftras-blue-text">AFTRAS</span>
+              <span className="text-2xl font-bold text-orange-500 ml-1">CI</span>
+            </div>
+            <span className="text-[10px] font-medium text-gray-500 -mt-1 tracking-wider uppercase">
+              Transparence-Fiabilité-Croissance
+            </span>
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">Bon retour !</h1>
           <p className="text-gray-500 mt-2">Connectez-vous à votre compte entreprise</p>

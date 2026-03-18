@@ -62,9 +62,14 @@ export const Register = () => {
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
-          <Link to="/" className="inline-flex items-center mb-6">
-            <span className="text-3xl font-bold text-aftras-blue-text">AFTRAS</span>
-            <span className="text-3xl font-bold text-orange-500 ml-1">CI</span>
+          <Link to="/" className="inline-flex flex-col items-center mb-6">
+            <div className="flex items-center">
+              <span className="text-3xl font-bold text-aftras-blue-text">AFTRAS</span>
+              <span className="text-3xl font-bold text-orange-500 ml-1">CI</span>
+            </div>
+            <span className="text-xs font-medium text-gray-500 -mt-1 tracking-wider uppercase">
+              Transparence-Fiabilité-Croissance
+            </span>
           </Link>
           <h1 className="text-3xl font-bold text-gray-900">Créer un compte entreprise</h1>
           <p className="text-gray-500 mt-2">Rejoignez notre réseau de partenaires commerciaux</p>

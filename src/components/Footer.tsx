@@ -9,9 +9,14 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Company Info */}
           <div>
-            <Link to="/" className="flex items-center mb-6">
-              <span className="text-2xl font-bold text-white">AFTRAS</span>
-              <span className="text-2xl font-bold text-aftras-orange ml-1">CI</span>
+            <Link to="/" className="flex flex-col mb-6">
+              <div className="flex items-center">
+                <span className="text-2xl font-bold text-white">AFTRAS</span>
+                <span className="text-2xl font-bold text-aftras-orange ml-1">CI</span>
+              </div>
+              <span className="text-[10px] font-medium text-blue-200 -mt-1 tracking-wider uppercase">
+                Transparence-Fiabilité-Croissance
+              </span>
             </Link>
             <p className="text-blue-100 text-sm leading-relaxed mb-6">
               Africa Trading Solutions Côte d'Ivoire SARL. Votre partenaire de négoce international fiable. Nous facilitons les échanges commerciaux entre l'Afrique et le reste du monde.
@@ -55,20 +60,29 @@ export const Footer = () => {
           {/* Contact Info */}
           <div>
             <h3 className="text-lg font-semibold mb-6 border-b border-white/20 pb-2">Contact</h3>
-            <ul className="space-y-4">
-              <li className="flex items-start">
-                <MapPin className="w-5 h-5 text-aftras-orange mr-3 mt-1 flex-shrink-0" />
-                <span className="text-blue-100 text-sm">Abidjan, Côte d'Ivoire / Genève, Suisse</span>
-              </li>
-              <li className="flex items-center">
-                <Phone className="w-5 h-5 text-aftras-orange mr-3 flex-shrink-0" />
-                <span className="text-blue-100 text-sm">+225 0141 354 860</span>
-              </li>
-              <li className="flex items-center">
-                <Mail className="w-5 h-5 text-aftras-orange mr-3 flex-shrink-0" />
-                <span className="text-blue-100 text-sm">contact@africatrading.com</span>
-              </li>
-            </ul>
+            <div className="space-y-6">
+              <div>
+                <p className="text-aftras-orange font-bold text-xs uppercase tracking-wider mb-1">Afrique</p>
+                <p className="text-white text-sm font-medium">Mr. Evariste Cyr Major Kahiba GNONSKAN</p>
+                <a href="https://wa.me/2250141354860" className="text-blue-200 text-xs hover:text-aftras-orange transition-colors flex items-center mt-1">
+                  <Phone className="w-3 h-3 mr-2" /> WhatsApp : +225 0141 354 860
+                </a>
+              </div>
+              <div>
+                <p className="text-aftras-orange font-bold text-xs uppercase tracking-wider mb-1">Asie</p>
+                <p className="text-white text-sm font-medium">Mr. Quevin ZOH</p>
+                <a href="https://wa.me/919625916929" className="text-blue-200 text-xs hover:text-aftras-orange transition-colors flex items-center mt-1">
+                  <Phone className="w-3 h-3 mr-2" /> WhatsApp : +91 96259 16929
+                </a>
+              </div>
+              <div>
+                <p className="text-aftras-orange font-bold text-xs uppercase tracking-wider mb-1">Europe</p>
+                <p className="text-white text-sm font-medium">Mme. Merfeuh NGUEYEP</p>
+                <a href="https://wa.me/41779208318" className="text-blue-200 text-xs hover:text-aftras-orange transition-colors flex items-center mt-1">
+                  <Phone className="w-3 h-3 mr-2" /> WhatsApp : +41 77 920 83 18
+                </a>
+              </div>
+            </div>
           </div>
         </div>
 
