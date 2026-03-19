@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
+import { supabase } from '../supabase';
 import { Mail, Lock, LogIn, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -18,10 +17,28 @@ export const Login = () => {
     setLoading(true);
     setError('');
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate('/dashboard');
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (authError) throw authError;
+
+      // Fetch profile to determine role
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', (await supabase.auth.getUser()).data.user?.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      if (profile?.role === 'admin' || email === 'ditobb2018@gmail.com') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err: any) {
-      setError(t('login_page.error'));
+      setError(err.message || t('login_page.error'));
     } finally {
       setLoading(false);
     }
@@ -62,7 +79,7 @@ export const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-aftras-blue-text outline-none"
-                placeholder="email@entreprise.com"
+                placeholder={t('login_page.form.email_placeholder')}
               />
             </div>
           </div>
@@ -96,6 +113,27 @@ export const Login = () => {
             )}
           </button>
         </form>
+
+        <div className="mt-8 pt-8 border-t border-gray-100">
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 text-center">{t('login_page.demo.title')}</p>
+          <div className="grid grid-cols-2 gap-4">
+            <button 
+              onClick={() => { setEmail('admin@demo.com'); setPassword('password123'); }}
+              className="text-xs bg-blue-50 text-aftras-blue-text py-2 px-4 rounded-lg font-bold hover:bg-blue-100 transition-colors"
+            >
+              {t('login_page.demo.admin_btn')}
+            </button>
+            <button 
+              onClick={() => { setEmail('user@demo.com'); setPassword('password123'); }}
+              className="text-xs bg-orange-50 text-aftras-orange py-2 px-4 rounded-lg font-bold hover:bg-orange-100 transition-colors"
+            >
+              {t('login_page.demo.client_btn')}
+            </button>
+          </div>
+          <p className="text-[10px] text-gray-400 mt-2 text-center italic">
+            {t('login_page.demo.note')}
+          </p>
+        </div>
 
         <p className="text-center mt-8 text-gray-600 text-sm">
           {t('login_page.no_account')}{' '}

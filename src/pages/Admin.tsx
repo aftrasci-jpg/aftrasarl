@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { collection, onSnapshot, query, orderBy, doc, updateDoc, addDoc, deleteDoc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { supabase } from '../supabase';
 import { LOI, Product, STATUS_COLORS, LOIStatus, PRODUCT_CATEGORIES, ProductCategory } from '../types';
-import { Plus, Trash2, Edit, CheckCircle2, X, Package, FileText, Send, Image as ImageIcon } from 'lucide-react';
+import { Plus, Trash2, Edit, CheckCircle2, X, Package, FileText, Send, Image as ImageIcon, Upload } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
@@ -16,6 +15,8 @@ export const Admin = () => {
   const [expandedLoiId, setExpandedLoiId] = useState<string | null>(null);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const STATUS_LABELS: Record<string, string> = {
     searching: t('dashboard.status.searching'),
@@ -34,56 +35,91 @@ export const Admin = () => {
     name: string;
     category: ProductCategory;
     description: string;
-    imageUrl: string;
-    isFeatured: boolean;
+    image_url: string;
+    is_featured: boolean;
   }>({
     name: '',
     category: PRODUCT_CATEGORIES[0],
     description: '',
-    imageUrl: '',
-    isFeatured: false
+    image_url: '',
+    is_featured: false
   });
 
   const [responseForm, setResponseForm] = useState({
-    proposedQuantity: '',
+    proposed_quantity: '',
     incoterm: 'CIF',
     location: '',
     price: '',
-    deliveryTime: '',
+    delivery_time: '',
     status: 'searching' as LOIStatus
   });
 
   useEffect(() => {
     if (!isAdmin) return;
 
-    const unsubLois = onSnapshot(query(collection(db, 'lois'), orderBy('createdAt', 'desc')), (snap) => {
-      setLois(snap.docs.map(d => ({ id: d.id, ...d.data() } as LOI)));
-    });
+    const fetchLois = async () => {
+      const { data, error: fetchError } = await supabase
+        .from('lois')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (fetchError) {
+        console.error("Admin LOI fetch error:", fetchError);
+        setError(t('common.error'));
+      } else {
+        setLois(data as LOI[]);
+        setError(null);
+      }
+    };
 
-    const unsubProds = onSnapshot(query(collection(db, 'products'), orderBy('createdAt', 'desc')), (snap) => {
-      setProducts(snap.docs.map(d => ({ id: d.id, ...d.data() } as Product)));
-    });
+    const fetchProducts = async () => {
+      const { data, error: fetchError } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (fetchError) {
+        console.error("Admin products fetch error:", fetchError);
+      } else {
+        setProducts(data as Product[]);
+      }
+    };
+
+    fetchLois();
+    fetchProducts();
+
+    const loisSub = supabase.channel('admin_lois').on('postgres_changes', { event: '*', schema: 'public', table: 'lois' }, fetchLois).subscribe();
+    const prodsSub = supabase.channel('admin_prods').on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, fetchProducts).subscribe();
 
     return () => {
-      unsubLois();
-      unsubProds();
+      loisSub.unsubscribe();
+      prodsSub.unsubscribe();
     };
   }, [isAdmin]);
 
   const handleProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      if (!productForm.image_url) {
+        alert(t('admin_page.products.modal.image_required'));
+        return;
+      }
+
       if (editingProduct) {
-        await updateDoc(doc(db, 'products', editingProduct.id), productForm);
+        const { error: saveError } = await supabase
+          .from('products')
+          .update(productForm)
+          .eq('id', editingProduct.id);
+        if (saveError) throw saveError;
       } else {
-        await addDoc(collection(db, 'products'), {
-          ...productForm,
-          createdAt: new Date().toISOString()
-        });
+        const { error: saveError } = await supabase
+          .from('products')
+          .insert([productForm]);
+        if (saveError) throw saveError;
       }
       setIsProductModalOpen(false);
       setEditingProduct(null);
-      setProductForm({ name: '', category: PRODUCT_CATEGORIES[0], description: '', imageUrl: '', isFeatured: false });
+      setProductForm({ name: '', category: PRODUCT_CATEGORIES[0], description: '', image_url: '', is_featured: false });
     } catch (error) {
       console.error("Product save error:", error);
     }
@@ -91,26 +127,68 @@ export const Admin = () => {
 
   const handleDeleteProduct = async (id: string) => {
     if (window.confirm(t('admin_page.products.confirm_delete'))) {
-      await deleteDoc(doc(db, 'products', id));
+      try {
+        const { error: deleteError } = await supabase
+          .from('products')
+          .delete()
+          .eq('id', id);
+        if (deleteError) throw deleteError;
+      } catch (error) {
+        console.error("Product delete error:", error);
+      }
     }
   };
 
   const handleLoiResponse = async (loi: LOI) => {
     try {
-      await updateDoc(doc(db, 'lois', loi.id), {
-        status: responseForm.status,
-        adminResponse: {
-          proposedQuantity: responseForm.proposedQuantity,
-          incoterm: responseForm.incoterm,
-          location: responseForm.location,
-          price: responseForm.price,
-          deliveryTime: responseForm.deliveryTime,
-          updatedAt: new Date().toISOString()
-        }
-      });
+      const { error: responseError } = await supabase
+        .from('lois')
+        .update({
+          status: responseForm.status,
+          admin_response: {
+            proposed_quantity: responseForm.proposed_quantity,
+            incoterm: responseForm.incoterm,
+            location: responseForm.location,
+            price: responseForm.price,
+            delivery_time: responseForm.delivery_time,
+            updated_at: new Date().toISOString()
+          }
+        })
+        .eq('id', loi.id);
+      
+      if (responseError) throw responseError;
       setExpandedLoiId(null);
     } catch (error) {
       console.error("LOI response error:", error);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('products')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('products')
+        .getPublicUrl(filePath);
+
+      setProductForm({ ...productForm, image_url: publicUrl });
+    } catch (error: any) {
+      console.error('Image upload error:', error);
+      alert(t('admin_page.products.modal.upload_error'));
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -141,6 +219,12 @@ export const Admin = () => {
           </button>
         </div>
 
+        {error && (
+          <div className="bg-red-50 text-red-600 p-6 rounded-2xl border border-red-100 mb-8">
+            {error}
+          </div>
+        )}
+
         {/* LOI Management */}
         {activeTab === 'lois' && (
           <div className="space-y-6">
@@ -149,13 +233,13 @@ export const Admin = () => {
                 <div 
                   onClick={() => {
                     setExpandedLoiId(expandedLoiId === loi.id ? null : loi.id);
-                    if (loi.adminResponse) {
+                    if (loi.admin_response) {
                       setResponseForm({
-                        proposedQuantity: loi.adminResponse.proposedQuantity,
-                        incoterm: loi.adminResponse.incoterm as any,
-                        location: loi.adminResponse.location,
-                        price: loi.adminResponse.price,
-                        deliveryTime: loi.adminResponse.deliveryTime,
+                        proposed_quantity: loi.admin_response.proposed_quantity,
+                        incoterm: loi.admin_response.incoterm as any,
+                        location: loi.admin_response.location,
+                        price: loi.admin_response.price,
+                        delivery_time: loi.admin_response.delivery_time,
                         status: loi.status
                       });
                     } else {
@@ -169,7 +253,7 @@ export const Admin = () => {
                       <FileText className="w-6 h-6 text-aftras-blue-text" />
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-gray-900">{loi.companyName}</h3>
+                      <h3 className="text-lg font-bold text-gray-900">{loi.company_name}</h3>
                       <p className="text-sm text-gray-500">{loi.product} • {loi.quantity}</p>
                     </div>
                   </div>
@@ -198,7 +282,7 @@ export const Admin = () => {
                           </div>
                           <div className="mt-4">
                             <p className="text-gray-500 text-sm mb-1">{t('loi_form.sections.additional')}:</p>
-                            <p className="text-gray-700 text-sm italic">{loi.additionalInfo || 'Aucune.'}</p>
+                            <p className="text-gray-700 text-sm italic">{loi.additional_info || 'Aucune.'}</p>
                           </div>
                         </div>
 
@@ -223,8 +307,8 @@ export const Admin = () => {
                                 <label className="block text-xs font-bold text-gray-500 mb-1">{t('dashboard.admin_response.proposed_quantity')}</label>
                                 <input 
                                   type="text" 
-                                  value={responseForm.proposedQuantity}
-                                  onChange={(e) => setResponseForm({...responseForm, proposedQuantity: e.target.value})}
+                                  value={responseForm.proposed_quantity}
+                                  onChange={(e) => setResponseForm({...responseForm, proposed_quantity: e.target.value})}
                                   className="w-full p-2 border rounded-lg text-sm"
                                 />
                               </div>
@@ -243,8 +327,8 @@ export const Admin = () => {
                                 <label className="block text-xs font-bold text-gray-500 mb-1">{t('dashboard.admin_response.delivery_time')}</label>
                                 <input 
                                   type="text" 
-                                  value={responseForm.deliveryTime}
-                                  onChange={(e) => setResponseForm({...responseForm, deliveryTime: e.target.value})}
+                                  value={responseForm.delivery_time}
+                                  onChange={(e) => setResponseForm({...responseForm, delivery_time: e.target.value})}
                                   className="w-full p-2 border rounded-lg text-sm"
                                 />
                               </div>
@@ -274,7 +358,7 @@ export const Admin = () => {
               <button 
                 onClick={() => {
                   setEditingProduct(null);
-                  setProductForm({ name: '', category: PRODUCT_CATEGORIES[0], description: '', imageUrl: '', isFeatured: false });
+                  setProductForm({ name: '', category: PRODUCT_CATEGORIES[0], description: '', image_url: '', is_featured: false });
                   setIsProductModalOpen(true);
                 }}
                 className="bg-aftras-orange text-white px-6 py-3 rounded-xl font-bold hover:bg-opacity-90 transition-all flex items-center"
@@ -287,8 +371,8 @@ export const Admin = () => {
               {products.map((product) => (
                 <div key={product.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
                   <div className="h-40 overflow-hidden relative">
-                    <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                    {product.isFeatured && (
+                    <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    {product.is_featured && (
                       <div className="absolute top-2 right-2 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded-full">{t('catalog_page.featured_badge')}</div>
                     )}
                   </div>
@@ -306,8 +390,8 @@ export const Admin = () => {
                           name: product.name,
                           category: product.category as ProductCategory,
                           description: product.description || '',
-                          imageUrl: product.imageUrl,
-                          isFeatured: product.isFeatured
+                          image_url: product.image_url,
+                          is_featured: product.is_featured
                         });
                         setIsProductModalOpen(true);
                       }}
@@ -369,16 +453,52 @@ export const Admin = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-gray-700 mb-2">{t('admin_page.products.modal.image_url')}</label>
-                    <div className="flex space-x-2">
-                      <div className="flex-grow relative">
+                    <div className="space-y-4">
+                      {productForm.image_url && (
+                        <div className="relative w-full h-40 rounded-xl overflow-hidden border">
+                          <img src={productForm.image_url} alt="Preview" className="w-full h-full object-cover" />
+                          <button 
+                            type="button"
+                            onClick={() => setProductForm({...productForm, image_url: ''})}
+                            className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full hover:bg-red-700"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center justify-center w-full">
+                        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all">
+                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                            {uploading ? (
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-aftras-blue-text" />
+                            ) : (
+                              <>
+                                <Upload className="w-8 h-8 mb-3 text-gray-400" />
+                                <p className="mb-2 text-sm text-gray-500 font-bold">{t('admin_page.products.modal.upload_label')}</p>
+                                <p className="text-xs text-gray-400">PNG, JPG, GIF (Max. 5MB)</p>
+                              </>
+                            )}
+                          </div>
+                          <input 
+                            type="file" 
+                            className="hidden" 
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            disabled={uploading}
+                          />
+                        </label>
+                      </div>
+
+                      <div className="relative">
                         <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                         <input 
                           required
                           type="url" 
-                          value={productForm.imageUrl}
-                          onChange={(e) => setProductForm({...productForm, imageUrl: e.target.value})}
+                          value={productForm.image_url}
+                          onChange={(e) => setProductForm({...productForm, image_url: e.target.value})}
                           className="w-full pl-10 p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text"
-                          placeholder="https://res.cloudinary.com/..."
+                          placeholder={t('admin_page.products.modal.image_url_placeholder')}
                         />
                       </div>
                     </div>
@@ -396,8 +516,8 @@ export const Admin = () => {
                     <input 
                       type="checkbox" 
                       id="isFeatured"
-                      checked={productForm.isFeatured}
-                      onChange={(e) => setProductForm({...productForm, isFeatured: e.target.checked})}
+                      checked={productForm.is_featured}
+                      onChange={(e) => setProductForm({...productForm, is_featured: e.target.checked})}
                       className="w-5 h-5 text-aftras-blue-text rounded border-gray-300 focus:ring-aftras-blue-text"
                     />
                     <label htmlFor="isFeatured" className="ml-3 text-sm font-bold text-gray-700">{t('admin_page.products.modal.featured')}</label>

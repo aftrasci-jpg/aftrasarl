@@ -1,17 +1,17 @@
 export type UserRole = 'admin' | 'company';
 
 export interface UserProfile {
-  uid: string;
+  id: string;
   email: string;
   role: UserRole;
-  companyName: string;
+  company_name: string;
   country: string;
   address: string;
   website?: string;
-  representativeName: string;
+  representative_name: string;
   position: string;
   phone: string;
-  createdAt: string;
+  created_at: string;
 }
 
 export interface Product {
@@ -19,37 +19,37 @@ export interface Product {
   name: string;
   category: string;
   description?: string;
-  imageUrl: string;
-  isFeatured: boolean;
-  createdAt: string;
+  image_url: string;
+  is_featured: boolean;
+  created_at: string;
 }
 
-export type LOIStatus = 'searching' | 'offer_sent' | 'negotiating' | 'provider_identified' | 'finalized';
+export type LOIStatus = 'searching' | 'offer_sent' | 'negotiating' | 'provider_identified' | 'finalized' | 'cancelled';
 
 export interface AdminResponse {
-  proposedQuantity: string;
+  proposed_quantity: string;
   incoterm: string;
   location: string;
   price: string;
-  deliveryTime: string;
+  delivery_time: string;
   attachments?: string[];
-  updatedAt: string;
+  updated_at: string;
 }
 
 export interface LOI {
   id: string;
-  companyId: string;
-  companyName: string;
+  company_id: string;
+  company_name: string;
   product: string;
   quantity: string;
   budget?: string;
   incoterm?: string;
   port?: string;
   deadline?: string;
-  additionalInfo?: string;
+  additional_info?: string;
   status: LOIStatus;
-  adminResponse?: AdminResponse;
-  createdAt: string;
+  admin_response?: AdminResponse;
+  created_at: string;
 }
 
 export const STATUS_COLORS: Record<LOIStatus, string> = {
@@ -58,6 +58,7 @@ export const STATUS_COLORS: Record<LOIStatus, string> = {
   negotiating: 'bg-orange-50 text-aftras-orange',
   provider_identified: 'bg-green-50 text-green-600',
   finalized: 'bg-green-600 text-white',
+  cancelled: 'bg-red-50 text-red-600',
 };
 
 export const STATUS_LABELS: Record<LOIStatus, string> = {
@@ -66,6 +67,7 @@ export const STATUS_LABELS: Record<LOIStatus, string> = {
   negotiating: 'En négociation',
   provider_identified: 'Fournisseur identifié',
   finalized: 'Transaction finalisée',
+  cancelled: 'Annulé',
 };
 
 export const PRODUCT_CATEGORIES = [

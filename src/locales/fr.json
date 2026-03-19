@@ -27,7 +27,12 @@
     "company_desc": "Africa Trading Solutions Côte d'Ivoire SARL. Votre partenaire de négoce international fiable. Nous facilitons les échanges commerciaux entre l'Afrique et le reste du monde.",
     "quick_links": "Liens Rapides",
     "our_services": "Nos Services",
-    "contact": "Contact"
+    "contact": "Contact",
+    "contacts": {
+      "africa": { "region": "Afrique" },
+      "asia": { "region": "Asie" },
+      "europe": { "region": "Europe" }
+    }
   },
   "home": {
     "hero": [
@@ -155,6 +160,17 @@
       "region": "Région concernée",
       "message": "Votre message"
     },
+    "form": {
+      "company": "Nom de l'entreprise",
+      "name": "Nom du contact",
+      "email": "Email",
+      "phone": "Téléphone / WhatsApp",
+      "region": "Région concernée",
+      "message": "Votre message",
+      "submit": "Envoyer le message",
+      "other": "Autre",
+      "whatsapp_label": "WhatsApp :"
+    },
     "regions": {
       "africa": "Afrique",
       "asia": "Asie",
@@ -167,29 +183,49 @@
     "subtitle": "Veuillez remplir ce formulaire avec précision pour nous permettre de trouver le meilleur fournisseur.",
     "success_title": "LOI Envoyée !",
     "success_desc": "Votre demande a été enregistrée avec succès. Nos représentants vont l'analyser et vous répondront prochainement.",
-    "redirect": "Redirection vers votre tableau de bord...",
+    "redirecting": "Redirection vers votre tableau de bord...",
+    "error_serious": "Veuillez confirmer le sérieux de votre demande.",
+    "error_generic": "Une erreur est survenue lors de l'envoi de la LOI.",
     "sections": {
       "product": "Informations sur le produit",
       "commercial": "Conditions commerciales",
       "additional": "Informations complémentaires"
     },
-    "fields": {
-      "product": "Produit demandé *",
+    "form": {
+      "product_label": "Produit demandé *",
       "product_placeholder": "Ex: Riz long grain, Noix de cajou...",
-      "quantity": "Quantité souhaitée *",
+      "quantity_label": "Quantité souhaitée *",
       "quantity_placeholder": "Ex: 500 MT, 2 conteneurs 40ft...",
-      "budget": "Budget estimé (USD/EUR)",
+      "budget_label": "Budget estimé (USD/EUR)",
       "budget_placeholder": "Ex: 450 USD / MT",
-      "incoterm": "Incoterm souhaité",
-      "port": "Port / Pays de destination",
+      "incoterm_label": "Incoterm souhaité",
+      "port_label": "Port / Pays de destination",
       "port_placeholder": "Ex: Port d'Abidjan, Côte d'Ivoire",
-      "deadline": "Délai de livraison souhaité",
+      "deadline_label": "Délai de livraison souhaité",
       "deadline_placeholder": "Ex: Sous 30 jours",
-      "additional": "Spécifications techniques, certifications requises, etc.",
-      "serious": "Je déclare que cette demande est sérieuse et que mon entreprise dispose des fonds nécessaires pour conclure la transaction si les conditions sont acceptées."
+      "additional_placeholder": "Spécifications techniques, certifications requises, etc.",
+      "declaration": "Je déclare que cette demande est sérieuse et que mon entreprise dispose des fonds nécessaires pour conclure la transaction si les conditions sont acceptées.",
+      "submit": "Envoyer la LOI"
+    }
+  },
+  "login_page": {
+    "title": "Bon retour !",
+    "subtitle": "Connectez-vous à votre compte entreprise",
+    "error": "Email ou mot de passe incorrect.",
+    "no_account": "Pas encore de compte ?",
+    "create_account": "Créer un compte entreprise",
+    "form": {
+      "email": "Email professionnel",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "email_placeholder": "email@entreprise.com"
     },
-    "submit": "Envoyer la LOI",
-    "confirm_serious": "Veuillez confirmer le sérieux de votre demande."
+    "demo": {
+      "title": "Accès Test / Demo",
+      "admin_btn": "Pre-remplir Admin",
+      "client_btn": "Pre-remplir Client",
+      "note": "Note: Créez ces utilisateurs dans votre console Firebase pour tester."
+    }
   },
   "auth": {
     "login_title": "Bon retour !",
@@ -312,6 +348,10 @@
         "name": "Nom du produit",
         "category": "Catégorie",
         "image_url": "URL de l'image (Cloudinary)",
+        "image_url_placeholder": "https://exemple.com/image.jpg",
+        "upload_label": "Cliquez pour téléverser ou glissez-déposez",
+        "image_required": "Une image est requise pour publier le produit.",
+        "upload_error": "Erreur lors du téléversement de l'image.",
         "description": "Description",
         "featured": "Produit Vedette (Slider)",
         "submit": "Enregistrer le produit"

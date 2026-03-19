@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { collection, addDoc } from 'firebase/firestore';
-import { db } from '../firebase';
+import { supabase } from '../supabase';
 import { FileText, Send, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -19,7 +18,7 @@ export const LOIForm = () => {
     incoterm: 'CIF',
     port: '',
     deadline: '',
-    additionalInfo: '',
+    additional_info: '',
     serious: false
   });
 
@@ -38,23 +37,27 @@ export const LOIForm = () => {
 
     setLoading(true);
     try {
-      await addDoc(collection(db, 'lois'), {
-        companyId: user.uid,
-        companyName: profile.companyName,
-        product: formData.product,
-        quantity: formData.quantity,
-        budget: formData.budget,
-        incoterm: formData.incoterm,
-        port: formData.port,
-        deadline: formData.deadline,
-        additionalInfo: formData.additionalInfo,
-        status: 'searching',
-        createdAt: new Date().toISOString()
-      });
+      const { error: submitError } = await supabase
+        .from('lois')
+        .insert({
+          company_id: user.id,
+          company_name: profile.company_name,
+          product: formData.product,
+          quantity: formData.quantity,
+          budget: formData.budget,
+          incoterm: formData.incoterm,
+          port: formData.port,
+          deadline: formData.deadline,
+          additional_info: formData.additional_info,
+          status: 'searching'
+        });
+
+      if (submitError) throw submitError;
+
       setSuccess(true);
       setTimeout(() => navigate('/dashboard'), 3000);
-    } catch (error) {
-      console.error("LOI submission error:", error);
+    } catch (err: any) {
+      console.error("LOI submission error:", err);
       setError(t('loi_form.error_generic'));
     } finally {
       setLoading(false);
@@ -181,8 +184,8 @@ export const LOIForm = () => {
               <div>
                 <textarea
                   rows={4}
-                  value={formData.additionalInfo}
-                  onChange={(e) => setFormData({...formData, additionalInfo: e.target.value})}
+                  value={formData.additional_info}
+                  onChange={(e) => setFormData({...formData, additional_info: e.target.value})}
                   placeholder={t('loi_form.form.additional_placeholder')}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-aftras-blue-text outline-none"
                 />

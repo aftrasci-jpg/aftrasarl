@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore';
-import { db } from '../firebase';
+import { supabase } from '../supabase';
 import { LOI, STATUS_COLORS } from '../types';
 import { Plus, ChevronDown, ChevronUp, Clock, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -14,6 +13,7 @@ export const Dashboard = () => {
   const [lois, setLois] = useState<LOI[]>([]);
   const [expandedLoiId, setExpandedLoiId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const STATUS_LABELS: Record<string, string> = {
     searching: t('dashboard.status.searching'),
@@ -24,16 +24,44 @@ export const Dashboard = () => {
 
   useEffect(() => {
     if (!user) return;
-    const q = query(
-      collection(db, 'lois'),
-      where('companyId', '==', user.uid),
-      orderBy('createdAt', 'desc')
-    );
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setLois(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as LOI)));
-      setLoading(false);
-    });
-    return () => unsubscribe();
+
+    const fetchLois = async () => {
+      try {
+        const { data, error: fetchError } = await supabase
+          .from('lois')
+          .select('*')
+          .eq('company_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (fetchError) throw fetchError;
+        setLois(data as LOI[]);
+        setError(null);
+      } catch (err: any) {
+        console.error("LOI fetch error:", err);
+        setError(t('common.error'));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLois();
+
+    // Subscribe to changes
+    const subscription = supabase
+      .channel('lois_changes')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'lois',
+        filter: `company_id=eq.${user.id}`
+      }, () => {
+        fetchLois();
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [user]);
 
   const toggleExpand = (id: string) => {
@@ -47,7 +75,7 @@ export const Dashboard = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
           <div>
             <h1 className="text-3xl font-bold text-aftras-blue-border">{t('dashboard.title')}</h1>
-            <p className="text-gray-600 mt-1">{t('dashboard.welcome')}, {profile?.companyName}</p>
+            <p className="text-gray-600 mt-1">{t('dashboard.welcome')}, {profile?.company_name}</p>
           </div>
           <Link 
             to="/loi" 
@@ -81,6 +109,12 @@ export const Dashboard = () => {
         <div className="space-y-6">
           <h2 className="text-xl font-bold text-aftras-blue-border mb-6">{t('dashboard.my_lois')}</h2>
           
+          {error && (
+            <div className="bg-red-50 text-red-600 p-6 rounded-2xl border border-red-100 mb-6">
+              {error}
+            </div>
+          )}
+          
           {loading ? (
             <div className="flex justify-center py-20">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-aftras-blue-text" />
@@ -99,7 +133,7 @@ export const Dashboard = () => {
                     </div>
                     <div>
                       <h3 className="text-lg font-bold text-gray-900">{loi.product}</h3>
-                      <p className="text-sm text-gray-500">{t('dashboard.loi_card.quantity')}: {loi.quantity} • {new Date(loi.createdAt).toLocaleDateString()}</p>
+                      <p className="text-sm text-gray-500">{t('dashboard.loi_card.quantity')}: {loi.quantity} • {new Date(loi.created_at).toLocaleDateString()}</p>
                     </div>
                   </div>
                   
@@ -140,12 +174,12 @@ export const Dashboard = () => {
                           </div>
                           <div className="md:col-span-2">
                             <p className="text-xs font-bold text-gray-400 uppercase mb-2">{t('loi_form.sections.additional')}</p>
-                            <p className="text-gray-700 text-sm leading-relaxed">{loi.additionalInfo || t('dashboard.loi_card.no_additional')}</p>
+                            <p className="text-gray-700 text-sm leading-relaxed">{loi.additional_info || t('dashboard.loi_card.no_additional')}</p>
                           </div>
                         </div>
 
                         {/* Admin Response */}
-                        {loi.adminResponse ? (
+                        {loi.admin_response ? (
                           <div className="bg-aftras-blue-text text-white rounded-2xl p-8 relative overflow-hidden">
                             <div className="absolute top-0 right-0 p-4 opacity-10">
                               <CheckCircle2 className="w-32 h-32" />
@@ -160,23 +194,23 @@ export const Dashboard = () => {
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                 <div>
                                   <p className="text-blue-200 text-xs font-bold uppercase mb-1">{t('dashboard.admin_response.proposed_quantity')}</p>
-                                  <p className="font-bold">{loi.adminResponse.proposedQuantity}</p>
+                                  <p className="font-bold">{loi.admin_response.proposed_quantity}</p>
                                 </div>
                                 <div>
                                   <p className="text-blue-200 text-xs font-bold uppercase mb-1">{t('dashboard.admin_response.proposed_price')}</p>
-                                  <p className="font-bold">{loi.adminResponse.price}</p>
+                                  <p className="font-bold">{loi.admin_response.price}</p>
                                 </div>
                                 <div>
                                   <p className="text-blue-200 text-xs font-bold uppercase mb-1">{t('dashboard.admin_response.incoterm_location')}</p>
-                                  <p className="font-bold">{loi.adminResponse.incoterm} - {loi.adminResponse.location}</p>
+                                  <p className="font-bold">{loi.admin_response.incoterm} - {loi.admin_response.location}</p>
                                 </div>
                                 <div>
                                   <p className="text-blue-200 text-xs font-bold uppercase mb-1">{t('dashboard.admin_response.delivery_time')}</p>
-                                  <p className="font-bold">{loi.adminResponse.deliveryTime} {t('dashboard.admin_response.days')}</p>
+                                  <p className="font-bold">{loi.admin_response.delivery_time} {t('dashboard.admin_response.days')}</p>
                                 </div>
                               </div>
                               <p className="text-blue-100 text-[10px] mt-6 text-right italic">
-                                {t('dashboard.admin_response.last_update')} {new Date(loi.adminResponse.updatedAt).toLocaleString()}
+                                {t('dashboard.admin_response.last_update')} {new Date(loi.admin_response.updated_at).toLocaleString()}
                               </p>
                             </div>
                           </div>

@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
-import { db } from '../firebase';
+import { supabase } from '../supabase';
 import { Product, PRODUCT_CATEGORIES } from '../types';
-import { Search, Filter, ShoppingCart, ChevronRight } from 'lucide-react';
+import { Search, Filter, ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ProductSlider } from '../components/ProductSlider';
 import { useTranslation } from 'react-i18next';
@@ -24,13 +23,32 @@ export const Catalog = () => {
   ];
 
   useEffect(() => {
-    const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const prods = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
-      setProducts(prods);
-      setLoading(false);
-    });
-    return () => unsubscribe();
+    const fetchProducts = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setProducts(data as Product[]);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+
+    const subscription = supabase
+      .channel('public:products')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, fetchProducts)
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -44,7 +62,7 @@ export const Catalog = () => {
     setFilteredProducts(filtered);
   }, [products, selectedCategory, searchTerm]);
 
-  const featuredProducts = products.filter(p => p.isFeatured);
+  const featuredProducts = products.filter(p => p.is_featured);
 
   return (
     <div className="bg-white min-h-screen">
@@ -116,7 +134,7 @@ export const Catalog = () => {
                     <div key={product.id} className="bg-white rounded-2xl shadow-sm border border-aftras-orange overflow-hidden group hover:shadow-xl transition-all">
                       <div className="h-56 overflow-hidden relative">
                         <img 
-                          src={product.imageUrl} 
+                          src={product.image_url} 
                           alt={product.name}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           referrerPolicy="no-referrer"

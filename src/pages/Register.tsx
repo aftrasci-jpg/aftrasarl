@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { supabase } from '../supabase';
 import { Building2, User, Mail, Lock, Globe, Phone, MapPin, Briefcase } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -35,26 +33,34 @@ export const Register = () => {
     setLoading(true);
     setError('');
     try {
-      const { user } = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-      
-      await setDoc(doc(db, 'users', user.uid), {
-        uid: user.uid,
+      const { data: { user }, error: authError } = await supabase.auth.signUp({
         email: formData.email,
-        role: 'company',
-        companyName: formData.companyName,
-        country: formData.country,
-        address: formData.address,
-        website: formData.website,
-        representativeName: formData.representativeName,
-        position: formData.position,
-        phone: formData.phone,
-        createdAt: new Date().toISOString()
+        password: formData.password,
       });
+      
+      if (authError) throw authError;
+      if (!user) throw new Error('Signup failed');
+
+      // Profile is created by trigger, but we update the extra fields
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          company_name: formData.companyName,
+          country: formData.country,
+          address: formData.address,
+          website: formData.website,
+          representative_name: formData.representativeName,
+          position: formData.position,
+          phone: formData.phone,
+        })
+        .eq('id', user.id);
+
+      if (profileError) throw profileError;
 
       navigate('/dashboard');
     } catch (err: any) {
       console.error(err);
-      setError(t('register_page.error_generic'));
+      setError(err.message || t('register_page.error_generic'));
     } finally {
       setLoading(false);
     }

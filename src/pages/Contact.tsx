@@ -10,7 +10,7 @@ export const Contact = () => {
     contactName: '',
     email: '',
     phone: '',
-    region: 'Afrique',
+    region: 'africa',
     message: ''
   });
   const [success, setSuccess] = useState(false);
@@ -88,15 +88,15 @@ export const Contact = () => {
                     <span className="text-sm font-bold text-orange-600 uppercase tracking-widest">{rep.region}</span>
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">{rep.name}</h3>
-                  <a 
-                    href={`https://wa.me/${rep.whatsapp.replace(/\s+/g, '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center text-aftras-blue-text font-bold hover:text-aftras-orange transition-colors"
-                  >
-                    <MessageSquare className="w-5 h-5 mr-2" />
-                    WhatsApp : {rep.whatsapp}
-                  </a>
+                    <a 
+                      href={`https://wa.me/${rep.whatsapp.replace(/\s+/g, '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center text-aftras-blue-text font-bold hover:text-aftras-orange transition-colors"
+                    >
+                      <MessageSquare className="w-5 h-5 mr-2" />
+                      {t('contact_page.form.whatsapp_label')} {rep.whatsapp}
+                    </a>
                 </motion.div>
               ))}
             </div>
@@ -163,10 +163,10 @@ export const Contact = () => {
                         onChange={(e) => setFormData({...formData, region: e.target.value})}
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-aftras-blue-text outline-none"
                       >
-                        <option value="Afrique">{t('footer.contacts.africa.region')}</option>
-                        <option value="Asie">{t('footer.contacts.asia.region')}</option>
-                        <option value="Europe">{t('footer.contacts.europe.region')}</option>
-                        <option value="Autre">{t('contact_page.form.other')}</option>
+                        <option value="africa">{t('contact_page.regions.africa')}</option>
+                        <option value="asia">{t('contact_page.regions.asia')}</option>
+                        <option value="europe">{t('contact_page.regions.europe')}</option>
+                        <option value="other">{t('contact_page.regions.other')}</option>
                       </select>
                     </div>
                     <div>

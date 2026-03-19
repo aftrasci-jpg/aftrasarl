@@ -68,21 +68,21 @@ export const Footer = () => {
                 <p className="text-aftras-orange font-bold text-xs uppercase tracking-wider mb-1">{t('contact_page.regions.africa')}</p>
                 <p className="text-white text-sm font-medium">Mr. Evariste Cyr Major Kahiba GNONSKAN</p>
                 <a href="https://wa.me/2250141354860" className="text-blue-200 text-xs hover:text-aftras-orange transition-colors flex items-center mt-1">
-                  <Phone className="w-3 h-3 mr-2" /> WhatsApp : +225 0141 354 860
+                  <Phone className="w-3 h-3 mr-2" /> {t('contact_page.form.whatsapp_label')} +225 0141 354 860
                 </a>
               </div>
               <div>
                 <p className="text-aftras-orange font-bold text-xs uppercase tracking-wider mb-1">{t('contact_page.regions.asia')}</p>
                 <p className="text-white text-sm font-medium">Mr. Quevin ZOH</p>
                 <a href="https://wa.me/919625916929" className="text-blue-200 text-xs hover:text-aftras-orange transition-colors flex items-center mt-1">
-                  <Phone className="w-3 h-3 mr-2" /> WhatsApp : +91 96259 16929
+                  <Phone className="w-3 h-3 mr-2" /> {t('contact_page.form.whatsapp_label')} +91 96259 16929
                 </a>
               </div>
               <div>
                 <p className="text-aftras-orange font-bold text-xs uppercase tracking-wider mb-1">{t('contact_page.regions.europe')}</p>
                 <p className="text-white text-sm font-medium">Mme. Merfeuh NGUEYEP</p>
                 <a href="https://wa.me/41779208318" className="text-blue-200 text-xs hover:text-aftras-orange transition-colors flex items-center mt-1">
-                  <Phone className="w-3 h-3 mr-2" /> WhatsApp : +41 77 920 83 18
+                  <Phone className="w-3 h-3 mr-2" /> {t('contact_page.form.whatsapp_label')} +41 77 920 83 18
                 </a>
               </div>
             </div>

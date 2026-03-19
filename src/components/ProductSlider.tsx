@@ -3,12 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react';
 import { Product } from '../types';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 interface ProductSliderProps {
   products: Product[];
 }
 
 export const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
+  const { t } = useTranslation();
   const [startIndex, setStartIndex] = useState(0);
   const [visibleCount, setVisibleCount] = useState(5);
 
@@ -28,7 +30,7 @@ export const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
     if (products.length === 0) return;
     const timer = setInterval(() => {
       setStartIndex((prev) => (prev + 1) % products.length);
-    }, 5000);
+    }, 6000);
     return () => clearInterval(timer);
   }, [products.length]);
 
@@ -58,17 +60,19 @@ export const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
               <div className="bg-white rounded-xl shadow-lg border border-aftras-orange overflow-hidden h-full flex flex-col transition-transform hover:-translate-y-2">
                 <div className="relative h-48 overflow-hidden">
                   <img 
-                    src={product.imageUrl} 
+                    src={product.image_url} 
                     alt={product.name}
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
                   />
                   <div className="absolute top-2 right-2 bg-aftras-orange text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase">
-                    Vedette
+                    {t('catalog_page.featured_badge')}
                   </div>
                 </div>
                 <div className="p-4 flex-grow">
-                  <span className="text-xs font-semibold text-aftras-blue-text uppercase tracking-wider">{product.category}</span>
+                  <span className="text-xs font-semibold text-aftras-blue-text uppercase tracking-wider">
+                    {t(`catalog_page.category_list.${product.category}`)}
+                  </span>
                   <h3 className="text-lg font-bold text-gray-900 mt-1 line-clamp-1">{product.name}</h3>
                 </div>
                 <div className="p-4 pt-0">
@@ -78,7 +82,7 @@ export const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
                     className="w-full flex items-center justify-center bg-aftras-orange text-white py-2 rounded-lg text-sm font-medium hover:bg-opacity-90 transition-colors"
                   >
                     <ShoppingCart className="w-4 h-4 mr-2" />
-                    Demander LOI
+                    {t('catalog_page.request_loi')}
                   </Link>
                 </div>
               </div>

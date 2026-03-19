@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { HeroSlider } from '../components/HeroSlider';
 import { ProductSlider } from '../components/ProductSlider';
-import { collection, query, where, getDocs, limit } from 'firebase/firestore';
-import { db } from '../firebase';
+import { supabase } from '../supabase';
 import { Product } from '../types';
 import { Search, Handshake, ShieldCheck, Zap, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -15,10 +14,17 @@ export const Home = () => {
 
   useEffect(() => {
     const fetchFeatured = async () => {
-      const q = query(collection(db, 'products'), where('isFeatured', '==', true), limit(10));
-      const snapshot = await getDocs(q);
-      const products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Product));
-      setFeaturedProducts(products);
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('is_featured', true)
+        .limit(10);
+      
+      if (error) {
+        console.error("Error fetching featured products:", error);
+      } else {
+        setFeaturedProducts(data as Product[]);
+      }
     };
     fetchFeatured();
   }, []);

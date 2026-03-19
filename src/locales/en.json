@@ -27,7 +27,12 @@
     "company_desc": "Africa Trading Solutions Côte d'Ivoire SARL. Your reliable international trading partner. We facilitate trade between Africa and the rest of the world.",
     "quick_links": "Quick Links",
     "our_services": "Our Services",
-    "contact": "Contact"
+    "contact": "Contact",
+    "contacts": {
+      "africa": { "region": "Africa" },
+      "asia": { "region": "Asia" },
+      "europe": { "region": "Europe" }
+    }
   },
   "home": {
     "hero": [
@@ -155,6 +160,17 @@
       "region": "Concerned Region",
       "message": "Your message"
     },
+    "form": {
+      "company": "Company Name",
+      "name": "Contact Name",
+      "email": "Email",
+      "phone": "Phone / WhatsApp",
+      "region": "Concerned Region",
+      "message": "Your message",
+      "submit": "Send Message",
+      "other": "Other",
+      "whatsapp_label": "WhatsApp:"
+    },
     "regions": {
       "africa": "Africa",
       "asia": "Asia",
@@ -167,29 +183,49 @@
     "subtitle": "Please fill out this form accurately to allow us to find the best supplier.",
     "success_title": "LOI Sent!",
     "success_desc": "Your request has been successfully registered. Our representatives will analyze it and respond to you soon.",
-    "redirect": "Redirecting to your dashboard...",
+    "redirecting": "Redirecting to your dashboard...",
+    "error_serious": "Please confirm the seriousness of your request.",
+    "error_generic": "An error occurred while sending the LOI.",
     "sections": {
       "product": "Product Information",
       "commercial": "Commercial Conditions",
       "additional": "Additional Information"
     },
-    "fields": {
-      "product": "Requested Product *",
+    "form": {
+      "product_label": "Requested Product *",
       "product_placeholder": "Ex: Long grain rice, Cashew nuts...",
-      "quantity": "Desired Quantity *",
+      "quantity_label": "Desired Quantity *",
       "quantity_placeholder": "Ex: 500 MT, 2 40ft containers...",
-      "budget": "Estimated Budget (USD/EUR)",
+      "budget_label": "Estimated Budget (USD/EUR)",
       "budget_placeholder": "Ex: 450 USD / MT",
-      "incoterm": "Desired Incoterm",
-      "port": "Port / Destination Country",
+      "incoterm_label": "Desired Incoterm",
+      "port_label": "Port / Destination Country",
       "port_placeholder": "Ex: Port of Abidjan, Côte d'Ivoire",
-      "deadline": "Desired Delivery Deadline",
+      "deadline_label": "Desired Delivery Deadline",
       "deadline_placeholder": "Ex: Within 30 days",
-      "additional": "Technical specifications, required certifications, etc.",
-      "serious": "I declare that this request is serious and that my company has the necessary funds to conclude the transaction if the conditions are accepted."
+      "additional_placeholder": "Technical specifications, required certifications, etc.",
+      "declaration": "I declare that this request is serious and that my company has the necessary funds to conclude the transaction if the conditions are accepted.",
+      "submit": "Send LOI"
+    }
+  },
+  "login_page": {
+    "title": "Welcome back!",
+    "subtitle": "Login to your business account",
+    "error": "Incorrect email or password.",
+    "no_account": "No account yet?",
+    "create_account": "Create a business account",
+    "form": {
+      "email": "Professional Email",
+      "password": "Password",
+      "submit": "Login",
+      "email_placeholder": "email@company.com"
     },
-    "submit": "Send LOI",
-    "confirm_serious": "Please confirm the seriousness of your request."
+    "demo": {
+      "title": "Test / Demo Access",
+      "admin_btn": "Pre-fill Admin",
+      "client_btn": "Pre-fill Client",
+      "note": "Note: Create these users in your Firebase console to test."
+    }
   },
   "auth": {
     "login_title": "Welcome back!",
@@ -312,6 +348,10 @@
         "name": "Product Name",
         "category": "Category",
         "image_url": "Image URL (Cloudinary)",
+        "image_url_placeholder": "https://example.com/image.jpg",
+        "upload_label": "Click to upload or drag and drop",
+        "image_required": "An image is required to publish the product.",
+        "upload_error": "Error uploading image.",
         "description": "Description",
         "featured": "Featured Product (Slider)",
         "submit": "Save product"
