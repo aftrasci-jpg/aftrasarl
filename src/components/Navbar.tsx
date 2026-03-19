@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Logo from '../logaft.png';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Menu, X, User, LogOut, LayoutDashboard, Globe } from 'lucide-react';
 import { NotificationBell } from './NotificationBell';
@@ -43,9 +44,9 @@ export const Navbar = () => {
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex flex-col">
               <div className="flex items-center mb-1">
-                <img 
-                  src="/src/logaft.png" 
-                  alt="AFTRAS CI Logo" 
+                <img
+                  src={Logo}
+                  alt="AFTRAS CI Logo"
                   className="h-10 w-auto sm:h-12 mr-2 object-contain flex-shrink-0"
                 />
                 <div className="flex flex-col">
@@ -79,7 +80,7 @@ export const Navbar = () => {
             ))}
 
             {/* Language Switcher */}
-            <button 
+            <button
               onClick={toggleLanguage}
               className="flex items-center text-sm font-bold text-aftras-blue-text hover:text-aftras-orange transition-colors"
             >
@@ -126,7 +127,7 @@ export const Navbar = () => {
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-4">
             {user && <NotificationBell />}
-            <button 
+            <button
               onClick={toggleLanguage}
               className="flex items-center text-sm font-bold text-aftras-blue-text"
             >
