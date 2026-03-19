@@ -17,7 +17,7 @@ export const Footer = () => {
             <Link to="/" className="flex flex-col mb-6">
               <div className="flex items-center mb-1">
                 <img 
-                  src="/logaft.png" 
+                  src="https://res.cloudinary.com/dnpgvhq2t/image/upload/v1773972011/logaft_djawlr.jpg" 
                   alt="AFTRAS CI Logo" 
                   className="h-10 w-auto sm:h-12 mr-2 object-contain flex-shrink-0"
                 />
