@@ -10,8 +10,8 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>,
 );
 
-// Ajouter le favicon pour GitHub Pages
+// Ajouter le favicon
 const link = document.createElement('link');
 link.rel = 'icon';
-link.href = '/aftrasarl/favicon.ico';
+link.href = '/favicon.ico';
 document.head.appendChild(link);

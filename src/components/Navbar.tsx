@@ -45,11 +45,11 @@ export const Navbar = () => {
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex flex-col">
               <div className="flex items-center mb-1">
-                <img 
-                  src="https://res.cloudinary.com/dnpgvhq2t/image/upload/v1773972011/logaft_djawlr.jpg" 
-                  alt="AFTRAS CI Logo" 
-                  className="h-10 w-auto sm:h-12 mr-2 object-contain flex-shrink-0"
-                />
+<img 
+  src="/logaft.png" 
+  alt="AFTRAS CI Logo" 
+  className="h-10 w-auto sm:h-12 mr-2 object-contain flex-shrink-0"
+/>
                 <div className="flex flex-col">
                   <div className="flex items-center">
                     <span className="text-2xl font-bold text-aftras-blue-text">AFTRAS</span>

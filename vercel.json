@@ -1,0 +1,17 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "framework": "react",
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/aftrasarl/$1"
+    }
+  ],
+  "buildEnv": {
+    "VITE_SUPABASE_URL": "@supabase-url",
+    "VITE_SUPABASE_ANON_KEY": "@supabase-anon-key",
+    "GEMINI_API_KEY": "@gemini-api-key"
+  }
+}
