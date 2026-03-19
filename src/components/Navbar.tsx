@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Logo from '../logaft.png';
+// Logo moved to public/
+
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Menu, X, User, LogOut, LayoutDashboard, Globe } from 'lucide-react';
 import { NotificationBell } from './NotificationBell';
@@ -24,7 +25,7 @@ export const Navbar = () => {
     navigate('/');
   };
 
-  const toggleLanguage = () => {
+  const toggleLanguage = async () => {
     const newLang = i18n.language === 'fr' ? 'en' : 'fr';
     i18n.changeLanguage(newLang);
   };
@@ -44,9 +45,9 @@ export const Navbar = () => {
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex flex-col">
               <div className="flex items-center mb-1">
-                <img
-                  src={Logo}
-                  alt="AFTRAS CI Logo"
+                <img 
+                  src="/logaft.png" 
+                  alt="AFTRAS CI Logo" 
                   className="h-10 w-auto sm:h-12 mr-2 object-contain flex-shrink-0"
                 />
                 <div className="flex flex-col">

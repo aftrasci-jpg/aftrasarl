@@ -1,5 +1,6 @@
 import React from 'react';
-import Logo from '../logaft.png';
+// Logo moved to public/
+
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, Globe, Facebook, Linkedin, Twitter } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +17,7 @@ export const Footer = () => {
             <Link to="/" className="flex flex-col mb-6">
               <div className="flex items-center mb-1">
                 <img 
-                  src={Logo} 
+                  src="/logaft.png" 
                   alt="AFTRAS CI Logo" 
                   className="h-10 w-auto sm:h-12 mr-2 object-contain flex-shrink-0"
                 />
