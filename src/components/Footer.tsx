@@ -13,9 +13,18 @@ export const Footer = () => {
           {/* Company Info */}
           <div>
             <Link to="/" className="flex flex-col mb-6">
-              <div className="flex items-center">
-                <span className="text-2xl font-bold text-white">AFTRAS</span>
-                <span className="text-2xl font-bold text-aftras-orange ml-1">CI</span>
+              <div className="flex items-center mb-1">
+                <img 
+                  src="/src/logaft.png" 
+                  alt="AFTRAS CI Logo" 
+                  className="h-10 w-auto sm:h-12 mr-2 object-contain flex-shrink-0"
+                />
+                <div className="flex flex-col">
+                  <div className="flex items-center">
+                    <span className="text-2xl font-bold text-white">AFTRAS</span>
+                    <span className="text-2xl font-bold text-aftras-orange ml-1">CI</span>
+                  </div>
+                </div>
               </div>
               <span className="text-[10px] font-medium text-blue-200 -mt-1 tracking-wider uppercase">
                 {t('common.slogan')}

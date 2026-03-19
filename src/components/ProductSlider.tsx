@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, ShoppingCart } from 'lucide-react';
 import { Product } from '../types';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useProductTranslation } from '../utils/translation';
 
 interface ProductSliderProps {
   products: Product[];
@@ -11,92 +12,93 @@ interface ProductSliderProps {
 
 export const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
   const { t } = useTranslation();
-  const [startIndex, setStartIndex] = useState(0);
-  const [visibleCount, setVisibleCount] = useState(5);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 640) setVisibleCount(1);
-      else if (window.innerWidth < 1024) setVisibleCount(2);
-      else if (window.innerWidth < 1280) setVisibleCount(3);
-      else setVisibleCount(5);
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const { translateProductName, translateProductCategory } = useProductTranslation();
+  const [current, setCurrent] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     if (products.length === 0) return;
+    
     const timer = setInterval(() => {
-      setStartIndex((prev) => (prev + 1) % products.length);
-    }, 6000);
-    return () => clearInterval(timer);
-  }, [products.length]);
+      if (!isPaused) {
+        setCurrent((prev) => (prev + 1) % products.length);
+      }
+    }, 4000);
 
-  const next = () => setStartIndex((prev) => (prev + 1) % products.length);
-  const prev = () => setStartIndex((prev) => (prev - 1 + products.length) % products.length);
+    return () => clearInterval(timer);
+  }, [products.length, isPaused]);
+
+  const next = () => setCurrent((prev) => (prev + 1) % products.length);
+  const prev = () => setCurrent((prev) => (prev - 1 + products.length) % products.length);
+  const goTo = (index: number) => setCurrent(index);
 
   if (products.length === 0) return null;
 
-  const visibleProducts = [];
-  for (let i = 0; i < visibleCount; i++) {
-    visibleProducts.push(products[(startIndex + i) % products.length]);
-  }
-
   return (
-    <div className="relative group px-12">
-      <div className="flex gap-6 overflow-hidden">
-        <AnimatePresence mode="popLayout">
-          {visibleProducts.map((product, idx) => (
-            <motion.div
-              key={`${product.id}-${idx}`}
-              layout
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              className="flex-1 min-w-0"
+    <div className="relative max-w-4xl mx-auto">
+      <AnimatePresence mode="wait">
+          <motion.div
+          key={current}
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -50 }}
+          transition={{ duration: 0.5 }}
+          className="relative h-[200px] md:h-[250px] rounded-2xl overflow-hidden shadow-2xl"
+        >
+          <img 
+            src={products[current].image_url}
+            alt={translateProductName(products[current].name)}
+            className="w-full h-full object-contain"
+            referrerPolicy="no-referrer"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+          
+          <div className="absolute bottom-8 left-8 right-8">
+            <span className="inline-block bg-aftras-orange/90 text-white px-3 py-1 rounded-full text-xs font-bold uppercase mb-2">
+              {translateProductCategory(products[current].category)}
+            </span>
+            <h3 className="text-2xl md:text-3xl font-bold text-white mb-4 drop-shadow-lg">
+              {translateProductName(products[current].name)}
+            </h3>
+            <Link 
+              to="/loi" 
+              state={{ product: translateProductName(products[current].name) }}
+              className="inline-flex items-center bg-aftras-orange text-white px-6 py-3 rounded-lg font-bold hover:bg-opacity-90 transition-all"
+              onClick={() => setIsPaused(true)}
             >
-              <div className="bg-white rounded-xl shadow-lg border border-aftras-orange overflow-hidden h-full flex flex-col transition-transform hover:-translate-y-2">
-                <div className="relative h-48 overflow-hidden">
-                  <img 
-                    src={product.image_url} 
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute top-2 right-2 bg-aftras-orange text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase">
-                    {t('catalog_page.featured_badge')}
-                  </div>
-                </div>
-                <div className="p-4 flex-grow">
-                  <span className="text-xs font-semibold text-aftras-blue-text uppercase tracking-wider">
-                    {t(`catalog_page.category_list.${product.category}`)}
-                  </span>
-                  <h3 className="text-lg font-bold text-gray-900 mt-1 line-clamp-1">{product.name}</h3>
-                </div>
-                <div className="p-4 pt-0">
-                  <Link 
-                    to="/loi" 
-                    state={{ product: product.name }}
-                    className="w-full flex items-center justify-center bg-aftras-orange text-white py-2 rounded-lg text-sm font-medium hover:bg-opacity-90 transition-colors"
-                  >
-                    <ShoppingCart className="w-4 h-4 mr-2" />
-                    {t('catalog_page.request_loi')}
-                  </Link>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
+              <ShoppingCart className="w-5 h-5 mr-2" />
+              {t('catalog_page.request_loi')}
+            </Link>
+          </div>
+        </motion.div>
+      </AnimatePresence>
 
-      <button onClick={prev} className="absolute left-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md text-aftras-blue-text hover:bg-blue-50 transition-colors opacity-0 group-hover:opacity-100">
+      {/* Navigation Buttons */}
+      <button 
+        onClick={prev}
+        className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/90 backdrop-blur hover:bg-white text-aftras-blue-text shadow-lg transition-all"
+      >
         <ChevronLeft className="w-6 h-6" />
       </button>
-      <button onClick={next} className="absolute right-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md text-aftras-blue-text hover:bg-blue-50 transition-colors opacity-0 group-hover:opacity-100">
+      <button 
+        onClick={next}
+        className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-white/90 backdrop-blur hover:bg-white text-aftras-blue-text shadow-lg transition-all"
+      >
         <ChevronRight className="w-6 h-6" />
       </button>
+
+      {/* Pagination Dots */}
+      <div className="flex justify-center space-x-2 mt-6">
+        {products.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => goTo(index)}
+            className={`w-3 h-3 rounded-full transition-all ${
+              current === index ? 'bg-aftras-orange w-8 shadow-lg' : 'bg-white/60 hover:bg-white'
+            }`}
+          />
+        ))}
+      </div>
     </div>
   );
 };

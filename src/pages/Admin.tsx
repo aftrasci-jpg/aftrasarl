@@ -19,6 +19,7 @@ export const Admin = () => {
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const STATUS_LABELS: Record<string, string> = {
@@ -103,6 +104,7 @@ export const Admin = () => {
   const handleProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSubmitting(true);
     try {
       // Validate with Zod
       productSchema.parse(productForm);
@@ -124,6 +126,8 @@ export const Admin = () => {
           .insert([productForm]);
         if (saveError) throw saveError;
       }
+      
+      // Success - close modal and reset form
       setIsProductModalOpen(false);
       setEditingProduct(null);
       setProductForm({ name: '', category: PRODUCT_CATEGORIES[0], description: '', image_url: '', is_featured: false });
@@ -134,6 +138,8 @@ export const Admin = () => {
         console.error("Product save error:", err);
         setError(t('common.error'));
       }
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -445,13 +451,13 @@ export const Admin = () => {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden"
+                className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
               >
-                <div className="bg-aftras-blue-text p-6 text-white flex justify-between items-center">
+                <div className="bg-aftras-blue-text p-6 text-white flex justify-between items-center sticky top-0 z-10">
                   <h3 className="text-xl font-bold">{editingProduct ? t('admin_page.products.modal.edit_title') : t('admin_page.products.modal.add_title')}</h3>
                   <button onClick={() => setIsProductModalOpen(false)}><X className="w-6 h-6" /></button>
                 </div>
-                <form onSubmit={handleProductSubmit} className="p-8 space-y-6">
+                <form onSubmit={handleProductSubmit} className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
                   {error && (
                     <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 flex items-center text-sm">
                       <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0" />
@@ -535,7 +541,7 @@ export const Admin = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">{t('admin_page.products.modal.description')}</label>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">{t('admin_page.products.modal.description')} <span className="text-gray-400 text-sm font-normal">({t('common.optional')})</span></label>
                       <textarea 
                         rows={3}
                         value={productForm.description}
@@ -553,8 +559,23 @@ export const Admin = () => {
                     />
                     <label htmlFor="isFeatured" className="ml-3 text-sm font-bold text-gray-700">{t('admin_page.products.modal.featured')}</label>
                   </div>
-                  <button type="submit" className="w-full bg-aftras-orange text-white py-4 rounded-xl font-bold hover:bg-opacity-90 transition-all">
-                    {t('admin_page.products.modal.submit')}
+                  <button 
+                    type="submit" 
+                    disabled={submitting}
+                    className={`w-full py-4 rounded-xl font-bold transition-all ${
+                      submitting 
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : 'bg-aftras-orange text-white hover:bg-opacity-90'
+                    }`}
+                  >
+                    {submitting ? (
+                      <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3" />
+                        {t('admin_page.products.modal.submitting')}
+                      </div>
+                    ) : (
+                      t('admin_page.products.modal.submit')
+                    )}
                   </button>
                 </form>
               </motion.div>

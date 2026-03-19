@@ -124,6 +124,53 @@
       ]
     }
   },
+  "products": {
+    "categories": {
+      "cereals": "Cereals & Grains",
+      "legumes": "Legumes",
+      "nuts": "Nuts & Oilseeds",
+      "export": "Export Products",
+      "spices": "Spices & Condiments",
+      "fruits": "Fruits & Vegetables",
+      "processed": "Processed Products"
+    },
+      "names": {
+      "Riz": "Rice",
+      "Maïs": "Corn",
+      "Haricots": "Beans",
+      "Pois": "Peas",
+      "Noix de cajou": "Cashew nuts",
+      "Arachides": "Peanuts",
+      "Cacao": "Cocoa",
+      "Café": "Coffee",
+      "Bananes": "Bananas",
+      "Ananas": "Pineapple",
+      "Huile de palme": "Palm oil",
+      "Sucre": "Sugar",
+      "Oignon": "Onion",
+      "Amandes de cajou": "Cashew almonds",
+      "Caoutchouc": "Rubber",
+      "Niébé": "Cowpea",
+      "Huile rouge": "Red oil",
+      "Miel": "Honey",
+      "Mil": "Millet",
+      "Pomme de terre": "Potato",
+      "Sorgho": "Sorghum",
+      "Soja": "Soy",
+      "Piment rouge": "Red pepper",
+      "Curcuma": "Turmeric",
+      "Cannelle": "Cinnamon",
+      "Blé": "Wheat",
+      "Orange": "Orange",
+      "Tomate": "Tomato",
+      "Ail": "Garlic",
+      "Mangue": "Mango",
+      "Avocat": "Avocado"
+    },
+    "descriptions": {
+      "default": "High-quality product sourced by our experts for your import-export needs."
+    }
+  },
   "catalog_page": {
     "title": "Product Catalog",
     "subtitle": "Discover our selection of high-quality products.",

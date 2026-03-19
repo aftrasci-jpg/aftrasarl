@@ -6,9 +6,11 @@ import { Search, Filter, ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ProductSlider } from '../components/ProductSlider';
 import { useTranslation } from 'react-i18next';
+import { useProductTranslation } from '../utils/translation';
 
 export const Catalog = () => {
   const { t } = useTranslation();
+  const { translateProductName, translateProductDescription, translateProductCategory } = useProductTranslation();
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -63,7 +65,7 @@ export const Catalog = () => {
     setFilteredProducts(filtered);
   }, [products, selectedCategory, searchTerm]);
 
-  const featuredProducts = products.filter(p => p.is_featured);
+  const featuredProducts = products.filter(p => p.is_featured).slice(0, 10);
 
   return (
     <div className="bg-white min-h-screen">
@@ -140,22 +142,22 @@ export const Catalog = () => {
                       <div className="h-56 overflow-hidden relative">
                         <img 
                           src={product.image_url} 
-                          alt={product.name}
+                          alt={translateProductName(product.name)}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           referrerPolicy="no-referrer"
                         />
                         <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-aftras-blue-text uppercase tracking-widest">
-                          {t(`catalog_page.category_list.${product.category}`)}
+                          {translateProductCategory(product.category)}
                         </div>
                       </div>
                       <div className="p-6">
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">{product.name}</h3>
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">{translateProductName(product.name)}</h3>
                         <p className="text-gray-600 text-sm line-clamp-2 mb-6">
-                          {product.description || t('catalog_page.default_desc')}
+                          {translateProductDescription(product.description)}
                         </p>
                         <Link 
                           to="/loi" 
-                          state={{ product: product.name }}
+                          state={{ product: translateProductName(product.name) }}
                           className="w-full flex items-center justify-center bg-aftras-orange text-white py-3 rounded-xl font-bold hover:bg-opacity-90 transition-colors"
                         >
                           <ShoppingCart className="w-4 h-4 mr-2" />

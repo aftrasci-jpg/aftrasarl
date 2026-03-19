@@ -42,9 +42,18 @@ export const Navbar = () => {
         <div className="flex justify-between h-20">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex flex-col">
-              <div className="flex items-center">
-                <span className="text-2xl font-bold text-aftras-blue-text">AFTRAS</span>
-                <span className="text-2xl font-bold text-aftras-orange ml-1">CI</span>
+              <div className="flex items-center mb-1">
+                <img 
+                  src="/src/logaft.png" 
+                  alt="AFTRAS CI Logo" 
+                  className="h-10 w-auto sm:h-12 mr-2 object-contain flex-shrink-0"
+                />
+                <div className="flex flex-col">
+                  <div className="flex items-center">
+                    <span className="text-2xl font-bold text-aftras-blue-text">AFTRAS</span>
+                    <span className="text-2xl font-bold text-aftras-orange ml-1">CI</span>
+                  </div>
+                </div>
               </div>
               <span className="text-[10px] font-medium text-gray-500 -mt-1 tracking-wider uppercase">
                 {t('common.slogan')}

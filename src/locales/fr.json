@@ -124,6 +124,54 @@
       ]
     }
   },
+  "products": {
+    "categories": {
+      "cereals": "Céréales & Grains",
+      "legumes": "Légumineuses",
+      "nuts": "Noix & Oléagineux",
+      "export": "Produits d'export",
+      "spices": "Épices & Condiments",
+      "fruits": "Fruits & Légumes",
+      "processed": "Produits transformés"
+    },
+    "names": {
+      "Rice": "Riz",
+      "Corn": "Maïs",
+      "Beans": "Haricots",
+      "Peas": "Pois",
+      "Cashew nuts": "Noix de cajou",
+      "Peanuts": "Arachides",
+      "Cocoa": "Cacao",
+      "Coffee": "Café",
+      "Bananas": "Bananes",
+      "Pineapple": "Ananas",
+      "Palm oil": "Huile de palme",
+      "Sugar": "Sucre",
+      "Onion": "Oignon",
+      "Cashew almonds": "Amandes de cajou",
+      "Rubber": "Caoutchouc",
+      "Cowpea": "Niébé",
+      "Red oil": "Huile rouge",
+      "Honey": "Miel",
+      "Millet": "Mil",
+      "Potato": "Pomme de terre",
+      "Sorghum": "Sorgho",
+      "Soy": "Soja",
+      "Red pepper": "Piment rouge",
+      "Turmeric": "Curcuma",
+      "Cinnamon": "Cannelle",
+      "Wheat": "Blé",
+      "Orange": "Orange",
+      "Tomato": "Tomate",
+      "Garlic": "Ail",
+      "Mango": "Mangue",
+      "Avocado": "Avocat",
+      "Amandes de cajou": "Amandes de cajou"
+    },
+    "descriptions": {
+      "default": "Produit de haute qualité sourcé par nos experts pour vos besoins d'import-export."
+    }
+  },
   "catalog_page": {
     "title": "Catalogue Produits",
     "subtitle": "Découvrez notre sélection de produits de haute qualité.",
@@ -134,7 +182,7 @@
       "cereals": "Céréales & Grains",
       "legumes": "Légumineuses",
       "nuts": "Noix & Oléagineux",
-      "export": "Produits d’export",
+      "export": "Produits d'export",
       "spices": "Épices & Condiments",
       "fruits": "Fruits & Légumes",
       "processed": "Produits transformés"

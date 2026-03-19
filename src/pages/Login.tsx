@@ -1,47 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { Mail, Lock, LogIn, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../context/AuthContext';
 import { loginSchema } from '../schemas';
 import { z } from 'zod';
 
 export const Login = () => {
   const { t } = useTranslation();
+  const { profile, loading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
+  const [redirectLoading, setRedirectLoading] = useState(false);
   const navigate = useNavigate();
+
+  // Auto-redirect after successful login when profile loads from AuthContext
+  useEffect(() => {
+    if (!authLoading && !formLoading && profile && !error) {
+      console.log('🔍 Login redirect - Profile loaded:', {
+        role: profile.role,
+        email: profile.email,
+        redirectTo: profile.role === 'admin' ? '/admin' : '/dashboard'
+      });
+
+      if (profile.role === 'admin') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
+    }
+  }, [profile, authLoading, formLoading, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setFormLoading(true);
     setError('');
+    
     try {
-      // Validate with Zod
+      // Validate form
       loginSchema.parse({ email, password });
 
+      // Authenticate
       const { error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-      if (authError) throw authError;
 
-      // Fetch profile to determine role
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', (await supabase.auth.getUser()).data.user?.id)
-        .single();
-
-      if (profileError) throw profileError;
-
-      if (profile?.role === 'admin' || email === 'ditobb2018@gmail.com') {
-        navigate('/admin');
-      } else {
-        navigate('/dashboard');
+      if (authError) {
+        setError(authError.message || t('login_page.error'));
+        throw authError;
       }
+
+      // Success - AuthContext will load profile and trigger useEffect redirect
+      console.log('✅ Auth success - Waiting for profile from AuthContext...');
+      
     } catch (err: any) {
       if (err instanceof z.ZodError) {
         setError(err.issues[0].message);
@@ -49,9 +64,23 @@ export const Login = () => {
         setError(err.message || t('login_page.error'));
       }
     } finally {
-      setLoading(false);
+      setFormLoading(false);
     }
   };
+
+  // Show loading if auth/profile loading or redirecting
+  if (authLoading || redirectLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-aftras-blue-text mx-auto mb-4" />
+          <p className="text-gray-600 font-medium">
+            {redirectLoading ? 'Redirection en cours...' : 'Chargement...'}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -114,40 +143,18 @@ export const Login = () => {
           </div>
 
           <button
-            disabled={loading}
+            disabled={formLoading}
             type="submit"
-            className="w-full bg-aftras-orange text-white py-4 rounded-xl font-bold text-lg hover:bg-opacity-90 transition-all flex items-center justify-center shadow-lg shadow-aftras-orange/20"
+            className="w-full bg-aftras-orange text-white py-4 rounded-xl font-bold text-lg hover:bg-opacity-90 transition-all flex items-center justify-center shadow-lg shadow-aftras-orange/20 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? (
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
+            {formLoading ? (
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-2" />
             ) : (
-              <>
-                <LogIn className="w-5 h-5 mr-2" /> {t('login_page.form.submit')}
-              </>
+              <LogIn className="w-5 h-5 mr-2" />
             )}
+            {formLoading ? 'Connexion...' : t('login_page.form.submit')}
           </button>
         </form>
-
-        <div className="mt-8 pt-8 border-t border-gray-100">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 text-center">{t('login_page.demo.title')}</p>
-          <div className="grid grid-cols-2 gap-4">
-            <button 
-              onClick={() => { setEmail('admin@demo.com'); setPassword('password123'); }}
-              className="text-xs bg-blue-50 text-aftras-blue-text py-2 px-4 rounded-lg font-bold hover:bg-blue-100 transition-colors"
-            >
-              {t('login_page.demo.admin_btn')}
-            </button>
-            <button 
-              onClick={() => { setEmail('user@demo.com'); setPassword('password123'); }}
-              className="text-xs bg-orange-50 text-aftras-orange py-2 px-4 rounded-lg font-bold hover:bg-orange-100 transition-colors"
-            >
-              {t('login_page.demo.client_btn')}
-            </button>
-          </div>
-          <p className="text-[10px] text-gray-400 mt-2 text-center italic">
-            {t('login_page.demo.note')}
-          </p>
-        </div>
 
         <p className="text-center mt-8 text-gray-600 text-sm">
           {t('login_page.no_account')}{' '}
