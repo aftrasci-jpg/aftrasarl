@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { SEO } from '../components/SEO';
 import { HeroSlider } from '../components/HeroSlider';
 import { ProductSlider } from '../components/ProductSlider';
 import { supabase } from '../supabase';
@@ -45,6 +46,10 @@ export const Home = () => {
 
   return (
     <div className="bg-white">
+      <SEO 
+        title="Accueil | AFTRAS CI - Négoce International & Sourcing"
+        description="AFTRAS CI facilite vos échanges commerciaux internationaux. Sourcing de produits, logistique et accompagnement sur mesure en Côte d'Ivoire et à l'international."
+      />
       <HeroSlider />
 
       {/* How we work */}

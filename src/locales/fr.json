@@ -217,6 +217,7 @@
     "form": {
       "email": "Email professionnel",
       "password": "Mot de passe",
+      "forgot_password": "Mot de passe oublié ?",
       "submit": "Se connecter",
       "email_placeholder": "email@entreprise.com"
     },
@@ -285,6 +286,24 @@
     },
     "has_account": "Vous avez déjà un compte ?",
     "login": "Se connecter"
+  },
+  "forgot_password_page": {
+    "title": "Mot de passe oublié ?",
+    "subtitle": "Entrez votre email pour recevoir un lien de réinitialisation.",
+    "email_label": "Email professionnel",
+    "submit": "Envoyer le lien",
+    "back_to_login": "Retour à la connexion",
+    "success_title": "Email envoyé !",
+    "success_desc": "Si un compte existe pour cet email, vous recevrez un lien de réinitialisation sous peu."
+  },
+  "reset_password_page": {
+    "title": "Réinitialiser le mot de passe",
+    "subtitle": "Choisissez un nouveau mot de passe pour votre compte.",
+    "new_password": "Nouveau mot de passe",
+    "confirm_password": "Confirmer le nouveau mot de passe",
+    "submit": "Mettre à jour le mot de passe",
+    "success_title": "Mot de passe mis à jour !",
+    "success_desc": "Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter."
   },
   "dashboard": {
     "title": "Tableau de bord",
@@ -356,6 +375,19 @@
         "featured": "Produit Vedette (Slider)",
         "submit": "Enregistrer le produit"
       }
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "Aucune notification",
+    "mark_all_read": "Tout marquer comme lu",
+    "loi_created": {
+      "title": "Nouvelle LOI reçue",
+      "message": "L'entreprise {{company}} a envoyé une nouvelle LOI pour {{product}}."
+    },
+    "loi_updated": {
+      "title": "Mise à jour de votre LOI",
+      "message": "L'administration a répondu à votre demande pour {{product}}."
     }
   }
 }

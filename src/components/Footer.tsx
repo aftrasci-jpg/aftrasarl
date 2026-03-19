@@ -90,6 +90,10 @@ export const Footer = () => {
         </div>
 
         <div className="border-t border-white/20 pt-8 text-center">
+          <div className="flex justify-center space-x-6 mb-4">
+            <Link to="/privacy" className="text-blue-200 text-xs hover:text-aftras-orange transition-colors">Politique de Confidentialité</Link>
+            <Link to="/terms" className="text-blue-200 text-xs hover:text-aftras-orange transition-colors">Conditions Générales</Link>
+          </div>
           <p className="text-blue-200 text-xs">
             &copy; {new Date().getFullYear()} Africa Trading Solutions Côte d'Ivoire SARL. {t('common.all_rights_reserved')}
           </p>

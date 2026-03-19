@@ -43,7 +43,35 @@ CREATE TABLE IF NOT EXISTS public.lois (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 4. Storage Buckets
+-- 4. Notifications Table
+CREATE TABLE IF NOT EXISTS public.notifications (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) NOT NULL,
+  title TEXT NOT NULL,
+  message TEXT NOT NULL,
+  type TEXT NOT NULL, -- 'loi_created', 'loi_updated', 'system'
+  link TEXT,
+  is_read BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Enable RLS for Notifications
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+
+-- Notifications Policies
+CREATE POLICY "Users can view their own notifications"
+  ON public.notifications FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own notifications (mark as read)"
+  ON public.notifications FOR UPDATE
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Anyone can create notifications (for the system to handle)"
+  ON public.notifications FOR INSERT
+  WITH CHECK (true);
+
+-- 6. Storage Buckets
 -- Note: Buckets can also be created via the Supabase UI.
 -- This SQL creates the 'products' bucket and sets up RLS policies.
 

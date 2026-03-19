@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { SEO } from '../components/SEO';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabase';
 import { LOI, STATUS_COLORS } from '../types';
@@ -70,6 +71,10 @@ export const Dashboard = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen py-12">
+      <SEO 
+        title="Tableau de Bord | AFTRAS CI"
+        description="Gérez vos demandes de sourcing (LOI), suivez l'état de vos dossiers et recevez des offres personnalisées de nos experts en négoce international."
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">

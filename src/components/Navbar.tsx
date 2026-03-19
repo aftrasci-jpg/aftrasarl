@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Menu, X, User, LogOut, LayoutDashboard, Globe } from 'lucide-react';
+import { NotificationBell } from './NotificationBell';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabase';
 import { clsx, type ClassValue } from 'clsx';
@@ -78,7 +79,8 @@ export const Navbar = () => {
             </button>
 
             {user ? (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-6">
+                <NotificationBell />
                 <Link
                   to={isAdmin ? "/admin" : "/dashboard"}
                   className="flex items-center text-sm font-medium text-aftras-blue-text hover:text-aftras-orange"
@@ -114,6 +116,7 @@ export const Navbar = () => {
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-4">
+            {user && <NotificationBell />}
             <button 
               onClick={toggleLanguage}
               className="flex items-center text-sm font-bold text-aftras-blue-text"

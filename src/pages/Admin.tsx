@@ -2,9 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabase';
 import { LOI, Product, STATUS_COLORS, LOIStatus, PRODUCT_CATEGORIES, ProductCategory } from '../types';
-import { Plus, Trash2, Edit, CheckCircle2, X, Package, FileText, Send, Image as ImageIcon, Upload } from 'lucide-react';
+import { Plus, Trash2, Edit, CheckCircle2, X, Package, FileText, Send, Image as ImageIcon, Upload, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { SEO } from '../components/SEO';
+import { productSchema } from '../schemas';
+import { z } from 'zod';
 
 export const Admin = () => {
   const { t } = useTranslation();
@@ -99,9 +102,13 @@ export const Admin = () => {
 
   const handleProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     try {
+      // Validate with Zod
+      productSchema.parse(productForm);
+
       if (!productForm.image_url) {
-        alert(t('admin_page.products.modal.image_required'));
+        setError(t('admin_page.products.modal.image_required'));
         return;
       }
 
@@ -120,22 +127,26 @@ export const Admin = () => {
       setIsProductModalOpen(false);
       setEditingProduct(null);
       setProductForm({ name: '', category: PRODUCT_CATEGORIES[0], description: '', image_url: '', is_featured: false });
-    } catch (error) {
-      console.error("Product save error:", error);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        setError(err.issues[0].message);
+      } else {
+        console.error("Product save error:", err);
+        setError(t('common.error'));
+      }
     }
   };
 
   const handleDeleteProduct = async (id: string) => {
-    if (window.confirm(t('admin_page.products.confirm_delete'))) {
-      try {
-        const { error: deleteError } = await supabase
-          .from('products')
-          .delete()
-          .eq('id', id);
-        if (deleteError) throw deleteError;
-      } catch (error) {
-        console.error("Product delete error:", error);
-      }
+    try {
+      const { error: deleteError } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', id);
+      if (deleteError) throw deleteError;
+    } catch (error) {
+      console.error("Product delete error:", error);
+      setError(t('common.error'));
     }
   };
 
@@ -157,6 +168,16 @@ export const Admin = () => {
         .eq('id', loi.id);
       
       if (responseError) throw responseError;
+
+      // Send notification to the company
+      await supabase.from('notifications').insert({
+        user_id: loi.company_id,
+        title: t('notifications.loi_updated.title'),
+        message: t('notifications.loi_updated.message', { product: loi.product }),
+        type: 'loi_updated',
+        link: '/dashboard'
+      });
+
       setExpandedLoiId(null);
     } catch (error) {
       console.error("LOI response error:", error);
@@ -186,7 +207,7 @@ export const Admin = () => {
       setProductForm({ ...productForm, image_url: publicUrl });
     } catch (error: any) {
       console.error('Image upload error:', error);
-      alert(t('admin_page.products.modal.upload_error'));
+      setError(t('admin_page.products.modal.upload_error'));
     } finally {
       setUploading(false);
     }
@@ -196,6 +217,10 @@ export const Admin = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen py-12">
+      <SEO 
+        title={t('admin_page.title')} 
+        description="Administration AFTRAS CI - Gestion des LOI et du catalogue produits."
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-aftras-blue-border mb-12">{t('admin_page.title')}</h1>
 
@@ -427,6 +452,12 @@ export const Admin = () => {
                   <button onClick={() => setIsProductModalOpen(false)}><X className="w-6 h-6" /></button>
                 </div>
                 <form onSubmit={handleProductSubmit} className="p-8 space-y-6">
+                  {error && (
+                    <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 flex items-center text-sm">
+                      <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0" />
+                      {error}
+                    </div>
+                  )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-bold text-gray-700 mb-2">{t('admin_page.products.modal.name')}</label>

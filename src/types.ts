@@ -81,3 +81,14 @@ export const PRODUCT_CATEGORIES = [
 ] as const;
 
 export type ProductCategory = typeof PRODUCT_CATEGORIES[number];
+
+export interface Notification {
+  id: string;
+  user_id: string;
+  title: string;
+  message: string;
+  type: 'loi_created' | 'loi_updated' | 'system';
+  link?: string;
+  is_read: boolean;
+  created_at: string;
+}

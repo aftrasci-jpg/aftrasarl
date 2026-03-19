@@ -1,4 +1,5 @@
 import React from 'react';
+import { SEO } from '../components/SEO';
 import { motion } from 'framer-motion';
 import { Search, Handshake, ShieldCheck, Truck, BarChart3, Globe2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -47,6 +48,10 @@ export const Services = () => {
 
   return (
     <div className="bg-white">
+      <SEO 
+        title="Nos Services | AFTRAS CI - Sourcing & Négoce"
+        description="Découvrez nos services d'intermédiation commerciale : sourcing de produits, logistique internationale, accompagnement stratégique et sécurisation des transactions."
+      />
       {/* Hero */}
       <section className="relative py-24 bg-aftras-blue-text text-white overflow-hidden">
         <div className="absolute inset-0 opacity-20">

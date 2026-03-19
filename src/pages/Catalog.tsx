@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { SEO } from '../components/SEO';
 import { supabase } from '../supabase';
 import { Product, PRODUCT_CATEGORIES } from '../types';
 import { Search, Filter, ShoppingCart } from 'lucide-react';
@@ -66,6 +67,10 @@ export const Catalog = () => {
 
   return (
     <div className="bg-white min-h-screen">
+      <SEO 
+        title="Catalogue Produits | AFTRAS CI"
+        description="Consultez notre catalogue de produits disponibles pour le négoce international : matières premières, produits manufacturés et solutions de sourcing sur mesure."
+      />
       {/* Featured Slider Section */}
       {featuredProducts.length > 0 && (
         <section className="py-12 bg-blue-50/50">

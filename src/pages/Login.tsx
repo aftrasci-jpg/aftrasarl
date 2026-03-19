@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { Mail, Lock, LogIn, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { loginSchema } from '../schemas';
+import { z } from 'zod';
 
 export const Login = () => {
   const { t } = useTranslation();
@@ -17,6 +19,9 @@ export const Login = () => {
     setLoading(true);
     setError('');
     try {
+      // Validate with Zod
+      loginSchema.parse({ email, password });
+
       const { error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -38,7 +43,11 @@ export const Login = () => {
         navigate('/dashboard');
       }
     } catch (err: any) {
-      setError(err.message || t('login_page.error'));
+      if (err instanceof z.ZodError) {
+        setError(err.issues[0].message);
+      } else {
+        setError(err.message || t('login_page.error'));
+      }
     } finally {
       setLoading(false);
     }
@@ -85,7 +94,12 @@ export const Login = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">{t('login_page.form.password')}</label>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-sm font-bold text-gray-700">{t('login_page.form.password')}</label>
+              <Link to="/forgot-password" id="forgot-password-link" className="text-xs font-bold text-aftras-blue-text hover:underline">
+                {t('login_page.form.forgot_password')}
+              </Link>
+            </div>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input

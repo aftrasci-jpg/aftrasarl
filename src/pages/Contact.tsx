@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SEO } from '../components/SEO';
 import { motion } from 'framer-motion';
 import { Phone, Mail, MapPin, Send, MessageSquare, Globe, CheckCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -45,6 +46,10 @@ export const Contact = () => {
 
   return (
     <div className="bg-white">
+      <SEO 
+        title="Contactez-nous | AFTRAS CI"
+        description="Besoin d'un sourcing spécifique ou d'un accompagnement commercial ? Contactez nos représentants en Afrique, Asie et Europe pour vos projets de négoce international."
+      />
       {/* Hero */}
       <section className="py-24 bg-aftras-blue-text text-white text-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

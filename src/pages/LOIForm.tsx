@@ -4,6 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabase';
 import { FileText, Send, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { SEO } from '../components/SEO';
+import { loiSchema } from '../schemas';
+import { z } from 'zod';
 
 export const LOIForm = () => {
   const { t } = useTranslation();
@@ -37,6 +40,15 @@ export const LOIForm = () => {
 
     setLoading(true);
     try {
+      // Validate with Zod
+      loiSchema.parse({
+        productName: formData.product,
+        quantity: formData.quantity,
+        specifications: formData.additional_info || 'Demande de sourcing standard',
+        targetPrice: formData.budget,
+        destination: formData.port || 'À définir',
+      });
+
       const { error: submitError } = await supabase
         .from('lois')
         .insert({
@@ -54,11 +66,36 @@ export const LOIForm = () => {
 
       if (submitError) throw submitError;
 
+      // Send notifications to all admins
+      const { data: admins } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('role', 'admin');
+
+      if (admins && admins.length > 0) {
+        const notifications = admins.map(admin => ({
+          user_id: admin.id,
+          title: t('notifications.loi_created.title'),
+          message: t('notifications.loi_created.message', { 
+            company: profile.company_name, 
+            product: formData.product 
+          }),
+          type: 'loi_created',
+          link: '/admin'
+        }));
+
+        await supabase.from('notifications').insert(notifications);
+      }
+
       setSuccess(true);
       setTimeout(() => navigate('/dashboard'), 3000);
     } catch (err: any) {
       console.error("LOI submission error:", err);
-      setError(t('loi_form.error_generic'));
+      if (err instanceof z.ZodError) {
+        setError(err.issues[0].message);
+      } else {
+        setError(t('loi_form.error_generic'));
+      }
     } finally {
       setLoading(false);
     }
@@ -81,6 +118,10 @@ export const LOIForm = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen py-12">
+      <SEO 
+        title="Soumettre une LOI | AFTRAS CI"
+        description="Soumettez votre lettre d'intention (LOI) pour un sourcing de produit spécifique. Notre équipe vous accompagnera dans la recherche des meilleurs fournisseurs."
+      />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="bg-aftras-blue-text p-10 text-white">

@@ -217,6 +217,7 @@
     "form": {
       "email": "Professional Email",
       "password": "Password",
+      "forgot_password": "Forgot password?",
       "submit": "Login",
       "email_placeholder": "email@company.com"
     },
@@ -285,6 +286,24 @@
     },
     "has_account": "Already have an account?",
     "login": "Login"
+  },
+  "forgot_password_page": {
+    "title": "Forgot password?",
+    "subtitle": "Enter your email to receive a reset link.",
+    "email_label": "Professional Email",
+    "submit": "Send link",
+    "back_to_login": "Back to login",
+    "success_title": "Email sent!",
+    "success_desc": "If an account exists for this email, you will receive a reset link shortly."
+  },
+  "reset_password_page": {
+    "title": "Reset password",
+    "subtitle": "Choose a new password for your account.",
+    "new_password": "New password",
+    "confirm_password": "Confirm new password",
+    "submit": "Update password",
+    "success_title": "Password updated!",
+    "success_desc": "Your password has been successfully reset. You can now log in."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -356,6 +375,19 @@
         "featured": "Featured Product (Slider)",
         "submit": "Save product"
       }
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications",
+    "mark_all_read": "Mark all as read",
+    "loi_created": {
+      "title": "New LOI received",
+      "message": "Company {{company}} sent a new LOI for {{product}}."
+    },
+    "loi_updated": {
+      "title": "Your LOI has been updated",
+      "message": "The administration has responded to your request for {{product}}."
     }
   }
 }

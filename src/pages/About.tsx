@@ -1,4 +1,5 @@
 import React from 'react';
+import { SEO } from '../components/SEO';
 import { motion } from 'framer-motion';
 import { Target, Eye, Rocket } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +9,10 @@ export const About = () => {
 
   return (
     <div className="bg-white">
+      <SEO 
+        title="À Propos | AFTRAS CI"
+        description="Découvrez AFTRAS CI, votre partenaire de confiance en Côte d'Ivoire pour le négoce international, le sourcing et l'accompagnement commercial."
+      />
       {/* Hero */}
       <section className="relative py-24 bg-aftras-blue-text text-white overflow-hidden">
         <div className="absolute inset-0 opacity-20">
@@ -18,13 +23,22 @@ export const About = () => {
           />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.h1 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-5xl font-bold mb-2"
+            className="inline-flex items-center justify-center relative mb-10 group max-w-full"
           >
-            {t('about.title')}
-          </motion.h1>
+            <div className="relative px-6 py-3 md:px-12 md:py-6 rounded-full overflow-hidden shadow-2xl border border-white/30 backdrop-blur-md">
+              {/* Background Image for the Badge */}
+              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800')] bg-cover bg-center opacity-80 group-hover:scale-110 transition-transform duration-700" />
+              <div className="absolute inset-0 bg-gradient-to-r from-aftras-blue-text/80 to-aftras-blue-border/80" />
+              
+              <h1 className="relative z-10 text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight whitespace-normal text-center leading-tight">
+                {t('about.title')}
+              </h1>
+            </div>
+          </motion.div>
+
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

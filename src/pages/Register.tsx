@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { Building2, User, Mail, Lock, Globe, Phone, MapPin, Briefcase } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { registerSchema } from '../schemas';
+import { z } from 'zod';
 
 export const Register = () => {
   const { t } = useTranslation();
@@ -33,6 +35,14 @@ export const Register = () => {
     setLoading(true);
     setError('');
     try {
+      // Validate with Zod
+      registerSchema.parse({
+        email: formData.email,
+        password: formData.password,
+        companyName: formData.companyName,
+        phone: formData.phone,
+      });
+
       const { data: { user }, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
@@ -60,7 +70,11 @@ export const Register = () => {
       navigate('/dashboard');
     } catch (err: any) {
       console.error(err);
-      setError(err.message || t('register_page.error_generic'));
+      if (err instanceof z.ZodError) {
+        setError(err.issues[0].message);
+      } else {
+        setError(err.message || t('register_page.error_generic'));
+      }
     } finally {
       setLoading(false);
     }
