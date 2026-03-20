@@ -88,6 +88,12 @@
       "desc": "Créez votre compte entreprise dès aujourd'hui et envoyez votre première Lettre d'Intention (LOI).",
       "register": "Créer mon compte",
       "login": "Se connecter"
+    },
+    "custom_sourcing": {
+      "title": "Vous ne trouvez pas votre produit ?",
+      "subtitle": "Notre expertise ne s'arrête pas à notre catalogue.",
+      "desc": "Grâce à notre réseau international étendu, nous pouvons sourcer pratiquement n'importe quel produit répondant à vos spécifications techniques. Que ce soit pour des matières premières, des équipements industriels ou des produits finis, nous trouvons la solution.",
+      "cta": "Faire une demande de sourcing sur mesure"
     }
   },
   "about": {
@@ -145,7 +151,11 @@
     "featured_desc": "Sélection exclusive de produits à fort potentiel.",
     "featured_badge": "Vedette",
     "selected": "Sélectionné",
+    "suggestions": "Suggestions du catalogue",
     "request_loi": "Demander LOI",
+    "custom_request": "Demande de sourcing personnalisée",
+    "not_found_title": "Vous ne trouvez pas votre produit ?",
+    "not_found_desc": "Notre réseau international nous permet de sourcer presque n'importe quel produit. Envoyez-nous une demande personnalisée et nos experts s'en chargeront.",
     "no_products": "Aucun produit trouvé pour cette sélection.",
     "default_desc": "Produit de haute qualité sourcé par nos experts pour vos besoins d'import-export."
   },
@@ -185,6 +195,7 @@
   "loi_form": {
     "title": "Lettre d'Intention d'Achat (LOI)",
     "subtitle": "Veuillez remplir ce formulaire avec précision pour nous permettre de trouver le meilleur fournisseur.",
+    "custom_sourcing_info": "Vous ne trouvez pas votre produit dans notre catalogue ? Pas de souci. AFTRAS CI peut sourcer pratiquement n'importe quel produit grâce à son réseau mondial. Décrivez simplement vos besoins ci-dessous.",
     "success_title": "LOI Envoyée !",
     "success_desc": "Votre demande a été enregistrée avec succès. Nos représentants vont l'analyser et vous répondront prochainement.",
     "redirecting": "Redirection vers votre tableau de bord...",
@@ -192,6 +203,7 @@
     "error_generic": "Une erreur est survenue lors de l'envoi de la LOI.",
     "sections": {
       "product": "Informations sur le produit",
+      "product_image": "Image du produit",
       "commercial": "Conditions commerciales",
       "additional": "Informations complémentaires"
     },

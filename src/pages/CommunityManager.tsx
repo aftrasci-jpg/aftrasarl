@@ -145,13 +145,13 @@ export const CommunityManager = () => {
   if (!isCommunityManager) return <div className="p-20 text-center">{t('cm_page.access_denied')}</div>;
 
   return (
-    <div className="bg-gray-50 min-h-screen py-12">
+    <div className="bg-gray-50 min-h-screen py-8 md:py-12">
       <SEO 
         title={t('cm_page.title')} 
         description="Gestion du catalogue produits AFTRAS CI."
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-aftras-blue-border mb-12">{t('cm_page.title')}</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-aftras-blue-border mb-8 md:mb-12">{t('cm_page.title')}</h1>
 
         {error && (
           <div className="bg-red-50 text-red-600 p-6 rounded-2xl border border-red-100 mb-8">
@@ -159,15 +159,15 @@ export const CommunityManager = () => {
           </div>
         )}
 
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-xl font-bold text-aftras-blue-border">{t('cm_page.products.title')}</h2>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 space-y-4 md:space-y-0">
+          <h2 className="text-lg md:text-xl font-bold text-aftras-blue-border">{t('cm_page.products.title')}</h2>
           <button 
             onClick={() => {
               setEditingProduct(null);
               setProductForm({ name: '', category: PRODUCT_CATEGORIES[0], description: '', image_url: '', is_featured: false });
               setIsProductModalOpen(true);
             }}
-            className="bg-aftras-orange text-white px-6 py-3 rounded-xl font-bold hover:bg-opacity-90 transition-all flex items-center"
+            className="w-full md:w-auto bg-aftras-orange text-white px-6 py-3 rounded-xl font-bold hover:bg-opacity-90 transition-all flex items-center justify-center"
           >
             <Plus className="w-5 h-5 mr-2" /> {t('cm_page.products.add_btn')}
           </button>
@@ -229,14 +229,14 @@ export const CommunityManager = () => {
                   <h3 className="text-xl font-bold">{editingProduct ? t('cm_page.products.modal.edit_title') : t('cm_page.products.modal.add_title')}</h3>
                   <button onClick={() => setIsProductModalOpen(false)}><X className="w-6 h-6" /></button>
                 </div>
-                <form onSubmit={handleProductSubmit} className="p-8 space-y-6">
+                <form onSubmit={handleProductSubmit} className="p-6 md:p-8 space-y-6 max-h-[70vh] overflow-y-auto">
                   {error && (
                     <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 flex items-center text-sm">
                       <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0" />
                       {error}
                     </div>
                   )}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     <div>
                       <label className="block text-sm font-bold text-gray-700 mb-2">{t('cm_page.products.modal.name')}</label>
                       <input 

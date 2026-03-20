@@ -81,30 +81,30 @@ export const Register = () => {
   };
 
   return (
-    <div className="bg-gray-50 py-20 px-4">
+    <div className="bg-gray-50 py-12 md:py-20 px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8 md:mb-12">
           <Link to="/" className="inline-flex flex-col items-center mb-6">
             <img 
               src="https://res.cloudinary.com/dnpgvhq2t/image/upload/v1773972011/logaft_djawlr.jpg" 
               alt="Logo" 
-              className="h-24 w-auto object-contain mb-2"
+              className="h-16 md:h-24 w-auto object-contain mb-2"
               referrerPolicy="no-referrer"
             />
             <div className="flex items-center">
-              <span className="text-3xl font-bold text-aftras-blue-text">AFTRAS</span>
-              <span className="text-3xl font-bold text-aftras-orange ml-1">CI</span>
+              <span className="text-2xl md:text-3xl font-bold text-aftras-blue-text">AFTRAS</span>
+              <span className="text-2xl md:text-3xl font-bold text-aftras-orange ml-1">CI</span>
             </div>
             <span className="text-xs font-medium text-gray-500 mt-1 tracking-wider uppercase">
               {t('common.slogan')}
             </span>
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">{t('register_page.title')}</h1>
-          <p className="text-gray-500 mt-2">{t('register_page.subtitle')}</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{t('register_page.title')}</h1>
+          <p className="text-sm md:text-base text-gray-500 mt-2">{t('register_page.subtitle')}</p>
         </div>
 
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
-          <form onSubmit={handleRegister} className="p-10 space-y-10">
+          <form onSubmit={handleRegister} className="p-6 md:p-10 space-y-8 md:space-y-10">
             {error && (
               <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm border border-red-100">
                 {error}

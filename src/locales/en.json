@@ -88,6 +88,12 @@
       "desc": "Create your business account today and send your first Letter of Intent (LOI).",
       "register": "Create my account",
       "login": "Login"
+    },
+    "custom_sourcing": {
+      "title": "Can't find your product?",
+      "subtitle": "Our expertise doesn't stop at our catalog.",
+      "desc": "Thanks to our extensive international network, we can source virtually any product that meets your technical specifications. Whether for raw materials, industrial equipment, or finished goods, we find the solution.",
+      "cta": "Make a custom sourcing request"
     }
   },
   "about": {
@@ -145,7 +151,11 @@
     "featured_desc": "Exclusive selection of products with high potential.",
     "featured_badge": "Featured",
     "selected": "Selected",
+    "suggestions": "Catalog Suggestions",
     "request_loi": "Request LOI",
+    "custom_request": "Custom Sourcing Request",
+    "not_found_title": "Can't find your product?",
+    "not_found_desc": "Our international network allows us to source almost any product. Send us a custom request and our experts will handle it.",
     "no_products": "No products found for this selection.",
     "default_desc": "High-quality product sourced by our experts for your import-export needs."
   },
@@ -185,6 +195,7 @@
   "loi_form": {
     "title": "Letter of Intent (LOI)",
     "subtitle": "Please fill out this form accurately to allow us to find the best supplier.",
+    "custom_sourcing_info": "Can't find your product in our catalog? No worries. AFTRAS CI can source virtually any product through its global network. Just describe your needs below.",
     "success_title": "LOI Sent!",
     "success_desc": "Your request has been successfully registered. Our representatives will analyze it and respond to you soon.",
     "redirecting": "Redirecting to your dashboard...",
@@ -192,6 +203,7 @@
     "error_generic": "An error occurred while sending the LOI.",
     "sections": {
       "product": "Product Information",
+      "product_image": "Product Image",
       "commercial": "Commercial Conditions",
       "additional": "Additional Information"
     },

@@ -107,13 +107,13 @@ export const Admin = () => {
   if (!isAdmin) return <div className="p-20 text-center">{t('admin_page.access_denied')}</div>;
 
   return (
-    <div className="bg-gray-50 min-h-screen py-12">
+    <div className="bg-gray-50 min-h-screen py-8 md:py-12">
       <SEO 
         title={t('admin_page.title')} 
         description="Administration AFTRAS CI - Gestion des LOI."
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-aftras-blue-border mb-12">{t('admin_page.title')}</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-aftras-blue-border mb-8 md:mb-12">{t('admin_page.title')}</h1>
 
         {error && (
           <div className="bg-red-50 text-red-600 p-6 rounded-2xl border border-red-100 mb-8">
@@ -148,16 +148,27 @@ export const Admin = () => {
                 }}
                 className="p-6 flex flex-col md:flex-row justify-between items-start md:items-center cursor-pointer hover:bg-gray-50"
               >
-                <div className="flex items-center space-x-4">
-                  <div className="p-3 bg-blue-50 rounded-xl">
-                    <FileText className="w-6 h-6 text-aftras-blue-text" />
-                  </div>
+                <div className="flex items-center space-x-3 md:space-x-4">
+                  {loi.product_image ? (
+                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl overflow-hidden border border-gray-100 flex-shrink-0">
+                      <img 
+                        src={loi.product_image} 
+                        alt={loi.product} 
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
+                  ) : (
+                    <div className="p-2 md:p-3 bg-blue-50 rounded-xl">
+                      <FileText className="w-5 h-5 md:w-6 md:h-6 text-aftras-blue-text" />
+                    </div>
+                  )}
                   <div>
-                    <h3 className="text-lg font-bold text-gray-900">{loi.company_name}</h3>
-                    <p className="text-sm text-gray-500">{loi.product} • {loi.quantity}</p>
+                    <h3 className="text-base md:text-lg font-bold text-gray-900 leading-tight">{loi.company_name}</h3>
+                    <p className="text-xs md:text-sm text-gray-500">{loi.product} • {loi.quantity}</p>
                   </div>
                 </div>
-                <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${STATUS_COLORS[loi.status]}`}>
+                <span className={`mt-4 md:mt-0 px-3 md:px-4 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider ${STATUS_COLORS[loi.status]}`}>
                   {STATUS_LABELS[loi.status]}
                 </span>
               </div>
@@ -170,29 +181,29 @@ export const Admin = () => {
                     exit={{ height: 0 }}
                     className="border-t border-gray-100 bg-gray-50/50 p-8"
                   >
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
                       {/* Details */}
                       <div>
-                        <h4 className="font-bold text-aftras-blue-border mb-4 uppercase text-xs tracking-widest">{t('admin_page.lois.details_title')}</h4>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
+                        <h4 className="font-bold text-aftras-blue-border mb-4 uppercase text-[10px] md:text-xs tracking-widest">{t('admin_page.lois.details_title')}</h4>
+                        <div className="grid grid-cols-2 gap-3 md:gap-4 text-xs md:text-sm">
                           <p className="text-gray-500">{t('loi_form.form.budget_label')}:</p><p className="font-medium">{loi.budget || 'N/A'}</p>
                           <p className="text-gray-500">{t('loi_form.form.incoterm_label')}:</p><p className="font-medium">{loi.incoterm || 'N/A'}</p>
                           <p className="text-gray-500">{t('loi_form.form.port_label')}:</p><p className="font-medium">{loi.port || 'N/A'}</p>
                           <p className="text-gray-500">{t('loi_form.form.deadline_label')}:</p><p className="font-medium">{loi.deadline || 'N/A'}</p>
                         </div>
                         <div className="mt-4">
-                          <p className="text-gray-500 text-sm mb-1">{t('loi_form.sections.additional')}:</p>
-                          <p className="text-gray-700 text-sm italic">{loi.additional_info || 'Aucune.'}</p>
+                          <p className="text-gray-500 text-xs md:text-sm mb-1">{t('loi_form.sections.additional')}:</p>
+                          <p className="text-gray-700 text-xs md:text-sm italic">{loi.additional_info || 'Aucune.'}</p>
                         </div>
                       </div>
 
                       {/* Response Form */}
-                      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
-                        <h4 className="font-bold text-aftras-blue-border mb-6 uppercase text-xs tracking-widest">{t('admin_page.lois.response_title')}</h4>
+                      <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-200">
+                        <h4 className="font-bold text-aftras-blue-border mb-6 uppercase text-[10px] md:text-xs tracking-widest">{t('admin_page.lois.response_title')}</h4>
                         <div className="space-y-4">
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <label className="block text-xs font-bold text-gray-500 mb-1">{t('admin_page.lois.form.status')}</label>
+                              <label className="block text-[10px] md:text-xs font-bold text-gray-500 mb-1">{t('admin_page.lois.form.status')}</label>
                               <select 
                                 value={responseForm.status}
                                 onChange={(e) => setResponseForm({...responseForm, status: e.target.value as LOIStatus})}
@@ -204,7 +215,7 @@ export const Admin = () => {
                               </select>
                             </div>
                             <div>
-                              <label className="block text-xs font-bold text-gray-500 mb-1">{t('dashboard.admin_response.proposed_quantity')}</label>
+                              <label className="block text-[10px] md:text-xs font-bold text-gray-500 mb-1">{t('dashboard.admin_response.proposed_quantity')}</label>
                               <input 
                                 type="text" 
                                 value={responseForm.proposed_quantity}
@@ -213,9 +224,9 @@ export const Admin = () => {
                               />
                             </div>
                           </div>
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                              <label className="block text-xs font-bold text-gray-500 mb-1">{t('dashboard.admin_response.proposed_price')}</label>
+                              <label className="block text-[10px] md:text-xs font-bold text-gray-500 mb-1">{t('dashboard.admin_response.proposed_price')}</label>
                               <input 
                                 type="text" 
                                 value={responseForm.price}
@@ -224,7 +235,7 @@ export const Admin = () => {
                               />
                             </div>
                             <div>
-                              <label className="block text-xs font-bold text-gray-500 mb-1">{t('dashboard.admin_response.delivery_time')}</label>
+                              <label className="block text-[10px] md:text-xs font-bold text-gray-500 mb-1">{t('dashboard.admin_response.delivery_time')}</label>
                               <input 
                                 type="text" 
                                 value={responseForm.delivery_time}

@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS public.lois (
   incoterm TEXT,
   port TEXT,
   deadline TEXT,
+  product_image TEXT,
   additional_info TEXT,
   status TEXT DEFAULT 'searching' CHECK (status IN ('searching', 'offer_sent', 'negotiating', 'provider_identified', 'finalized', 'cancelled')),
   admin_response JSONB,

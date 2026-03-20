@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabase';
-import { FileText, Send, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { FileText, Send, AlertCircle, CheckCircle2, Globe2, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { SEO } from '../components/SEO';
 import { loiSchema } from '../schemas';
 import { z } from 'zod';
+import { Product } from '../types';
 
 export const LOIForm = () => {
   const { t } = useTranslation();
@@ -16,6 +17,7 @@ export const LOIForm = () => {
   
   const [formData, setFormData] = useState({
     product: location.state?.product || '',
+    product_image: location.state?.product_image || '',
     quantity: '',
     budget: '',
     incoterm: 'CIF',
@@ -28,6 +30,51 @@ export const LOIForm = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const { data } = await supabase.from('products').select('*');
+      if (data) setAllProducts(data as Product[]);
+    };
+    fetchProducts();
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleProductChange = (val: string) => {
+    setFormData({ ...formData, product: val, product_image: '' });
+    if (val.trim()) {
+      const filtered = allProducts.filter(p => 
+        p.name.toLowerCase().includes(val.toLowerCase())
+      );
+      setFilteredProducts(filtered);
+      setShowSuggestions(true);
+    } else {
+      setFilteredProducts([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const selectProduct = (p: Product) => {
+    setFormData({ 
+      ...formData, 
+      product: p.name, 
+      product_image: p.image_url 
+    });
+    setShowSuggestions(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +102,7 @@ export const LOIForm = () => {
           company_id: user.id,
           company_name: profile.company_name,
           product: formData.product,
+          product_image: formData.product_image,
           quantity: formData.quantity,
           budget: formData.budget,
           incoterm: formData.incoterm,
@@ -124,15 +172,24 @@ export const LOIForm = () => {
       />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="bg-aftras-blue-text p-10 text-white">
+          <div className="bg-aftras-blue-text p-6 md:p-10 text-white">
             <div className="flex items-center mb-4">
-              <FileText className="w-8 h-8 mr-4" />
-              <h1 className="text-3xl font-bold">{t('loi_form.title')}</h1>
+              <FileText className="w-6 h-6 md:w-8 md:h-8 mr-3 md:mr-4" />
+              <h1 className="text-2xl md:text-3xl font-bold">{t('loi_form.title')}</h1>
             </div>
-            <p className="text-blue-100">{t('loi_form.subtitle')}</p>
+            <p className="text-blue-100 text-sm md:text-base">{t('loi_form.subtitle')}</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-10 space-y-8">
+          <div className="px-6 md:px-10 pt-6 md:pt-8">
+            <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 md:p-6 flex items-start">
+              <Globe2 className="w-5 h-5 md:w-6 md:h-6 text-aftras-blue-text mr-3 md:mr-4 flex-shrink-0 mt-1" />
+              <p className="text-xs md:text-sm text-aftras-blue-text leading-relaxed">
+                {t('loi_form.custom_sourcing_info')}
+              </p>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="p-6 md:p-10 space-y-6 md:space-y-8">
             {error && (
               <div className="bg-red-50 p-4 rounded-xl border border-red-100 flex items-center text-red-700">
                 <AlertCircle className="w-5 h-5 mr-3 flex-shrink-0" />
@@ -143,21 +200,74 @@ export const LOIForm = () => {
             {/* Section 1: Produit */}
             <div className="space-y-6">
               <h3 className="text-lg font-bold text-aftras-blue-border border-b pb-2">{t('loi_form.sections.product')}</h3>
+              
+              {formData.product_image && (
+                <div className="flex items-center gap-4 bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
+                  <div className="w-24 h-24 rounded-xl overflow-hidden border-2 border-white shadow-sm flex-shrink-0">
+                    <img 
+                      src={formData.product_image} 
+                      alt={formData.product} 
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-aftras-blue-border">{formData.product}</h4>
+                    <p className="text-xs text-gray-500 mt-1 uppercase tracking-wider">{t('catalog_page.selected')}</p>
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
+                <div className="relative" ref={suggestionsRef}>
                   <label className="block text-sm font-bold text-gray-700 mb-2">{t('loi_form.form.product_label')}</label>
                   <div className="relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
                     <input
                       required
                       type="text"
                       value={formData.product}
-                      onChange={(e) => setFormData({...formData, product: e.target.value})}
+                      onChange={(e) => handleProductChange(e.target.value)}
+                      onFocus={() => formData.product.trim() && setShowSuggestions(true)}
                       placeholder={t('loi_form.form.product_placeholder')}
-                      className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-aftras-blue-text outline-none ${
-                        location.state?.product ? 'border-aftras-orange bg-orange-50/30' : 'border-gray-200'
+                      className={`w-full pl-11 pr-4 py-3 rounded-xl border focus:ring-2 focus:ring-aftras-blue-text outline-none ${
+                        location.state?.product || formData.product_image ? 'border-aftras-orange bg-orange-50/30' : 'border-gray-200'
                       }`}
                     />
-                    {location.state?.product && (
+                    
+                    {/* Suggestions Dropdown */}
+                    {showSuggestions && filteredProducts.length > 0 && (
+                      <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl max-h-60 overflow-y-auto">
+                        <div className="p-2 border-b border-gray-50 bg-gray-50/50">
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">
+                            {t('catalog_page.suggestions')}
+                          </p>
+                        </div>
+                        {filteredProducts.map(p => (
+                          <button
+                            key={p.id}
+                            type="button"
+                            onClick={() => selectProduct(p)}
+                            className="w-full flex items-center gap-3 p-3 hover:bg-blue-50 transition-colors border-b border-gray-50 last:border-0"
+                          >
+                            <img 
+                              src={p.image_url} 
+                              alt={p.name} 
+                              className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                              referrerPolicy="no-referrer"
+                            />
+                            <div className="text-left">
+                              <p className="font-bold text-aftras-blue-border text-sm">{p.name}</p>
+                              <p className="text-[10px] text-gray-400 uppercase tracking-wider">
+                                {t(`catalog_page.category_list.${p.category}`)}
+                              </p>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    {(location.state?.product || formData.product_image) && (
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-aftras-orange uppercase tracking-wider bg-white px-2 py-1 rounded-md border border-orange-100">
                         {t('catalog_page.selected')}
                       </span>

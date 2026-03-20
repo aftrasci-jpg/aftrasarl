@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Menu, X, User, LogOut, LayoutDashboard, Globe } from 'lucide-react';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import { Menu, X, User, LogOut, LayoutDashboard, Globe, ArrowLeft } from 'lucide-react';
 import { NotificationBell } from './NotificationBell';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabase';
@@ -16,7 +16,10 @@ export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, profile, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t, i18n } = useTranslation();
+
+  const showBackButton = location.pathname !== '/';
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -41,6 +44,15 @@ export const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20">
           <div className="flex items-center">
+            {showBackButton && (
+              <button 
+                onClick={() => navigate(-1)}
+                className="mr-2 p-2 rounded-full hover:bg-gray-100 transition-colors text-aftras-blue-text"
+                aria-label="Retour"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+            )}
             <Link to="/" className="flex-shrink-0 flex items-center">
               <img 
                 src="https://res.cloudinary.com/dnpgvhq2t/image/upload/v1773972011/logaft_djawlr.jpg" 

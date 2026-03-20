@@ -45,8 +45,8 @@ export const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
   }
 
   return (
-    <div className="relative group px-12">
-      <div className="flex gap-6 overflow-hidden">
+    <div className="relative group px-4 md:px-12">
+      <div className="flex gap-4 md:gap-6 overflow-hidden">
         <AnimatePresence mode="popLayout">
           {visibleProducts.map((product, idx) => (
             <motion.div
@@ -57,29 +57,29 @@ export const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
               exit={{ opacity: 0, x: -50 }}
               className="flex-1 min-w-0"
             >
-              <div className="bg-white rounded-xl shadow-lg border border-aftras-orange overflow-hidden h-full flex flex-col transition-transform hover:-translate-y-2">
-                <div className="relative h-48 overflow-hidden">
+              <div className="bg-white rounded-xl shadow-lg border border-aftras-orange/30 overflow-hidden h-full flex flex-col transition-transform hover:-translate-y-2">
+                <div className="relative h-40 md:h-48 overflow-hidden">
                   <img 
                     src={product.image_url} 
                     alt={product.name}
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute top-2 right-2 bg-aftras-orange text-white text-[10px] font-bold px-2 py-1 rounded-full uppercase">
+                  <div className="absolute top-2 right-2 bg-aftras-orange text-white text-[9px] md:text-[10px] font-bold px-2 py-1 rounded-full uppercase">
                     {t('catalog_page.featured_badge')}
                   </div>
                 </div>
-                <div className="p-4 flex-grow">
-                  <span className="text-xs font-semibold text-aftras-blue-text uppercase tracking-wider">
+                <div className="p-3 md:p-4 flex-grow">
+                  <span className="text-[10px] md:text-xs font-semibold text-aftras-blue-text uppercase tracking-wider">
                     {t(`catalog_page.category_list.${product.category}`)}
                   </span>
-                  <h3 className="text-lg font-bold text-gray-900 mt-1 line-clamp-1">{product.name}</h3>
+                  <h3 className="text-base md:text-lg font-bold text-gray-900 mt-1 line-clamp-1">{product.name}</h3>
                 </div>
-                <div className="p-4 pt-0">
+                <div className="p-3 md:p-4 pt-0">
                   <Link 
                     to="/loi" 
-                    state={{ product: product.name }}
-                    className="w-full flex items-center justify-center bg-aftras-orange text-white py-2 rounded-lg text-sm font-medium hover:bg-opacity-90 transition-colors"
+                    state={{ product: product.name, product_image: product.image_url }}
+                    className="w-full flex items-center justify-center bg-aftras-orange text-white py-2 rounded-lg text-xs md:text-sm font-bold hover:bg-opacity-90 transition-colors"
                   >
                     <ShoppingCart className="w-4 h-4 mr-2" />
                     {t('catalog_page.request_loi')}
@@ -91,12 +91,13 @@ export const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
         </AnimatePresence>
       </div>
 
-      <button onClick={prev} className="absolute left-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md text-aftras-blue-text hover:bg-blue-50 transition-colors opacity-0 group-hover:opacity-100">
-        <ChevronLeft className="w-6 h-6" />
+      <button onClick={prev} className="absolute left-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md text-aftras-blue-text hover:bg-blue-50 transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100">
+        <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
       </button>
-      <button onClick={next} className="absolute right-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md text-aftras-blue-text hover:bg-blue-50 transition-colors opacity-0 group-hover:opacity-100">
-        <ChevronRight className="w-6 h-6" />
+      <button onClick={next} className="absolute right-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white shadow-md text-aftras-blue-text hover:bg-blue-50 transition-colors opacity-100 md:opacity-0 md:group-hover:opacity-100">
+        <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
       </button>
+
     </div>
   );
 };

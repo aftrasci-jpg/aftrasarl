@@ -6,11 +6,11 @@ export const Terms = () => {
   const { t } = useTranslation();
   
   return (
-    <div className="bg-gray-50 min-h-screen py-20">
+    <div className="bg-gray-50 min-h-screen py-12 md:py-20">
       <SEO title="Conditions Générales d'Utilisation" />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-white p-12 rounded-3xl shadow-sm border border-gray-100">
-          <h1 className="text-3xl font-bold text-aftras-blue-border mb-8">Conditions Générales d'Utilisation (CGU)</h1>
+        <div className="bg-white p-6 md:p-12 rounded-3xl shadow-sm border border-gray-100">
+          <h1 className="text-2xl md:text-3xl font-bold text-aftras-blue-border mb-6 md:mb-8">Conditions Générales d'Utilisation (CGU)</h1>
           
           <div className="prose prose-blue max-w-none text-gray-600 space-y-6">
             <section>

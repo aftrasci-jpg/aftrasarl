@@ -41,6 +41,7 @@ export interface LOI {
   company_id: string;
   company_name: string;
   product: string;
+  product_image?: string;
   quantity: string;
   budget?: string;
   incoterm?: string;

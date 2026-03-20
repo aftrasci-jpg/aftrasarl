@@ -94,15 +94,15 @@ export const Catalog = () => {
                   <h3 className="text-lg font-bold text-aftras-blue-border mb-4 flex items-center">
                     <Filter className="w-4 h-4 mr-2 text-aftras-orange" /> {t('catalog_page.categories')}
                   </h3>
-                  <div className="space-y-2">
+                  <div className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 gap-2 no-scrollbar">
                     {CATEGORIES.map(cat => (
                       <button
                         key={cat.id}
                         onClick={() => setSelectedCategory(cat.id)}
-                        className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-colors ${
+                        className={`whitespace-nowrap lg:whitespace-normal text-left px-4 py-2 rounded-lg text-sm transition-colors ${
                           selectedCategory === cat.id 
                             ? 'bg-aftras-blue-text text-white font-bold' 
-                            : 'text-gray-600 hover:bg-gray-100'
+                            : 'text-gray-600 hover:bg-gray-100 border lg:border-0'
                         }`}
                       >
                         {cat.label}
@@ -160,7 +160,7 @@ export const Catalog = () => {
                         </p>
                         <Link 
                           to="/loi" 
-                          state={{ product: product.name }}
+                          state={{ product: product.name, product_image: product.image_url }}
                           className="w-full flex items-center justify-center bg-aftras-orange text-white py-3 rounded-xl font-bold hover:bg-opacity-90 transition-colors"
                         >
                           <ShoppingCart className="w-4 h-4 mr-2" />
@@ -172,9 +172,29 @@ export const Catalog = () => {
                 </div>
               ) : (
                 <div className="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
-                  <p className="text-gray-500 text-lg">{t('catalog_page.no_products')}</p>
+                  <p className="text-gray-500 text-lg mb-6">{t('catalog_page.no_products')}</p>
+                  <Link 
+                    to="/loi" 
+                    className="inline-flex items-center bg-aftras-blue-text text-white px-8 py-3 rounded-xl font-bold hover:bg-opacity-90 transition-all"
+                  >
+                    <ShoppingCart className="w-5 h-5 mr-2" /> {t('catalog_page.custom_request')}
+                  </Link>
                 </div>
               )}
+
+              {/* Custom Sourcing CTA */}
+              <div className="mt-12 md:mt-20 bg-aftras-blue-text rounded-3xl p-6 md:p-10 text-white flex flex-col md:flex-row items-center justify-between gap-8">
+                <div className="max-w-xl text-center md:text-left">
+                  <h2 className="text-xl md:text-2xl font-bold mb-4">{t('catalog_page.not_found_title')}</h2>
+                  <p className="text-blue-100 text-sm md:text-base">{t('catalog_page.not_found_desc')}</p>
+                </div>
+                <Link 
+                  to="/loi" 
+                  className="w-full md:w-auto text-center bg-aftras-orange text-white px-8 py-4 rounded-xl font-bold hover:bg-opacity-90 transition-all whitespace-nowrap shadow-lg shadow-aftras-orange/20"
+                >
+                  {t('catalog_page.custom_request')}
+                </Link>
+              </div>
             </main>
           </div>
         </div>

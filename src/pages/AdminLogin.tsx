@@ -35,7 +35,7 @@ export const AdminLogin = () => {
 
       if (profileError) throw profileError;
 
-      if (profile?.role === 'admin' || email === 'ditobb2018@gmail.com') {
+      if (profile?.role === 'admin') {
         navigate('/admin');
       } else {
         setError(t('cm_page.access_denied'));
@@ -53,19 +53,19 @@ export const AdminLogin = () => {
   };
 
   return (
-    <div className="bg-slate-900 flex items-center justify-center py-20 px-4">
-      <div className="bg-white p-10 rounded-3xl shadow-2xl border border-gray-100 w-full max-w-md">
-        <div className="text-center mb-10">
+    <div className="bg-slate-900 flex items-center justify-center py-12 md:py-20 px-4">
+      <div className="bg-white p-6 md:p-10 rounded-3xl shadow-2xl border border-gray-100 w-full max-w-md">
+        <div className="text-center mb-8 md:mb-10">
           <Link to="/" className="inline-flex flex-col items-center mb-6">
             <img 
               src="https://res.cloudinary.com/dnpgvhq2t/image/upload/v1773972011/logaft_djawlr.jpg" 
               alt="Logo" 
-              className="h-20 w-auto object-contain mb-2"
+              className="h-16 md:h-20 w-auto object-contain mb-2"
               referrerPolicy="no-referrer"
             />
             <div className="flex items-center">
-              <span className="text-2xl font-bold text-aftras-blue-text">AFTRAS</span>
-              <span className="text-2xl font-bold text-aftras-orange ml-1">CI</span>
+              <span className="text-xl md:text-2xl font-bold text-aftras-blue-text">AFTRAS</span>
+              <span className="text-xl md:text-2xl font-bold text-aftras-orange ml-1">CI</span>
             </div>
             <div className="flex items-center mt-2 px-3 py-1 bg-red-50 rounded-full">
               <ShieldCheck className="w-3 h-3 text-red-600 mr-1" />
@@ -74,8 +74,8 @@ export const AdminLogin = () => {
               </span>
             </div>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">{t('admin_login_page.title')}</h1>
-          <p className="text-gray-500 mt-2">{t('admin_login_page.subtitle')}</p>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-900">{t('admin_login_page.title')}</h1>
+          <p className="text-sm md:text-base text-gray-500 mt-2">{t('admin_login_page.subtitle')}</p>
         </div>
 
         {error && (

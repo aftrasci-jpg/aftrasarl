@@ -43,7 +43,7 @@ export const HeroSlider = () => {
   const prev = () => setCurrent((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
 
   return (
-    <div className="relative h-[600px] overflow-hidden bg-blue-900">
+    <div className="relative h-[450px] md:h-[600px] overflow-hidden bg-blue-900">
       <AnimatePresence mode="wait">
         <motion.div
           key={current}
@@ -57,15 +57,15 @@ export const HeroSlider = () => {
             className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: `url(${slides[current].image})` }}
           >
-            <div className="absolute inset-0 bg-black/50" />
+            <div className="absolute inset-0 bg-black/50 md:bg-black/40" />
           </div>
           
-          <div className="relative h-full max-w-7xl mx-auto px-4 flex flex-col justify-center items-start text-white">
+          <div className="relative h-full max-w-7xl mx-auto px-6 md:px-8 flex flex-col justify-center items-start text-white">
             <motion.h1 
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-4xl md:text-6xl font-bold mb-4 max-w-3xl leading-tight"
+              className="text-3xl md:text-6xl font-bold mb-4 max-w-3xl leading-tight"
             >
               {slides[current].title}
             </motion.h1>
@@ -73,7 +73,7 @@ export const HeroSlider = () => {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="text-xl md:text-2xl mb-8 text-blue-100 max-w-2xl"
+              className="text-lg md:text-2xl mb-8 text-blue-100 max-w-2xl"
             >
               {slides[current].subtitle}
             </motion.p>
@@ -81,10 +81,11 @@ export const HeroSlider = () => {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.6 }}
+              className="w-full md:w-auto"
             >
               <Link 
                 to={slides[current].link}
-                className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition-all transform hover:scale-105"
+                className="inline-block w-full md:w-auto text-center bg-aftras-orange hover:bg-opacity-90 text-white px-8 py-4 rounded-xl font-bold text-base md:text-lg transition-all transform hover:scale-105 shadow-lg shadow-aftras-orange/20"
               >
                 {slides[current].cta}
               </Link>
@@ -93,13 +94,14 @@ export const HeroSlider = () => {
         </motion.div>
       </AnimatePresence>
 
-      {/* Navigation */}
-      <button onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/20 hover:bg-white/40 text-white transition-colors">
+      {/* Navigation - Hidden on mobile for cleaner look */}
+      <button onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/20 hover:bg-white/40 text-white transition-colors hidden md:block">
         <ChevronLeft className="w-8 h-8" />
       </button>
-      <button onClick={next} className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/20 hover:bg-white/40 text-white transition-colors">
+      <button onClick={next} className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/20 hover:bg-white/40 text-white transition-colors hidden md:block">
         <ChevronRight className="w-8 h-8" />
       </button>
+
 
       {/* Pagination */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex space-x-2">
