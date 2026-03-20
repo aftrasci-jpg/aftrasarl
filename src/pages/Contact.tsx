@@ -21,18 +21,21 @@ export const Contact = () => {
       region: t('footer.contacts.africa.region'),
       name: 'Mr. Evariste Cyr Major Kahiba GNONSKAN',
       whatsapp: '+225 0141 354 860',
+      email: 'kahibacyr@gmail.com',
       icon: Globe
     },
     {
       region: t('footer.contacts.asia.region'),
       name: 'Mr. Quevin ZOH',
       whatsapp: '+91 96259 16929',
+      email: 'zohquevin77@gmail.com',
       icon: Globe
     },
     {
       region: t('footer.contacts.europe.region'),
       name: 'Mme. Merfeuh NGUEYEP',
       whatsapp: '+41 77 920 83 18',
+      email: 'rbbsucces@gmail.com',
       icon: Globe
     }
   ];
@@ -93,6 +96,7 @@ export const Contact = () => {
                     <span className="text-sm font-bold text-orange-600 uppercase tracking-widest">{rep.region}</span>
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">{rep.name}</h3>
+                  <div className="space-y-2">
                     <a 
                       href={`https://wa.me/${rep.whatsapp.replace(/\s+/g, '')}`}
                       target="_blank"
@@ -102,6 +106,14 @@ export const Contact = () => {
                       <MessageSquare className="w-5 h-5 mr-2" />
                       {t('contact_page.form.whatsapp_label')} {rep.whatsapp}
                     </a>
+                    <a 
+                      href={`mailto:${rep.email}`}
+                      className="flex items-center text-gray-600 hover:text-aftras-orange transition-colors text-sm"
+                    >
+                      <Mail className="w-4 h-4 mr-2" />
+                      {rep.email}
+                    </a>
+                  </div>
                 </motion.div>
               ))}
             </div>

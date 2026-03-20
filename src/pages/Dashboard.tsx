@@ -185,39 +185,86 @@ export const Dashboard = () => {
 
                         {/* Admin Response */}
                         {loi.admin_response ? (
-                          <div className="bg-aftras-blue-text text-white rounded-2xl p-8 relative overflow-hidden">
-                            <div className="absolute top-0 right-0 p-4 opacity-10">
-                              <CheckCircle2 className="w-32 h-32" />
-                            </div>
-                            <div className="relative z-10">
-                              <div className="flex items-center mb-6">
-                                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mr-4">
-                                  <AlertCircle className="w-6 h-6 text-white" />
-                                </div>
-                                <h4 className="text-xl font-bold">{t('dashboard.admin_response.title')}</h4>
+                          <div className="space-y-6">
+                            {/* Latest Response */}
+                            <div className="bg-aftras-blue-text text-white rounded-2xl p-8 relative overflow-hidden">
+                              <div className="absolute top-0 right-0 p-4 opacity-10">
+                                <CheckCircle2 className="w-32 h-32" />
                               </div>
-                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                                <div>
-                                  <p className="text-blue-200 text-xs font-bold uppercase mb-1">{t('dashboard.admin_response.proposed_quantity')}</p>
-                                  <p className="font-bold">{loi.admin_response.proposed_quantity}</p>
+                              <div className="relative z-10">
+                                <div className="flex items-center mb-6">
+                                  <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mr-4">
+                                    <AlertCircle className="w-6 h-6 text-white" />
+                                  </div>
+                                  <h4 className="text-xl font-bold">{t('dashboard.admin_response.title')}</h4>
                                 </div>
-                                <div>
-                                  <p className="text-blue-200 text-xs font-bold uppercase mb-1">{t('dashboard.admin_response.proposed_price')}</p>
-                                  <p className="font-bold">{loi.admin_response.price}</p>
-                                </div>
-                                <div>
-                                  <p className="text-blue-200 text-xs font-bold uppercase mb-1">{t('dashboard.admin_response.incoterm_location')}</p>
-                                  <p className="font-bold">{loi.admin_response.incoterm} - {loi.admin_response.location}</p>
-                                </div>
-                                <div>
-                                  <p className="text-blue-200 text-xs font-bold uppercase mb-1">{t('dashboard.admin_response.delivery_time')}</p>
-                                  <p className="font-bold">{loi.admin_response.delivery_time} {t('dashboard.admin_response.days')}</p>
+                                {(() => {
+                                  const latest = Array.isArray(loi.admin_response) 
+                                    ? loi.admin_response[loi.admin_response.length - 1] 
+                                    : loi.admin_response;
+                                  
+                                  return (
+                                    <>
+                                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                        <div>
+                                          <p className="text-blue-200 text-xs font-bold uppercase mb-1">{t('dashboard.admin_response.proposed_quantity')}</p>
+                                          <p className="font-bold">{latest.proposed_quantity}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-blue-200 text-xs font-bold uppercase mb-1">{t('dashboard.admin_response.proposed_price')}</p>
+                                          <p className="font-bold">{latest.price}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-blue-200 text-xs font-bold uppercase mb-1">{t('dashboard.admin_response.incoterm_location')}</p>
+                                          <p className="font-bold">{latest.incoterm} - {latest.location}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-blue-200 text-xs font-bold uppercase mb-1">{t('dashboard.admin_response.delivery_time')}</p>
+                                          <p className="font-bold">{latest.delivery_time} {t('dashboard.admin_response.days')}</p>
+                                        </div>
+                                      </div>
+                                      <p className="text-blue-100 text-[10px] mt-6 text-right italic">
+                                        {t('dashboard.admin_response.last_update')} {new Date(latest.updated_at).toLocaleString()}
+                                      </p>
+                                    </>
+                                  );
+                                })()}
+                              </div>
+                            </div>
+
+                            {/* History (if multiple responses) */}
+                            {Array.isArray(loi.admin_response) && loi.admin_response.length > 1 && (
+                              <div className="mt-8">
+                                <h4 className="text-sm font-bold text-aftras-blue-border mb-4 uppercase tracking-widest">Historique des offres précédentes</h4>
+                                <div className="space-y-3">
+                                  {loi.admin_response.slice(0, -1).reverse().map((resp: any, idx: number) => (
+                                    <div key={idx} className="bg-white p-4 rounded-xl border border-gray-200 flex justify-between items-center text-sm shadow-sm">
+                                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-1">
+                                        <div>
+                                          <p className="text-gray-400 text-[10px] uppercase font-bold">Quantité</p>
+                                          <p className="font-medium text-gray-700">{resp.proposed_quantity}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-gray-400 text-[10px] uppercase font-bold">Prix</p>
+                                          <p className="font-medium text-gray-700">{resp.price}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-gray-400 text-[10px] uppercase font-bold">Incoterm</p>
+                                          <p className="font-medium text-gray-700">{resp.incoterm}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-gray-400 text-[10px] uppercase font-bold">Délai</p>
+                                          <p className="font-medium text-gray-700">{resp.delivery_time}</p>
+                                        </div>
+                                      </div>
+                                      <div className="text-right ml-4">
+                                        <p className="text-[10px] text-gray-400">{new Date(resp.updated_at).toLocaleDateString()}</p>
+                                      </div>
+                                    </div>
+                                  ))}
                                 </div>
                               </div>
-                              <p className="text-blue-100 text-[10px] mt-6 text-right italic">
-                                {t('dashboard.admin_response.last_update')} {new Date(loi.admin_response.updated_at).toLocaleString()}
-                              </p>
-                            </div>
+                            )}
                           </div>
                         ) : (
                           <div className="bg-gray-100 rounded-2xl p-8 text-center border-2 border-dashed border-gray-200">

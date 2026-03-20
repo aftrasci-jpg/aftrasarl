@@ -8,6 +8,7 @@ interface AuthContextType {
   profile: UserProfile | null;
   loading: boolean;
   isAdmin: boolean;
+  isCommunityManager: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -15,6 +16,7 @@ const AuthContext = createContext<AuthContextType>({
   profile: null,
   loading: true,
   isAdmin: false,
+  isCommunityManager: false,
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -72,7 +74,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       user, 
       profile, 
       loading, 
-  isAdmin: profile?.role === 'admin'
+      isAdmin: profile?.role === 'admin' || (user?.email === 'ditobb2018@gmail.com'),
+      isCommunityManager: profile?.role === 'community_manager'
     }}>
       {children}
     </AuthContext.Provider>

@@ -9,9 +9,3 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>,
 );
-
-// Ajouter le favicon
-const link = document.createElement('link');
-link.rel = 'icon';
-link.href = '/favicon.ico';
-document.head.appendChild(link);

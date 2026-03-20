@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// Logo moved to public/
-
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Menu, X, User, LogOut, LayoutDashboard, Globe } from 'lucide-react';
 import { NotificationBell } from './NotificationBell';
@@ -25,7 +23,7 @@ export const Navbar = () => {
     navigate('/');
   };
 
-  const toggleLanguage = async () => {
+  const toggleLanguage = () => {
     const newLang = i18n.language === 'fr' ? 'en' : 'fr';
     i18n.changeLanguage(newLang);
   };
@@ -43,23 +41,22 @@ export const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20">
           <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex flex-col">
-              <div className="flex items-center mb-1">
-<img 
-  src="/logaft.png" 
-  alt="AFTRAS CI Logo" 
-  className="h-10 w-auto sm:h-12 mr-2 object-contain flex-shrink-0"
-/>
-                <div className="flex flex-col">
-                  <div className="flex items-center">
-                    <span className="text-2xl font-bold text-aftras-blue-text">AFTRAS</span>
-                    <span className="text-2xl font-bold text-aftras-orange ml-1">CI</span>
-                  </div>
+            <Link to="/" className="flex-shrink-0 flex items-center">
+              <img 
+                src="https://res.cloudinary.com/dnpgvhq2t/image/upload/v1773972011/logaft_djawlr.jpg" 
+                alt="Logo" 
+                className="h-12 w-auto object-contain mr-3"
+                referrerPolicy="no-referrer"
+              />
+              <div className="flex flex-col">
+                <div className="flex items-center">
+                  <span className="text-2xl font-bold text-aftras-blue-text">AFTRAS</span>
+                  <span className="text-2xl font-bold text-aftras-orange ml-1">CI</span>
                 </div>
+                <span className="text-[10px] font-medium text-gray-500 -mt-1 tracking-wider uppercase">
+                  {t('common.slogan')}
+                </span>
               </div>
-              <span className="text-[10px] font-medium text-gray-500 -mt-1 tracking-wider uppercase">
-                {t('common.slogan')}
-              </span>
             </Link>
           </div>
 
@@ -81,7 +78,7 @@ export const Navbar = () => {
             ))}
 
             {/* Language Switcher */}
-            <button
+            <button 
               onClick={toggleLanguage}
               className="flex items-center text-sm font-bold text-aftras-blue-text hover:text-aftras-orange transition-colors"
             >
@@ -128,7 +125,7 @@ export const Navbar = () => {
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-4">
             {user && <NotificationBell />}
-            <button
+            <button 
               onClick={toggleLanguage}
               className="flex items-center text-sm font-bold text-aftras-blue-text"
             >

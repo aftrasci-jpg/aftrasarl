@@ -146,14 +146,23 @@ export const LOIForm = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">{t('loi_form.form.product_label')}</label>
-                  <input
-                    required
-                    type="text"
-                    value={formData.product}
-                    onChange={(e) => setFormData({...formData, product: e.target.value})}
-                    placeholder={t('loi_form.form.product_placeholder')}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-aftras-blue-text outline-none"
-                  />
+                  <div className="relative">
+                    <input
+                      required
+                      type="text"
+                      value={formData.product}
+                      onChange={(e) => setFormData({...formData, product: e.target.value})}
+                      placeholder={t('loi_form.form.product_placeholder')}
+                      className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-aftras-blue-text outline-none ${
+                        location.state?.product ? 'border-aftras-orange bg-orange-50/30' : 'border-gray-200'
+                      }`}
+                    />
+                    {location.state?.product && (
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-aftras-orange uppercase tracking-wider bg-white px-2 py-1 rounded-md border border-orange-100">
+                        {t('catalog_page.selected')}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">{t('loi_form.form.quantity_label')}</label>

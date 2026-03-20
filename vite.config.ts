@@ -17,17 +17,10 @@ export default defineConfig(({mode}) => {
         '@': path.resolve(__dirname, '.'),
       },
     },
-    base: env.NODE_ENV === 'production' ? '/aftrasarl/' : '/',
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
       // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
-      port: 3000,
-      host: true,
-      // Configure WebSocket for HMR to avoid connection issues
-      hmr: {
-        port: 3001,
-        overlay: false
-      }
+      hmr: process.env.DISABLE_HMR !== 'true',
     },
   };
 });

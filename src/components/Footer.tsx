@@ -1,6 +1,4 @@
 import React from 'react';
-// Logo moved to public/
-
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, Globe, Facebook, Linkedin, Twitter } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -14,23 +12,24 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           {/* Company Info */}
           <div>
-            <Link to="/" className="flex flex-col mb-6">
-              <div className="flex items-center mb-1">
+            <Link to="/" className="mb-6 flex items-center group">
+              <div className="bg-white p-1.5 rounded-lg mr-4 shadow-sm group-hover:shadow-md transition-shadow">
                 <img 
                   src="https://res.cloudinary.com/dnpgvhq2t/image/upload/v1773972011/logaft_djawlr.jpg" 
-                  alt="AFTRAS CI Logo" 
-                  className="h-10 w-auto sm:h-12 mr-2 object-contain flex-shrink-0"
+                  alt="Logo" 
+                  className="h-12 w-auto object-contain"
+                  referrerPolicy="no-referrer"
                 />
-                <div className="flex flex-col">
-                  <div className="flex items-center">
-                    <span className="text-2xl font-bold text-white">AFTRAS</span>
-                    <span className="text-2xl font-bold text-aftras-orange ml-1">CI</span>
-                  </div>
-                </div>
               </div>
-              <span className="text-[10px] font-medium text-blue-200 -mt-1 tracking-wider uppercase">
-                {t('common.slogan')}
-              </span>
+              <div className="flex flex-col">
+                <div className="flex items-center">
+                  <span className="text-2xl font-bold text-white">AFTRAS</span>
+                  <span className="text-2xl font-bold text-aftras-orange ml-1">CI</span>
+                </div>
+                <span className="text-[10px] font-medium text-blue-200 -mt-1 tracking-wider uppercase">
+                  {t('common.slogan')}
+                </span>
+              </div>
             </Link>
             <p className="text-blue-100 text-sm leading-relaxed mb-6">
               {t('footer.company_desc')}
@@ -57,6 +56,18 @@ export const Footer = () => {
               <li><Link to="/services" className="text-blue-100 hover:text-aftras-orange transition-colors">{t('common.services')}</Link></li>
               <li><Link to="/catalog" className="text-blue-100 hover:text-aftras-orange transition-colors">{t('common.catalog')}</Link></li>
               <li><Link to="/contact" className="text-blue-100 hover:text-aftras-orange transition-colors">{t('common.contact')}</Link></li>
+              <li className="pt-2 border-t border-white/10">
+                <Link to="/admin-login" className="text-xs font-medium text-blue-300 hover:text-aftras-orange transition-colors flex items-center">
+                  <span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>
+                  {t('footer.admin_login')}
+                </Link>
+              </li>
+              <li>
+                <Link to="/cm-login" className="text-xs font-medium text-blue-300 hover:text-aftras-orange transition-colors flex items-center">
+                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-2"></span>
+                  {t('footer.cm_login')}
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -81,6 +92,9 @@ export const Footer = () => {
                 <a href="https://wa.me/2250141354860" className="text-blue-200 text-xs hover:text-aftras-orange transition-colors flex items-center mt-1">
                   <Phone className="w-3 h-3 mr-2" /> {t('contact_page.form.whatsapp_label')} +225 0141 354 860
                 </a>
+                <a href="mailto:kahibacyr@gmail.com" className="text-blue-300 text-[10px] hover:text-aftras-orange transition-colors flex items-center mt-1">
+                  <Mail className="w-3 h-3 mr-2" /> kahibacyr@gmail.com
+                </a>
               </div>
               <div>
                 <p className="text-aftras-orange font-bold text-xs uppercase tracking-wider mb-1">{t('contact_page.regions.asia')}</p>
@@ -88,12 +102,18 @@ export const Footer = () => {
                 <a href="https://wa.me/919625916929" className="text-blue-200 text-xs hover:text-aftras-orange transition-colors flex items-center mt-1">
                   <Phone className="w-3 h-3 mr-2" /> {t('contact_page.form.whatsapp_label')} +91 96259 16929
                 </a>
+                <a href="mailto:zohquevin77@gmail.com" className="text-blue-300 text-[10px] hover:text-aftras-orange transition-colors flex items-center mt-1">
+                  <Mail className="w-3 h-3 mr-2" /> zohquevin77@gmail.com
+                </a>
               </div>
               <div>
                 <p className="text-aftras-orange font-bold text-xs uppercase tracking-wider mb-1">{t('contact_page.regions.europe')}</p>
                 <p className="text-white text-sm font-medium">Mme. Merfeuh NGUEYEP</p>
                 <a href="https://wa.me/41779208318" className="text-blue-200 text-xs hover:text-aftras-orange transition-colors flex items-center mt-1">
                   <Phone className="w-3 h-3 mr-2" /> {t('contact_page.form.whatsapp_label')} +41 77 920 83 18
+                </a>
+                <a href="mailto:rbbsucces@gmail.com" className="text-blue-300 text-[10px] hover:text-aftras-orange transition-colors flex items-center mt-1">
+                  <Mail className="w-3 h-3 mr-2" /> rbbsucces@gmail.com
                 </a>
               </div>
             </div>

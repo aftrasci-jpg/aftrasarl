@@ -22,7 +22,7 @@ export const loiSchema = z.object({
 
 export const productSchema = z.object({
   name: z.string().min(2, 'Le nom du produit est requis'),
-  description: z.string().optional(),
+  description: z.string().min(10, 'La description doit contenir au moins 10 caractères'),
   category: z.string().min(1, 'La catégorie est requise'),
   image_url: z.string().url('URL de l\'image invalide'),
   is_featured: z.boolean().default(false),

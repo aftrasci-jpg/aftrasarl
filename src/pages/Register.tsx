@@ -81,15 +81,21 @@ export const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="bg-gray-50 py-20 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <Link to="/" className="inline-flex flex-col items-center mb-6">
+            <img 
+              src="https://res.cloudinary.com/dnpgvhq2t/image/upload/v1773972011/logaft_djawlr.jpg" 
+              alt="Logo" 
+              className="h-24 w-auto object-contain mb-2"
+              referrerPolicy="no-referrer"
+            />
             <div className="flex items-center">
               <span className="text-3xl font-bold text-aftras-blue-text">AFTRAS</span>
-              <span className="text-3xl font-bold text-orange-500 ml-1">CI</span>
+              <span className="text-3xl font-bold text-aftras-orange ml-1">CI</span>
             </div>
-            <span className="text-xs font-medium text-gray-500 -mt-1 tracking-wider uppercase">
+            <span className="text-xs font-medium text-gray-500 mt-1 tracking-wider uppercase">
               {t('common.slogan')}
             </span>
           </Link>

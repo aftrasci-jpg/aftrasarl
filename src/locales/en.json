@@ -28,6 +28,8 @@
     "quick_links": "Quick Links",
     "our_services": "Our Services",
     "contact": "Contact",
+    "admin_login": "Admin Space",
+    "cm_login": "CM Space",
     "contacts": {
       "africa": { "region": "Africa" },
       "asia": { "region": "Asia" },
@@ -124,53 +126,6 @@
       ]
     }
   },
-  "products": {
-    "categories": {
-      "cereals": "Cereals & Grains",
-      "legumes": "Legumes",
-      "nuts": "Nuts & Oilseeds",
-      "export": "Export Products",
-      "spices": "Spices & Condiments",
-      "fruits": "Fruits & Vegetables",
-      "processed": "Processed Products"
-    },
-      "names": {
-      "Riz": "Rice",
-      "Maïs": "Corn",
-      "Haricots": "Beans",
-      "Pois": "Peas",
-      "Noix de cajou": "Cashew nuts",
-      "Arachides": "Peanuts",
-      "Cacao": "Cocoa",
-      "Café": "Coffee",
-      "Bananes": "Bananas",
-      "Ananas": "Pineapple",
-      "Huile de palme": "Palm oil",
-      "Sucre": "Sugar",
-      "Oignon": "Onion",
-      "Amandes de cajou": "Cashew almonds",
-      "Caoutchouc": "Rubber",
-      "Niébé": "Cowpea",
-      "Huile rouge": "Red oil",
-      "Miel": "Honey",
-      "Mil": "Millet",
-      "Pomme de terre": "Potato",
-      "Sorgho": "Sorghum",
-      "Soja": "Soy",
-      "Piment rouge": "Red pepper",
-      "Curcuma": "Turmeric",
-      "Cannelle": "Cinnamon",
-      "Blé": "Wheat",
-      "Orange": "Orange",
-      "Tomate": "Tomato",
-      "Ail": "Garlic",
-      "Mangue": "Mango",
-      "Avocat": "Avocado"
-    },
-    "descriptions": {
-      "default": "High-quality product sourced by our experts for your import-export needs."
-    }
-  },
   "catalog_page": {
     "title": "Product Catalog",
     "subtitle": "Discover our selection of high-quality products.",
@@ -188,6 +143,8 @@
     },
     "featured": "Featured Products",
     "featured_desc": "Exclusive selection of products with high potential.",
+    "featured_badge": "Featured",
+    "selected": "Selected",
     "request_loi": "Request LOI",
     "no_products": "No products found for this selection.",
     "default_desc": "High-quality product sourced by our experts for your import-export needs."
@@ -273,6 +230,24 @@
       "admin_btn": "Pre-fill Admin",
       "client_btn": "Pre-fill Client",
       "note": "Note: Create these users in your Firebase console to test."
+    }
+  },
+  "admin_login_page": {
+    "title": "AFTRAS CI Administration",
+    "subtitle": "Restricted access for administrators",
+    "form": {
+      "email": "Administrator Email",
+      "password": "Password",
+      "submit": "Access Control Panel"
+    }
+  },
+  "cm_login_page": {
+    "title": "Community Manager Space",
+    "subtitle": "Catalog and product management",
+    "form": {
+      "email": "Community Manager Email",
+      "password": "Password",
+      "submit": "Access Management Space"
     }
   },
   "auth": {
@@ -393,8 +368,7 @@
     "title": "Administration",
     "access_denied": "Access denied.",
     "tabs": {
-      "lois": "LOI Management",
-      "catalog": "Catalog Management"
+      "lois": "LOI Management"
     },
     "lois": {
       "details_title": "Request Details",
@@ -403,7 +377,11 @@
         "status": "Status",
         "submit": "Update & Send"
       }
-    },
+    }
+  },
+  "cm_page": {
+    "title": "Product Management",
+    "access_denied": "Access denied. Community Manager only.",
     "products": {
       "title": "Product Catalog",
       "add_btn": "Add a product",
@@ -413,7 +391,7 @@
         "edit_title": "Edit product",
         "name": "Product Name",
         "category": "Category",
-        "image_url": "Image URL (Cloudinary)",
+        "image_url": "Image URL",
         "image_url_placeholder": "https://example.com/image.jpg",
         "upload_label": "Click to upload or drag and drop",
         "image_required": "An image is required to publish the product.",

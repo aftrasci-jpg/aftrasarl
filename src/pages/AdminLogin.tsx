@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
-import { Mail, Lock, LogIn, AlertCircle } from 'lucide-react';
+import { Mail, Lock, LogIn, AlertCircle, ShieldCheck } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { loginSchema } from '../schemas';
 import { z } from 'zod';
 
-export const Login = () => {
+export const AdminLogin = () => {
   const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,7 +19,6 @@ export const Login = () => {
     setLoading(true);
     setError('');
     try {
-      // Validate with Zod
       loginSchema.parse({ email, password });
 
       const { error: authError } = await supabase.auth.signInWithPassword({
@@ -28,7 +27,6 @@ export const Login = () => {
       });
       if (authError) throw authError;
 
-      // Fetch profile to determine role
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role')
@@ -40,7 +38,8 @@ export const Login = () => {
       if (profile?.role === 'admin' || email === 'ditobb2018@gmail.com') {
         navigate('/admin');
       } else {
-        navigate('/dashboard');
+        setError(t('cm_page.access_denied'));
+        await supabase.auth.signOut();
       }
     } catch (err: any) {
       if (err instanceof z.ZodError) {
@@ -54,8 +53,8 @@ export const Login = () => {
   };
 
   return (
-    <div className="bg-gray-50 flex items-center justify-center py-20 px-4">
-      <div className="bg-white p-10 rounded-3xl shadow-xl border border-gray-100 w-full max-w-md">
+    <div className="bg-slate-900 flex items-center justify-center py-20 px-4">
+      <div className="bg-white p-10 rounded-3xl shadow-2xl border border-gray-100 w-full max-w-md">
         <div className="text-center mb-10">
           <Link to="/" className="inline-flex flex-col items-center mb-6">
             <img 
@@ -68,15 +67,15 @@ export const Login = () => {
               <span className="text-2xl font-bold text-aftras-blue-text">AFTRAS</span>
               <span className="text-2xl font-bold text-aftras-orange ml-1">CI</span>
             </div>
-            <div className="flex items-center mt-2 px-3 py-1 bg-blue-50 rounded-full">
-              <LogIn className="w-3 h-3 text-aftras-blue-text mr-1" />
-              <span className="text-[10px] font-bold text-aftras-blue-text uppercase tracking-widest">
-                Company Portal
+            <div className="flex items-center mt-2 px-3 py-1 bg-red-50 rounded-full">
+              <ShieldCheck className="w-3 h-3 text-red-600 mr-1" />
+              <span className="text-[10px] font-bold text-red-600 uppercase tracking-widest">
+                Admin Panel
               </span>
             </div>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">{t('login_page.title')}</h1>
-          <p className="text-gray-500 mt-2">{t('login_page.subtitle')}</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('admin_login_page.title')}</h1>
+          <p className="text-gray-500 mt-2">{t('admin_login_page.subtitle')}</p>
         </div>
 
         {error && (
@@ -88,7 +87,7 @@ export const Login = () => {
 
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">{t('login_page.form.email')}</label>
+            <label className="block text-sm font-bold text-gray-700 mb-2">{t('admin_login_page.form.email')}</label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -96,19 +95,14 @@ export const Login = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-aftras-blue-text outline-none"
-                placeholder={t('login_page.form.email_placeholder')}
+                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-red-500 outline-none"
+                placeholder="admin@aftras.ci"
               />
             </div>
           </div>
 
           <div>
-            <div className="flex justify-between items-center mb-2">
-              <label className="block text-sm font-bold text-gray-700">{t('login_page.form.password')}</label>
-              <Link to="/forgot-password" id="forgot-password-link" className="text-xs font-bold text-aftras-blue-text hover:underline">
-                {t('login_page.form.forgot_password')}
-              </Link>
-            </div>
+            <label className="block text-sm font-bold text-gray-700 mb-2">{t('admin_login_page.form.password')}</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -116,7 +110,7 @@ export const Login = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-aftras-blue-text outline-none"
+                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-red-500 outline-none"
                 placeholder="••••••••"
               />
             </div>
@@ -125,45 +119,23 @@ export const Login = () => {
           <button
             disabled={loading}
             type="submit"
-            className="w-full bg-aftras-orange text-white py-4 rounded-xl font-bold text-lg hover:bg-opacity-90 transition-all flex items-center justify-center shadow-lg shadow-aftras-orange/20"
+            className="w-full bg-red-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-red-700 transition-all flex items-center justify-center shadow-lg shadow-red-600/20"
           >
             {loading ? (
               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white" />
             ) : (
               <>
-                <LogIn className="w-5 h-5 mr-2" /> {t('login_page.form.submit')}
+                <LogIn className="w-5 h-5 mr-2" /> {t('admin_login_page.form.submit')}
               </>
             )}
           </button>
         </form>
 
-        <div className="mt-8 pt-8 border-t border-gray-100">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 text-center">{t('login_page.demo.title')}</p>
-          <div className="grid grid-cols-2 gap-4">
-            <button 
-              onClick={() => { setEmail('admin@demo.com'); setPassword('password123'); }}
-              className="text-xs bg-blue-50 text-aftras-blue-text py-2 px-4 rounded-lg font-bold hover:bg-blue-100 transition-colors"
-            >
-              {t('login_page.demo.admin_btn')}
-            </button>
-            <button 
-              onClick={() => { setEmail('user@demo.com'); setPassword('password123'); }}
-              className="text-xs bg-orange-50 text-aftras-orange py-2 px-4 rounded-lg font-bold hover:bg-orange-100 transition-colors"
-            >
-              {t('login_page.demo.client_btn')}
-            </button>
-          </div>
-          <p className="text-[10px] text-gray-400 mt-2 text-center italic">
-            {t('login_page.demo.note')}
-          </p>
-        </div>
-
-        <p className="text-center mt-8 text-gray-600 text-sm">
-          {t('login_page.no_account')}{' '}
-          <Link to="/register" className="text-aftras-blue-text font-bold hover:underline">
-            {t('login_page.create_account')}
+        <div className="mt-8 pt-8 border-t border-gray-100 text-center">
+          <Link to="/login" className="text-sm font-bold text-gray-500 hover:text-aftras-blue-text transition-colors">
+            ← Retour au portail entreprise
           </Link>
-        </p>
+        </div>
       </div>
     </div>
   );

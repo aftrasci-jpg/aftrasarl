@@ -1,4 +1,4 @@
-export type UserRole = 'admin' | 'company';
+export type UserRole = 'admin' | 'company' | 'community_manager';
 
 export interface UserProfile {
   id: string;
@@ -48,7 +48,7 @@ export interface LOI {
   deadline?: string;
   additional_info?: string;
   status: LOIStatus;
-  admin_response?: AdminResponse;
+  admin_response?: AdminResponse | AdminResponse[];
   created_at: string;
 }
 

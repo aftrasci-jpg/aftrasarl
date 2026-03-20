@@ -4,7 +4,7 @@ import { HeroSlider } from '../components/HeroSlider';
 import { ProductSlider } from '../components/ProductSlider';
 import { supabase } from '../supabase';
 import { Product } from '../types';
-import { Search, Handshake, ShieldCheck, Zap, ArrowRight, CheckCircle2, Globe } from 'lucide-react';
+import { Search, Handshake, ShieldCheck, Zap, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -194,3 +194,9 @@ export const Home = () => {
   );
 };
 
+const Globe = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10" strokeWidth="2" />
+    <path strokeWidth="2" d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+  </svg>
+);
