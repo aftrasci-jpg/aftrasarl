@@ -95,7 +95,7 @@ export const Register = () => {
               <span className="text-2xl md:text-3xl font-bold text-aftras-blue-text">AFTRAS</span>
               <span className="text-2xl md:text-3xl font-bold text-aftras-orange ml-1">CI</span>
             </div>
-            <span className="text-xs font-medium text-gray-500 mt-1 tracking-wider uppercase">
+            <span className="text-[10px] sm:text-xs font-medium text-gray-500 mt-1 tracking-wider uppercase">
               {t('common.slogan')}
             </span>
           </Link>

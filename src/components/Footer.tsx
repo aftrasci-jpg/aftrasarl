@@ -26,7 +26,7 @@ export const Footer = () => {
                   <span className="text-2xl font-bold text-white">AFTRAS</span>
                   <span className="text-2xl font-bold text-aftras-orange ml-1">CI</span>
                 </div>
-                <span className="text-[10px] font-medium text-blue-200 -mt-1 tracking-wider uppercase">
+                <span className="text-[8px] sm:text-[10px] md:text-xs font-medium text-blue-200 -mt-0.5 md:-mt-1 tracking-wider uppercase">
                   {t('common.slogan')}
                 </span>
               </div>

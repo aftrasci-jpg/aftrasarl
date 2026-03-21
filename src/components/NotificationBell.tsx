@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Bell, Check, Trash2 } from 'lucide-react';
+import { Bell, Check, Trash2, X } from 'lucide-react';
 import { supabase } from '../supabase';
 import { useAuth } from '../context/AuthContext';
 import { Notification } from '../types';
@@ -128,34 +128,60 @@ export const NotificationBell = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 hover:text-aftras-blue-text transition-colors"
+        className="relative p-2 text-gray-600 hover:text-aftras-blue-text transition-colors focus:outline-none"
+        aria-label={t('notifications.title')}
       >
         <Bell className="w-6 h-6" />
         {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
-            {unreadCount}
+          <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[10px] font-bold text-white ring-2 ring-white">
+            {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </button>
 
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            className="fixed inset-x-4 top-20 md:absolute md:inset-auto md:right-0 md:top-full md:mt-2 md:w-80 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden"
-          >
+          <>
+            {/* Mobile Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden"
+            />
+            
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              className="fixed inset-x-4 top-24 md:absolute md:inset-auto md:right-0 md:top-full md:mt-2 md:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50 overflow-hidden"
+            >
             <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-              <h3 className="font-bold text-aftras-blue-border">{t('notifications.title')}</h3>
-              {unreadCount > 0 && (
-                <button
-                  onClick={markAllAsRead}
-                  className="text-xs text-aftras-blue-text hover:underline font-medium"
+              <div className="flex items-center space-x-2">
+                <h3 className="font-bold text-aftras-blue-border">{t('notifications.title')}</h3>
+                {unreadCount > 0 && (
+                  <span className="bg-red-100 text-red-600 text-[10px] px-1.5 py-0.5 rounded-full font-bold">
+                    {unreadCount}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center space-x-3">
+                {unreadCount > 0 && (
+                  <button
+                    onClick={markAllAsRead}
+                    className="text-xs text-aftras-blue-text hover:underline font-medium"
+                  >
+                    {t('notifications.mark_all_read')}
+                  </button>
+                )}
+                <button 
+                  onClick={() => setIsOpen(false)}
+                  className="md:hidden p-1 text-gray-400 hover:text-gray-600"
                 >
-                  {t('notifications.mark_all_read')}
+                  <X className="w-5 h-5" />
                 </button>
-              )}
+              </div>
             </div>
 
             <div className="max-h-[70vh] md:max-h-96 overflow-y-auto">
@@ -199,8 +225,9 @@ export const NotificationBell = () => {
               )}
             </div>
           </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
+        </>
+      )}
+    </AnimatePresence>
+  </div>
+);
 };

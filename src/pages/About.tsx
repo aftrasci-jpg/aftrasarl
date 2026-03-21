@@ -43,7 +43,7 @@ export const About = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-xs md:text-sm font-medium text-aftras-orange tracking-[0.2em] uppercase mb-6 md:mb-8"
+            className="text-[10px] sm:text-xs md:text-sm font-medium text-aftras-orange tracking-[0.15em] md:tracking-[0.2em] uppercase mb-6 md:mb-8"
           >
             {t('common.slogan')}
           </motion.p>
