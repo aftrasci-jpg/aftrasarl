@@ -112,17 +112,42 @@ USING (
 
 -- 5. Row Level Security (RLS)
 
+-- Helper functions
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS boolean
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE id = auth.uid() AND role = 'admin'
+  );
+$$;
+
+-- Function to delete a user from auth.users
+CREATE OR REPLACE FUNCTION public.delete_user(target_user_id uuid)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, auth
+AS $$
+BEGIN
+  IF public.is_admin() THEN
+    DELETE FROM auth.users WHERE id = target_user_id;
+  ELSE
+    RAISE EXCEPTION 'Only admins can delete users';
+  END IF;
+END;
+$$;
+
 -- Profiles
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public profiles are viewable by everyone." ON public.profiles FOR SELECT USING (true);
 CREATE POLICY "Users can update their own profile." ON public.profiles FOR UPDATE USING (auth.uid() = id);
 CREATE POLICY "Users can insert their own profile." ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
-CREATE POLICY "Admins can update any profile." ON public.profiles FOR UPDATE USING (
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
-);
-CREATE POLICY "Admins can delete any profile." ON public.profiles FOR DELETE USING (
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
-);
+CREATE POLICY "Admins can update any profile." ON public.profiles FOR UPDATE USING (public.is_admin());
+CREATE POLICY "Admins can delete any profile." ON public.profiles FOR DELETE USING (public.is_admin());
 
 -- Products
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
@@ -142,8 +167,13 @@ CREATE POLICY "Only admins can delete LOIs." ON public.lois FOR DELETE USING (EX
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, role)
-  VALUES (new.id, new.email, 'company');
+  INSERT INTO public.profiles (id, email, role, company_name)
+  VALUES (
+    new.id, 
+    new.email, 
+    COALESCE(new.raw_user_meta_data->>'role', 'company'),
+    new.raw_user_meta_data->>'company_name'
+  );
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

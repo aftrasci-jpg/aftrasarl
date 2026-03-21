@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabase';
 import { LOI, Product, STATUS_COLORS, LOIStatus, PRODUCT_CATEGORIES, ProductCategory } from '../types';
@@ -11,7 +12,7 @@ import { z } from 'zod';
 
 export const Admin = () => {
   const { t } = useTranslation();
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
   const [activeTab, setActiveTab] = useState<'lois' | 'users'>('lois');
   const [lois, setLois] = useState<LOI[]>([]);
   const [profiles, setProfiles] = useState<any[]>([]);
@@ -21,6 +22,15 @@ export const Admin = () => {
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  // Create a temporary client for user creation to avoid signing out the admin
+  const getAdminAuthClient = () => {
+    const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || '';
+    const supabaseAnonKey = (import.meta as any).env.VITE_SUPABASE_ANON_KEY || '';
+    return createClient(supabaseUrl, supabaseAnonKey, {
+      auth: { persistSession: false }
+    });
+  };
 
   const [newUserForm, setNewUserForm] = useState({
     email: '',
@@ -160,36 +170,45 @@ export const Admin = () => {
     }
   };
 
-  const handleRoleUpdate = async (profileId: string, newRole: string) => {
-    try {
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ role: newRole })
-        .eq('id', profileId);
-      
-      if (updateError) throw updateError;
-      setSuccess(t('common.success'));
-      setTimeout(() => setSuccess(null), 3000);
-    } catch (error) {
-      console.error("Role update error:", error);
-      setError(t('common.error'));
-    }
-  };
-
   const handleDeleteProfile = async (id: string) => {
-    try {
-      const { error: deleteError } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', id);
+    // Prevent self-deletion
+    if (user?.id === id) {
+      setError(t('admin_page.users.cannotDeleteSelf'));
+      return;
+    }
 
-      if (deleteError) throw deleteError;
+    try {
+      setError(null);
+      // Use RPC to delete from auth.users (which cascades to profiles)
+      const { error: rpcError } = await supabase.rpc('delete_user', { target_user_id: id });
+
+      if (rpcError) {
+        // Fallback to direct profile deletion if RPC fails
+        const { error: deleteError } = await supabase
+          .from('profiles')
+          .delete()
+          .eq('id', id);
+        
+        if (deleteError) throw deleteError;
+      }
       
+      // Update local state immediately
       setProfiles(prev => prev.filter(p => p.id !== id));
       setDeletingProfileId(null);
-    } catch (error) {
+      setSuccess(t('admin_page.users.deleteSuccess'));
+      setTimeout(() => setSuccess(null), 3000);
+
+      // Also manually refresh to be absolutely sure
+      const { data: profilesData } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (profilesData) setProfiles(profilesData);
+
+    } catch (error: any) {
       console.error("Delete profile error:", error);
-      setError(t('common.error'));
+      setError(error.message || t('admin_page.users.deleteError'));
+      setDeletingProfileId(null);
     }
   };
 
@@ -198,33 +217,54 @@ export const Admin = () => {
     setError(null);
     setSuccess(null);
     try {
-      // Note: signUp will create the Auth user and the trigger will create the profile.
-      // We then update the profile role if it's not 'company'.
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      const adminAuthClient = getAdminAuthClient();
+      
+      // 1. Create the Auth user using the temporary client
+      // This prevents the current admin from being signed out
+      const { data: authData, error: authError } = await adminAuthClient.auth.signUp({
         email: newUserForm.email,
         password: newUserForm.password,
+        options: {
+          data: {
+            role: newUserForm.role,
+            company_name: newUserForm.company_name
+          }
+        }
       });
 
       if (authError) throw authError;
 
-      if (authData.user && newUserForm.role !== 'company') {
-        // Wait a bit for the trigger to finish
-        setTimeout(async () => {
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .update({ 
-              role: newUserForm.role,
-              company_name: newUserForm.company_name || null
-            })
-            .eq('id', authData.user!.id);
-          
-          if (profileError) console.error("Profile role update error:", profileError);
-        }, 1000);
+      if (authData.user) {
+        // 2. Update the profile using the main client (where admin is still logged in)
+        // We wait a tiny bit to ensure the trigger has created the initial profile
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({ 
+            role: newUserForm.role,
+            company_name: newUserForm.role === 'company' ? newUserForm.company_name : null
+          })
+          .eq('id', authData.user.id);
+        
+        if (profileError) {
+          console.error("Profile update error:", profileError);
+          // If update fails, we still show success but warn about the role
+          setSuccess("Utilisateur créé. Note: La mise à jour automatique du rôle a échoué, veuillez le modifier manuellement dans la liste.");
+        } else {
+          setSuccess("Utilisateur créé avec succès avec le rôle: " + newUserForm.role);
+        }
+        
+        setIsUserModalOpen(false);
+        setNewUserForm({ email: '', password: '', role: 'company', company_name: '' });
+        
+        // Refresh profiles list manually
+        const { data: profilesData } = await supabase
+          .from('profiles')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (profilesData) setProfiles(profilesData);
       }
-
-      setSuccess("Utilisateur créé avec succès. Note: L'utilisateur devra confirmer son email si activé.");
-      setIsUserModalOpen(false);
-      setNewUserForm({ email: '', password: '', role: 'company', company_name: '' });
     } catch (err: any) {
       console.error("User creation error:", err);
       setError(err.message || t('common.error'));
@@ -510,39 +550,41 @@ export const Admin = () => {
                   </div>
 
                   <div className="flex items-center space-x-4 w-full md:w-auto">
-                    <select 
-                      value={profile.role}
-                      onChange={(e) => handleRoleUpdate(profile.id, e.target.value)}
-                      className="p-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-aftras-blue-text flex-grow md:flex-grow-0"
-                    >
-                      <option value="company">Entreprise</option>
-                      <option value="community_manager">Community Manager</option>
-                      <option value="admin">Administrateur</option>
-                    </select>
+                    <div className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider ${
+                      profile.role === 'admin' ? 'bg-red-100 text-red-700' : 
+                      profile.role === 'community_manager' ? 'bg-blue-100 text-blue-700' : 
+                      'bg-gray-100 text-gray-700'
+                    }`}>
+                      {profile.role === 'admin' ? 'Administrateur' : 
+                       profile.role === 'community_manager' ? 'Community Manager' : 
+                       'Entreprise'}
+                    </div>
 
-                    {deletingProfileId === profile.id ? (
-                      <div className="flex items-center space-x-2">
+                    {user?.id !== profile.id && (
+                      deletingProfileId === profile.id ? (
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => handleDeleteProfile(profile.id)}
+                            className="px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-full hover:bg-red-700"
+                          >
+                            {t('common.delete')}
+                          </button>
+                          <button
+                            onClick={() => setDeletingProfileId(null)}
+                            className="px-3 py-1 bg-gray-200 text-gray-600 text-xs font-bold rounded-full hover:bg-gray-300"
+                          >
+                            {t('common.cancel')}
+                          </button>
+                        </div>
+                      ) : (
                         <button
-                          onClick={() => handleDeleteProfile(profile.id)}
-                          className="px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-full hover:bg-red-700"
+                          onClick={() => setDeletingProfileId(profile.id)}
+                          className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                          title={t('common.delete')}
                         >
-                          {t('common.delete')}
+                          <Trash2 className="w-5 h-5" />
                         </button>
-                        <button
-                          onClick={() => setDeletingProfileId(null)}
-                          className="px-3 py-1 bg-gray-200 text-gray-600 text-xs font-bold rounded-full hover:bg-gray-300"
-                        >
-                          {t('common.cancel')}
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => setDeletingProfileId(profile.id)}
-                        className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                        title={t('common.delete')}
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
+                      )
                     )}
                   </div>
                 </div>

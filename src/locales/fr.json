@@ -389,7 +389,11 @@
     },
     "users": {
       "add_btn": "Ajouter un utilisateur",
-      "confirm_delete": "Supprimer cet utilisateur ?"
+      "confirm_delete": "Supprimer cet utilisateur ?",
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action supprimera également son compte d'accès.",
+      "deleteSuccess": "Utilisateur supprimé avec succès.",
+      "deleteError": "Erreur lors de la suppression de l'utilisateur.",
+      "cannotDeleteSelf": "Vous ne pouvez pas supprimer votre propre compte."
     },
     "lois": {
       "details_title": "Détails de la demande",
