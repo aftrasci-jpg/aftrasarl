@@ -55,8 +55,9 @@ export const NotificationBell = () => {
       .on('postgres_changes', {
         event: 'DELETE',
         schema: 'public',
-        table: 'notifications',
-        filter: `user_id=eq.${user.id}`
+        table: 'notifications'
+        // No filter on user_id for DELETE because 'old' payload only contains PK
+        // RLS will ensure we only receive deletes for our own notifications
       }, (payload) => {
         setNotifications(prev => prev.filter(n => n.id !== payload.old.id));
       })
@@ -78,26 +79,49 @@ export const NotificationBell = () => {
   }, []);
 
   const markAsRead = async (id: string) => {
-    await supabase
+    // Optimistic update
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, is_read: true } : n));
+    
+    const { error } = await supabase
       .from('notifications')
       .update({ is_read: true })
       .eq('id', id);
+    
+    if (error) {
+      console.error("Error marking as read:", error);
+      // Revert on error if needed, but real-time should sync back
+    }
   };
 
   const markAllAsRead = async () => {
     if (!user) return;
-    await supabase
+    // Optimistic update
+    setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+
+    const { error } = await supabase
       .from('notifications')
       .update({ is_read: true })
       .eq('user_id', user.id)
       .eq('is_read', false);
+
+    if (error) {
+      console.error("Error marking all as read:", error);
+    }
   };
 
   const deleteNotification = async (id: string) => {
-    await supabase
+    // Optimistic update
+    setNotifications(prev => prev.filter(n => n.id !== id));
+
+    const { error } = await supabase
       .from('notifications')
       .delete()
       .eq('id', id);
+
+    if (error) {
+      console.error("Error deleting notification:", error);
+      // Revert on error if needed, but real-time should sync back
+    }
   };
 
   return (
@@ -120,7 +144,7 @@ export const NotificationBell = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden"
+            className="fixed inset-x-4 top-20 md:absolute md:inset-auto md:right-0 md:top-full md:mt-2 md:w-80 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden"
           >
             <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
               <h3 className="font-bold text-aftras-blue-border">{t('notifications.title')}</h3>
@@ -134,7 +158,7 @@ export const NotificationBell = () => {
               )}
             </div>
 
-            <div className="max-h-96 overflow-y-auto">
+            <div className="max-h-[70vh] md:max-h-96 overflow-y-auto">
               {notifications.length > 0 ? (
                 notifications.map((n) => (
                   <div
@@ -142,21 +166,21 @@ export const NotificationBell = () => {
                     className={`p-4 border-b border-gray-50 last:border-0 hover:bg-gray-50 transition-colors relative group ${!n.is_read ? 'bg-blue-50/30' : ''}`}
                   >
                     <div className="flex justify-between items-start mb-1">
-                      <h4 className={`text-sm font-bold ${!n.is_read ? 'text-aftras-blue-text' : 'text-gray-900'}`}>
+                      <h4 className={`text-sm font-bold leading-tight ${!n.is_read ? 'text-aftras-blue-text' : 'text-gray-900'}`}>
                         {n.title}
                       </h4>
-                      <div className="flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex space-x-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                         {!n.is_read && (
                           <button
                             onClick={() => markAsRead(n.id)}
-                            className="p-1 text-green-600 hover:bg-green-50 rounded"
+                            className="p-1.5 text-green-600 hover:bg-green-50 rounded"
                           >
                             <Check className="w-4 h-4" />
                           </button>
                         )}
                         <button
                           onClick={() => deleteNotification(n.id)}
-                          className="p-1 text-red-600 hover:bg-red-50 rounded"
+                          className="p-1.5 text-red-600 hover:bg-red-50 rounded"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

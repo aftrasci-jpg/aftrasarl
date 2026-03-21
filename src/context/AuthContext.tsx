@@ -26,17 +26,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     // 1. Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error("Auth session error:", error.message);
+        if (error.message.toLowerCase().includes('refresh_token_not_found') || 
+            error.message.toLowerCase().includes('refresh token not found')) {
+          // Clear session if refresh token is invalid
+          supabase.auth.signOut();
+        }
+        setUser(null);
+        setProfile(null);
+        setLoading(false);
+        return;
+      }
+
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchProfile(session.user.id);
       } else {
         setLoading(false);
       }
+    }).catch(err => {
+      console.error("Auth getSession catch:", err);
+      setLoading(false);
     });
 
     // 2. Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth event:", event);
       const currentUser = session?.user ?? null;
       setUser(currentUser);
       
@@ -45,6 +62,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } else {
         setProfile(null);
         setLoading(false);
+      }
+
+      if (event === 'SIGNED_OUT') {
+        setProfile(null);
+        setUser(null);
       }
     });
 

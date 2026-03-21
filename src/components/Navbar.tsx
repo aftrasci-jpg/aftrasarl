@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, User, LogOut, LayoutDashboard, Globe, ArrowLeft } from 'lucide-react';
+import { Menu, X, User, LogOut, LayoutDashboard, Globe, ArrowLeft, Package } from 'lucide-react';
 import { NotificationBell } from './NotificationBell';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabase';
@@ -14,7 +14,7 @@ function cn(...inputs: ClassValue[]) {
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, profile, isAdmin } = useAuth();
+  const { user, profile, isAdmin, isCommunityManager } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { t, i18n } = useTranslation();
@@ -101,13 +101,33 @@ export const Navbar = () => {
             {user ? (
               <div className="flex items-center space-x-6">
                 <NotificationBell />
-                <Link
-                  to={isAdmin ? "/admin" : "/dashboard"}
-                  className="flex items-center text-sm font-medium text-aftras-blue-text hover:text-aftras-orange"
-                >
-                  <LayoutDashboard className="w-4 h-4 mr-1" />
-                  {isAdmin ? t('common.admin') : t('common.dashboard')}
-                </Link>
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    className="flex items-center text-sm font-medium text-aftras-blue-text hover:text-aftras-orange"
+                  >
+                    <LayoutDashboard className="w-4 h-4 mr-1" />
+                    {t('common.admin')}
+                  </Link>
+                )}
+                {isCommunityManager && (
+                  <Link
+                    to="/community-manager"
+                    className="flex items-center text-sm font-medium text-aftras-blue-text hover:text-aftras-orange"
+                  >
+                    <Package className="w-4 h-4 mr-1" />
+                    {t('common.cm')}
+                  </Link>
+                )}
+                {!isAdmin && !isCommunityManager && (
+                  <Link
+                    to="/dashboard"
+                    className="flex items-center text-sm font-medium text-aftras-blue-text hover:text-aftras-orange"
+                  >
+                    <LayoutDashboard className="w-4 h-4 mr-1" />
+                    {t('common.dashboard')}
+                  </Link>
+                )}
                 <button
                   onClick={handleLogout}
                   className="flex items-center text-sm font-medium text-red-600 hover:text-red-800"
@@ -175,20 +195,44 @@ export const Navbar = () => {
             ))}
             {user ? (
               <>
-                <Link
-                  to={isAdmin ? "/admin" : "/dashboard"}
-                  onClick={() => setIsOpen(false)}
-                  className="block px-3 py-2 rounded-md text-base font-medium text-aftras-blue-text hover:bg-gray-50"
-                >
-                  {isAdmin ? t('common.admin') : t('common.dashboard')}
-                </Link>
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center px-3 py-2 rounded-md text-base font-medium text-aftras-blue-text hover:bg-gray-50"
+                  >
+                    <LayoutDashboard className="w-4 h-4 mr-2" />
+                    {t('common.admin')}
+                  </Link>
+                )}
+                {isCommunityManager && (
+                  <Link
+                    to="/community-manager"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center px-3 py-2 rounded-md text-base font-medium text-aftras-blue-text hover:bg-gray-50"
+                  >
+                    <Package className="w-4 h-4 mr-2" />
+                    {t('common.cm')}
+                  </Link>
+                )}
+                {!isAdmin && !isCommunityManager && (
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center px-3 py-2 rounded-md text-base font-medium text-aftras-blue-text hover:bg-gray-50"
+                  >
+                    <LayoutDashboard className="w-4 h-4 mr-2" />
+                    {t('common.dashboard')}
+                  </Link>
+                )}
                 <button
                   onClick={() => {
                     handleLogout();
                     setIsOpen(false);
                   }}
-                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-gray-50"
+                  className="flex items-center w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-gray-50"
                 >
+                  <LogOut className="w-4 h-4 mr-2" />
                   {t('common.logout')}
                 </button>
               </>

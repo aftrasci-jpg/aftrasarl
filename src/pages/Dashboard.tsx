@@ -3,7 +3,7 @@ import { SEO } from '../components/SEO';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabase';
 import { LOI, STATUS_COLORS } from '../types';
-import { Plus, ChevronDown, ChevronUp, Clock, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Plus, ChevronDown, ChevronUp, Clock, FileText, CheckCircle2, AlertCircle, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
@@ -69,6 +69,37 @@ export const Dashboard = () => {
     setExpandedLoiId(expandedLoiId === id ? null : id);
   };
 
+  const deleteLoi = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent expanding the card when clicking delete
+    
+    if (!window.confirm(t('dashboard.loi_card.delete_confirm'))) {
+      return;
+    }
+
+    try {
+      const { error: deleteError } = await supabase
+        .from('lois')
+        .delete()
+        .eq('id', id);
+
+      if (deleteError) throw deleteError;
+
+      setLois(prev => prev.filter(l => l.id !== id));
+    } catch (err: any) {
+      console.error("Error deleting LOI:", err);
+      alert(t('common.error'));
+    }
+  };
+
+  const getLoiImage = (loi: LOI) => {
+    if (loi.product_image) return loi.product_image;
+    if (loi.additional_info?.includes('[IMAGE_URL]:')) {
+      const match = loi.additional_info.match(/\[IMAGE_URL\]:\s*(https?:\/\/[^\s\n]+)/);
+      return match ? match[1] : null;
+    }
+    return null;
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen py-6 md:py-12">
       <SEO 
@@ -80,7 +111,9 @@ export const Dashboard = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-12 gap-6">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-aftras-blue-border">{t('dashboard.title')}</h1>
-            <p className="text-gray-600 mt-1 text-sm md:text-base">{t('dashboard.welcome')}, {profile?.company_name}</p>
+            <p className="text-gray-600 mt-1 text-sm md:text-base">
+              {t('dashboard.welcome')} <span className="font-bold text-aftras-blue-text">{profile?.company_name}</span>
+            </p>
           </div>
           <Link 
             to="/loi" 
@@ -133,10 +166,10 @@ export const Dashboard = () => {
                   className="p-4 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center cursor-pointer hover:bg-gray-50 transition-colors gap-4"
                 >
                   <div className="flex items-center space-x-4">
-                    {loi.product_image ? (
+                    {getLoiImage(loi) ? (
                       <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl overflow-hidden border border-gray-100 flex-shrink-0">
                         <img 
-                          src={loi.product_image} 
+                          src={getLoiImage(loi)!} 
                           alt={loi.product} 
                           className="w-full h-full object-cover"
                           referrerPolicy="no-referrer"
@@ -157,7 +190,16 @@ export const Dashboard = () => {
                     <span className={`px-3 md:px-4 py-1 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider ${STATUS_COLORS[loi.status]}`}>
                       {STATUS_LABELS[loi.status]}
                     </span>
-                    {expandedLoiId === loi.id ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+                    <div className="flex items-center space-x-2">
+                      <button 
+                        onClick={(e) => deleteLoi(loi.id, e)}
+                        className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                        title={t('common.delete')}
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                      {expandedLoiId === loi.id ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+                    </div>
                   </div>
                 </div>
 
@@ -190,7 +232,9 @@ export const Dashboard = () => {
                           </div>
                           <div className="sm:col-span-2">
                             <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">{t('loi_form.sections.additional')}</p>
-                            <p className="text-gray-700 text-xs md:text-sm leading-relaxed">{loi.additional_info || t('dashboard.loi_card.no_additional')}</p>
+                            <p className="text-gray-700 text-xs md:text-sm leading-relaxed">
+                              {loi.additional_info?.split('[IMAGE_URL]:')[0].trim() || t('dashboard.loi_card.no_additional')}
+                            </p>
                           </div>
                         </div>
 

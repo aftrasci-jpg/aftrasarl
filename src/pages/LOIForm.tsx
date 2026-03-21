@@ -96,21 +96,40 @@ export const LOIForm = () => {
         destination: formData.port || 'À définir',
       });
 
-      const { error: submitError } = await supabase
+      const insertData: any = {
+        company_id: user.id,
+        company_name: profile.company_name,
+        product: formData.product,
+        product_image: formData.product_image,
+        quantity: formData.quantity,
+        budget: formData.budget,
+        incoterm: formData.incoterm,
+        port: formData.port,
+        deadline: formData.deadline,
+        additional_info: formData.additional_info,
+        status: 'searching'
+      };
+
+      let { error: submitError } = await supabase
         .from('lois')
-        .insert({
-          company_id: user.id,
-          company_name: profile.company_name,
-          product: formData.product,
-          product_image: formData.product_image,
-          quantity: formData.quantity,
-          budget: formData.budget,
-          incoterm: formData.incoterm,
-          port: formData.port,
-          deadline: formData.deadline,
-          additional_info: formData.additional_info,
-          status: 'searching'
-        });
+        .insert(insertData);
+
+      // Fallback if product_image column is missing (PGRST204)
+      if (submitError && (submitError as any).code === 'PGRST204' && (submitError as any).message?.includes('product_image')) {
+        console.warn("product_image column missing, using fallback in additional_info");
+        const { product_image, ...dataWithoutImage } = insertData;
+        const fallbackInfo = product_image 
+          ? `${formData.additional_info}\n\n[IMAGE_URL]: ${product_image}`
+          : formData.additional_info;
+        
+        const { error: retryError } = await supabase
+          .from('lois')
+          .insert({
+            ...dataWithoutImage,
+            additional_info: fallbackInfo
+          });
+        submitError = retryError;
+      }
 
       if (submitError) throw submitError;
 

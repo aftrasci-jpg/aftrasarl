@@ -6,6 +6,7 @@
     "logout": "Déconnexion",
     "dashboard": "Tableau de bord",
     "admin": "Admin",
+    "cm": "Espace CM",
     "home": "Accueil",
     "about": "À propos",
     "services": "Services",
@@ -18,7 +19,9 @@
     "send": "Envoyer",
     "loading": "Chargement...",
     "error": "Une erreur est survenue.",
-    "success": "Succès !"
+    "success": "Succès !",
+    "delete": "Supprimer",
+    "cancel": "Annuler"
   },
   "navbar": {
     "create_account": "Créer un compte"
@@ -358,7 +361,8 @@
     "loi_card": {
       "quantity": "Quantité",
       "not_specified": "Non spécifié",
-      "no_additional": "Aucune information supplémentaire."
+      "no_additional": "Aucune information supplémentaire.",
+      "delete_confirm": "Êtes-vous sûr de vouloir supprimer cette LOI ? Cette action est irréversible."
     },
     "admin_response": {
       "title": "Réponse d'AFTRAS CI",
@@ -378,9 +382,14 @@
   },
   "admin_page": {
     "title": "Administration",
-    "access_denied": "Accès refusé.",
+    "access_denied": "Accès refusé. Réservé aux administrateurs.",
     "tabs": {
-      "lois": "Gestion des LOI"
+      "lois": "Gestion des LOI",
+      "users": "Gestion des Utilisateurs"
+    },
+    "users": {
+      "add_btn": "Ajouter un utilisateur",
+      "confirm_delete": "Supprimer cet utilisateur ?"
     },
     "lois": {
       "details_title": "Détails de la demande",

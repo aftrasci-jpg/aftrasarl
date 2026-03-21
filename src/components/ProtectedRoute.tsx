@@ -25,11 +25,16 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" replace />;
   }
 
-  if (adminOnly && !isAdmin) {
-    return <Navigate to="/dashboard" replace />;
+  // Enforce role-based redirections
+  if (isAdmin && !adminOnly) {
+    return <Navigate to="/admin" replace />;
   }
 
-  if (communityManagerOnly && !isCommunityManager) {
+  if (isCommunityManager && !communityManagerOnly) {
+    return <Navigate to="/community-manager" replace />;
+  }
+
+  if (profile?.role === 'company' && (adminOnly || communityManagerOnly)) {
     return <Navigate to="/dashboard" replace />;
   }
 

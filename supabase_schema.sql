@@ -4,7 +4,7 @@
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users(id) PRIMARY KEY,
   email TEXT NOT NULL,
-  role TEXT DEFAULT 'company' CHECK (role IN ('admin', 'company')),
+  role TEXT DEFAULT 'company' CHECK (role IN ('admin', 'company', 'community_manager')),
   company_name TEXT,
   country TEXT,
   address TEXT,
@@ -72,6 +72,10 @@ CREATE POLICY "Anyone can create notifications (for the system to handle)"
   ON public.notifications FOR INSERT
   WITH CHECK (true);
 
+CREATE POLICY "Users can delete their own notifications"
+  ON public.notifications FOR DELETE
+  USING (auth.uid() = user_id);
+
 -- 6. Storage Buckets
 -- Note: Buckets can also be created via the Supabase UI.
 -- This SQL creates the 'products' bucket and sets up RLS policies.
@@ -85,25 +89,25 @@ CREATE POLICY "Public Access"
 ON storage.objects FOR SELECT
 USING ( bucket_id = 'products' );
 
-CREATE POLICY "Admins can upload product images"
+CREATE POLICY "Admins and CMs can upload product images"
 ON storage.objects FOR INSERT
 WITH CHECK (
   bucket_id = 'products' AND
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'community_manager'))
 );
 
-CREATE POLICY "Admins can update product images"
+CREATE POLICY "Admins and CMs can update product images"
 ON storage.objects FOR UPDATE
 USING (
   bucket_id = 'products' AND
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'community_manager'))
 );
 
-CREATE POLICY "Admins can delete product images"
+CREATE POLICY "Admins and CMs can delete product images"
 ON storage.objects FOR DELETE
 USING (
   bucket_id = 'products' AND
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'community_manager'))
 );
 
 -- 5. Row Level Security (RLS)
@@ -113,12 +117,18 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public profiles are viewable by everyone." ON public.profiles FOR SELECT USING (true);
 CREATE POLICY "Users can update their own profile." ON public.profiles FOR UPDATE USING (auth.uid() = id);
 CREATE POLICY "Users can insert their own profile." ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
+CREATE POLICY "Admins can update any profile." ON public.profiles FOR UPDATE USING (
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+);
+CREATE POLICY "Admins can delete any profile." ON public.profiles FOR DELETE USING (
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+);
 
 -- Products
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Products are viewable by everyone." ON public.products FOR SELECT USING (true);
-CREATE POLICY "Only admins can modify products." ON public.products FOR ALL USING (
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+CREATE POLICY "Only admins and CMs can modify products." ON public.products FOR ALL USING (
+  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'community_manager'))
 );
 
 -- LOIs

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabase';
 import { LOI, Product, STATUS_COLORS, LOIStatus, PRODUCT_CATEGORIES, ProductCategory } from '../types';
-import { Plus, Trash2, Edit, CheckCircle2, X, Package, FileText, Send, Image as ImageIcon, Upload, AlertCircle } from 'lucide-react';
+import { Plus, Trash2, Edit, CheckCircle2, X, Package, FileText, Send, Image as ImageIcon, Upload, AlertCircle, Users, UserPlus, Shield, Briefcase, Mail, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { SEO } from '../components/SEO';
@@ -12,9 +12,22 @@ import { z } from 'zod';
 export const Admin = () => {
   const { t } = useTranslation();
   const { isAdmin } = useAuth();
+  const [activeTab, setActiveTab] = useState<'lois' | 'users'>('lois');
   const [lois, setLois] = useState<LOI[]>([]);
+  const [profiles, setProfiles] = useState<any[]>([]);
   const [expandedLoiId, setExpandedLoiId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deletingProfileId, setDeletingProfileId] = useState<string | null>(null);
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const [newUserForm, setNewUserForm] = useState({
+    email: '',
+    password: '',
+    role: 'company' as 'admin' | 'company' | 'community_manager',
+    company_name: ''
+  });
 
   const STATUS_LABELS: Record<string, string> = {
     searching: t('dashboard.status.searching'),
@@ -52,12 +65,38 @@ export const Admin = () => {
 
     fetchLois();
 
+    const fetchProfiles = async () => {
+      const { data, error: fetchError } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (fetchError) {
+        console.error("Admin profiles fetch error:", fetchError);
+      } else {
+        setProfiles(data);
+      }
+    };
+
+    fetchProfiles();
+
     const loisSub = supabase.channel('admin_lois').on('postgres_changes', { event: '*', schema: 'public', table: 'lois' }, fetchLois).subscribe();
+    const profilesSub = supabase.channel('admin_profiles').on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, fetchProfiles).subscribe();
 
     return () => {
       loisSub.unsubscribe();
+      profilesSub.unsubscribe();
     };
   }, [isAdmin]);
+
+  const getLoiImage = (loi: LOI) => {
+    if (loi.product_image) return loi.product_image;
+    if (loi.additional_info?.includes('[IMAGE_URL]:')) {
+      const match = loi.additional_info.match(/\[IMAGE_URL\]:\s*(https?:\/\/[^\s\n]+)/);
+      return match ? match[1] : null;
+    }
+    return null;
+  };
 
   const handleLoiResponse = async (loi: LOI) => {
     try {
@@ -104,6 +143,94 @@ export const Admin = () => {
     }
   };
 
+  const handleDeleteLoi = async (id: string) => {
+    try {
+      const { error: deleteError } = await supabase
+        .from('lois')
+        .delete()
+        .eq('id', id);
+
+      if (deleteError) throw deleteError;
+      
+      setLois(prev => prev.filter(loi => loi.id !== id));
+      setDeletingId(null);
+    } catch (error) {
+      console.error("Delete LOI error:", error);
+      setError(t('common.error'));
+    }
+  };
+
+  const handleRoleUpdate = async (profileId: string, newRole: string) => {
+    try {
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ role: newRole })
+        .eq('id', profileId);
+      
+      if (updateError) throw updateError;
+      setSuccess(t('common.success'));
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (error) {
+      console.error("Role update error:", error);
+      setError(t('common.error'));
+    }
+  };
+
+  const handleDeleteProfile = async (id: string) => {
+    try {
+      const { error: deleteError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', id);
+
+      if (deleteError) throw deleteError;
+      
+      setProfiles(prev => prev.filter(p => p.id !== id));
+      setDeletingProfileId(null);
+    } catch (error) {
+      console.error("Delete profile error:", error);
+      setError(t('common.error'));
+    }
+  };
+
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSuccess(null);
+    try {
+      // Note: signUp will create the Auth user and the trigger will create the profile.
+      // We then update the profile role if it's not 'company'.
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: newUserForm.email,
+        password: newUserForm.password,
+      });
+
+      if (authError) throw authError;
+
+      if (authData.user && newUserForm.role !== 'company') {
+        // Wait a bit for the trigger to finish
+        setTimeout(async () => {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .update({ 
+              role: newUserForm.role,
+              company_name: newUserForm.company_name || null
+            })
+            .eq('id', authData.user!.id);
+          
+          if (profileError) console.error("Profile role update error:", profileError);
+        }, 1000);
+      }
+
+      setSuccess("Utilisateur créé avec succès. Note: L'utilisateur devra confirmer son email si activé.");
+      setIsUserModalOpen(false);
+      setNewUserForm({ email: '', password: '', role: 'company', company_name: '' });
+    } catch (err: any) {
+      console.error("User creation error:", err);
+      setError(err.message || t('common.error'));
+    }
+  };
+
   if (!isAdmin) return <div className="p-20 text-center">{t('admin_page.access_denied')}</div>;
 
   return (
@@ -113,186 +240,396 @@ export const Admin = () => {
         description="Administration AFTRAS CI - Gestion des LOI."
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-aftras-blue-border mb-8 md:mb-12">{t('admin_page.title')}</h1>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 md:mb-12 gap-4">
+          <h1 className="text-2xl md:text-3xl font-bold text-aftras-blue-border">{t('admin_page.title')}</h1>
+          
+          <div className="flex bg-white p-1 rounded-xl shadow-sm border border-gray-100">
+            <button 
+              onClick={() => setActiveTab('lois')}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center ${activeTab === 'lois' ? 'bg-aftras-blue-text text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
+            >
+              <FileText className="w-4 h-4 mr-2" /> {t('admin_page.tabs.lois')}
+            </button>
+            <button 
+              onClick={() => setActiveTab('users')}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center ${activeTab === 'users' ? 'bg-aftras-blue-text text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
+            >
+              <Users className="w-4 h-4 mr-2" /> {t('admin_page.tabs.users')}
+            </button>
+          </div>
+        </div>
 
         {error && (
-          <div className="bg-red-50 text-red-600 p-6 rounded-2xl border border-red-100 mb-8">
+          <div className="bg-red-50 text-red-600 p-6 rounded-2xl border border-red-100 mb-8 flex items-center">
+            <AlertCircle className="w-5 h-5 mr-3 flex-shrink-0" />
             {error}
           </div>
         )}
 
-        {/* LOI Management */}
-        <div className="space-y-6">
-          <h2 className="text-xl font-bold text-aftras-blue-border mb-6">{t('admin_page.tabs.lois')} ({lois.length})</h2>
-          {lois.map((loi) => (
-            <div key={loi.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div 
-                onClick={() => {
-                  setExpandedLoiId(expandedLoiId === loi.id ? null : loi.id);
-                  const latestResponse = Array.isArray(loi.admin_response) 
-                    ? loi.admin_response[loi.admin_response.length - 1] 
-                    : loi.admin_response;
+        {success && (
+          <div className="bg-green-50 text-green-600 p-6 rounded-2xl border border-green-100 mb-8 flex items-center">
+            <CheckCircle2 className="w-5 h-5 mr-3 flex-shrink-0" />
+            {success}
+          </div>
+        )}
 
-                  if (latestResponse) {
-                    setResponseForm({
-                      proposed_quantity: latestResponse.proposed_quantity,
-                      incoterm: latestResponse.incoterm as any,
-                      location: latestResponse.location,
-                      price: latestResponse.price,
-                      delivery_time: latestResponse.delivery_time,
-                      status: loi.status
-                    });
-                  } else {
-                    setResponseForm({ ...responseForm, status: loi.status });
-                  }
-                }}
-                className="p-6 flex flex-col md:flex-row justify-between items-start md:items-center cursor-pointer hover:bg-gray-50"
-              >
-                <div className="flex items-center space-x-3 md:space-x-4">
-                  {loi.product_image ? (
-                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl overflow-hidden border border-gray-100 flex-shrink-0">
-                      <img 
-                        src={loi.product_image} 
-                        alt={loi.product} 
-                        className="w-full h-full object-cover"
-                        referrerPolicy="no-referrer"
-                      />
-                    </div>
-                  ) : (
-                    <div className="p-2 md:p-3 bg-blue-50 rounded-xl">
-                      <FileText className="w-5 h-5 md:w-6 md:h-6 text-aftras-blue-text" />
-                    </div>
-                  )}
-                  <div>
-                    <h3 className="text-base md:text-lg font-bold text-gray-900 leading-tight">{loi.company_name}</h3>
-                    <p className="text-xs md:text-sm text-gray-500">{loi.product} • {loi.quantity}</p>
-                  </div>
-                </div>
-                <span className={`mt-4 md:mt-0 px-3 md:px-4 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider ${STATUS_COLORS[loi.status]}`}>
-                  {STATUS_LABELS[loi.status]}
-                </span>
-              </div>
+        {activeTab === 'lois' ? (
+          /* LOI Management */
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold text-aftras-blue-border mb-6">{t('admin_page.tabs.lois')} ({lois.length})</h2>
+            {lois.map((loi) => (
+              <div key={loi.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div 
+                  onClick={() => {
+                    setExpandedLoiId(expandedLoiId === loi.id ? null : loi.id);
+                    const latestResponse = Array.isArray(loi.admin_response) 
+                      ? loi.admin_response[loi.admin_response.length - 1] 
+                      : loi.admin_response;
 
-              <AnimatePresence>
-                {expandedLoiId === loi.id && (
-                  <motion.div
-                    initial={{ height: 0 }}
-                    animate={{ height: 'auto' }}
-                    exit={{ height: 0 }}
-                    className="border-t border-gray-100 bg-gray-50/50 p-8"
-                  >
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
-                      {/* Details */}
-                      <div>
-                        <h4 className="font-bold text-aftras-blue-border mb-4 uppercase text-[10px] md:text-xs tracking-widest">{t('admin_page.lois.details_title')}</h4>
-                        <div className="grid grid-cols-2 gap-3 md:gap-4 text-xs md:text-sm">
-                          <p className="text-gray-500">{t('loi_form.form.budget_label')}:</p><p className="font-medium">{loi.budget || 'N/A'}</p>
-                          <p className="text-gray-500">{t('loi_form.form.incoterm_label')}:</p><p className="font-medium">{loi.incoterm || 'N/A'}</p>
-                          <p className="text-gray-500">{t('loi_form.form.port_label')}:</p><p className="font-medium">{loi.port || 'N/A'}</p>
-                          <p className="text-gray-500">{t('loi_form.form.deadline_label')}:</p><p className="font-medium">{loi.deadline || 'N/A'}</p>
-                        </div>
-                        <div className="mt-4">
-                          <p className="text-gray-500 text-xs md:text-sm mb-1">{t('loi_form.sections.additional')}:</p>
-                          <p className="text-gray-700 text-xs md:text-sm italic">{loi.additional_info || 'Aucune.'}</p>
-                        </div>
+                    if (latestResponse) {
+                      setResponseForm({
+                        proposed_quantity: latestResponse.proposed_quantity,
+                        incoterm: latestResponse.incoterm as any,
+                        location: latestResponse.location,
+                        price: latestResponse.price,
+                        delivery_time: latestResponse.delivery_time,
+                        status: loi.status
+                      });
+                    } else {
+                      setResponseForm({ ...responseForm, status: loi.status });
+                    }
+                  }}
+                  className="p-6 flex flex-col md:flex-row justify-between items-start md:items-center cursor-pointer hover:bg-gray-50"
+                >
+                  <div className="flex items-center space-x-3 md:space-x-4">
+                    {getLoiImage(loi) ? (
+                      <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl overflow-hidden border border-gray-100 flex-shrink-0">
+                        <img 
+                          src={getLoiImage(loi)!} 
+                          alt={loi.product} 
+                          className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
+                        />
                       </div>
-
-                      {/* Response Form */}
-                      <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-200">
-                        <h4 className="font-bold text-aftras-blue-border mb-6 uppercase text-[10px] md:text-xs tracking-widest">{t('admin_page.lois.response_title')}</h4>
-                        <div className="space-y-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-[10px] md:text-xs font-bold text-gray-500 mb-1">{t('admin_page.lois.form.status')}</label>
-                              <select 
-                                value={responseForm.status}
-                                onChange={(e) => setResponseForm({...responseForm, status: e.target.value as LOIStatus})}
-                                className="w-full p-2 border rounded-lg text-sm"
-                              >
-                                {Object.entries(STATUS_LABELS).map(([val, label]) => (
-                                  <option key={val} value={val}>{label}</option>
-                                ))}
-                              </select>
-                            </div>
-                            <div>
-                              <label className="block text-[10px] md:text-xs font-bold text-gray-500 mb-1">{t('dashboard.admin_response.proposed_quantity')}</label>
-                              <input 
-                                type="text" 
-                                value={responseForm.proposed_quantity}
-                                onChange={(e) => setResponseForm({...responseForm, proposed_quantity: e.target.value})}
-                                className="w-full p-2 border rounded-lg text-sm"
-                              />
-                            </div>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-[10px] md:text-xs font-bold text-gray-500 mb-1">{t('dashboard.admin_response.proposed_price')}</label>
-                              <input 
-                                type="text" 
-                                value={responseForm.price}
-                                onChange={(e) => setResponseForm({...responseForm, price: e.target.value})}
-                                className="w-full p-2 border rounded-lg text-sm"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-[10px] md:text-xs font-bold text-gray-500 mb-1">{t('dashboard.admin_response.delivery_time')}</label>
-                              <input 
-                                type="text" 
-                                value={responseForm.delivery_time}
-                                onChange={(e) => setResponseForm({...responseForm, delivery_time: e.target.value})}
-                                className="w-full p-2 border rounded-lg text-sm"
-                              />
-                            </div>
-                          </div>
-                          <button 
-                            onClick={() => handleLoiResponse(loi)}
-                            className="w-full bg-aftras-orange text-white py-3 rounded-xl font-bold text-sm hover:bg-opacity-90 transition-all flex items-center justify-center"
-                          >
-                            <Send className="w-4 h-4 mr-2" /> {t('admin_page.lois.form.submit')}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* History Section */}
-                    {Array.isArray(loi.admin_response) && loi.admin_response.length > 0 && (
-                      <div className="mt-8 pt-8 border-t border-gray-200">
-                        <h4 className="font-bold text-aftras-blue-border mb-6 uppercase text-xs tracking-widest">Historique des Réponses</h4>
-                        <div className="space-y-4">
-                          {loi.admin_response.slice().reverse().map((resp: any, idx: number) => (
-                            <div key={idx} className="bg-white p-4 rounded-xl border border-gray-100 flex justify-between items-center text-sm">
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-1">
-                                <div>
-                                  <p className="text-gray-400 text-[10px] uppercase font-bold">Quantité</p>
-                                  <p className="font-medium">{resp.proposed_quantity}</p>
-                                </div>
-                                <div>
-                                  <p className="text-gray-400 text-[10px] uppercase font-bold">Prix</p>
-                                  <p className="font-medium">{resp.price}</p>
-                                </div>
-                                <div>
-                                  <p className="text-gray-400 text-[10px] uppercase font-bold">Incoterm</p>
-                                  <p className="font-medium">{resp.incoterm} - {resp.location}</p>
-                                </div>
-                                <div>
-                                  <p className="text-gray-400 text-[10px] uppercase font-bold">Délai</p>
-                                  <p className="font-medium">{resp.delivery_time}</p>
-                                </div>
-                              </div>
-                              <div className="text-right ml-4">
-                                <p className="text-[10px] text-gray-400">{new Date(resp.updated_at).toLocaleString()}</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                    ) : (
+                      <div className="p-2 md:p-3 bg-blue-50 rounded-xl">
+                        <FileText className="w-5 h-5 md:w-6 md:h-6 text-aftras-blue-text" />
                       </div>
                     )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    <div>
+                      <h3 className="text-base md:text-lg font-bold text-gray-900 leading-tight">{loi.company_name}</h3>
+                      <p className="text-xs md:text-sm text-gray-500">{loi.product} • {loi.quantity}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2 mt-4 md:mt-0">
+                    {deletingId === loi.id ? (
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteLoi(loi.id);
+                          }}
+                          className="px-3 py-1 bg-red-600 text-white text-[10px] md:text-xs font-bold rounded-full hover:bg-red-700 transition-colors"
+                        >
+                          {t('common.delete')}
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeletingId(null);
+                          }}
+                          className="px-3 py-1 bg-gray-200 text-gray-600 text-[10px] md:text-xs font-bold rounded-full hover:bg-gray-300 transition-colors"
+                        >
+                          {t('common.cancel')}
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeletingId(loi.id);
+                        }}
+                        className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                        title={t('common.delete')}
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    )}
+                    <span className={`px-3 md:px-4 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider ${STATUS_COLORS[loi.status]}`}>
+                      {STATUS_LABELS[loi.status]}
+                    </span>
+                  </div>
+                </div>
+
+                <AnimatePresence>
+                  {expandedLoiId === loi.id && (
+                    <motion.div
+                      initial={{ height: 0 }}
+                      animate={{ height: 'auto' }}
+                      exit={{ height: 0 }}
+                      className="border-t border-gray-100 bg-gray-50/50 p-8"
+                    >
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
+                        {/* Details */}
+                        <div>
+                          <h4 className="font-bold text-aftras-blue-border mb-4 uppercase text-[10px] md:text-xs tracking-widest">{t('admin_page.lois.details_title')}</h4>
+                          <div className="grid grid-cols-2 gap-3 md:gap-4 text-xs md:text-sm">
+                            <p className="text-gray-500">{t('loi_form.form.budget_label')}:</p><p className="font-medium">{loi.budget || 'N/A'}</p>
+                            <p className="text-gray-500">{t('loi_form.form.incoterm_label')}:</p><p className="font-medium">{loi.incoterm || 'N/A'}</p>
+                            <p className="text-gray-500">{t('loi_form.form.port_label')}:</p><p className="font-medium">{loi.port || 'N/A'}</p>
+                            <p className="text-gray-500">{t('loi_form.form.deadline_label')}:</p><p className="font-medium">{loi.deadline || 'N/A'}</p>
+                          </div>
+                          <div className="mt-4">
+                            <p className="text-gray-500 text-xs md:text-sm mb-1">{t('loi_form.sections.additional')}:</p>
+                            <p className="text-gray-700 text-xs md:text-sm italic">
+                              {loi.additional_info?.split('[IMAGE_URL]:')[0].trim() || 'Aucune.'}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Response Form */}
+                        <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-gray-200">
+                          <h4 className="font-bold text-aftras-blue-border mb-6 uppercase text-[10px] md:text-xs tracking-widest">{t('admin_page.lois.response_title')}</h4>
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-[10px] md:text-xs font-bold text-gray-500 mb-1">{t('admin_page.lois.form.status')}</label>
+                                <select 
+                                  value={responseForm.status}
+                                  onChange={(e) => setResponseForm({...responseForm, status: e.target.value as LOIStatus})}
+                                  className="w-full p-2 border rounded-lg text-sm"
+                                >
+                                  {Object.entries(STATUS_LABELS).map(([val, label]) => (
+                                    <option key={val} value={val}>{label}</option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-[10px] md:text-xs font-bold text-gray-500 mb-1">{t('dashboard.admin_response.proposed_quantity')}</label>
+                                <input 
+                                  type="text" 
+                                  value={responseForm.proposed_quantity}
+                                  onChange={(e) => setResponseForm({...responseForm, proposed_quantity: e.target.value})}
+                                  className="w-full p-2 border rounded-lg text-sm"
+                                />
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-[10px] md:text-xs font-bold text-gray-500 mb-1">{t('dashboard.admin_response.proposed_price')}</label>
+                                <input 
+                                  type="text" 
+                                  value={responseForm.price}
+                                  onChange={(e) => setResponseForm({...responseForm, price: e.target.value})}
+                                  className="w-full p-2 border rounded-lg text-sm"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[10px] md:text-xs font-bold text-gray-500 mb-1">{t('dashboard.admin_response.delivery_time')}</label>
+                                <input 
+                                  type="text" 
+                                  value={responseForm.delivery_time}
+                                  onChange={(e) => setResponseForm({...responseForm, delivery_time: e.target.value})}
+                                  className="w-full p-2 border rounded-lg text-sm"
+                                />
+                              </div>
+                            </div>
+                            <button 
+                              onClick={() => handleLoiResponse(loi)}
+                              className="w-full bg-aftras-orange text-white py-3 rounded-xl font-bold text-sm hover:bg-opacity-90 transition-all flex items-center justify-center"
+                            >
+                              <Send className="w-4 h-4 mr-2" /> {t('admin_page.lois.form.submit')}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* History Section */}
+                      {Array.isArray(loi.admin_response) && loi.admin_response.length > 0 && (
+                        <div className="mt-8 pt-8 border-t border-gray-200">
+                          <h4 className="font-bold text-aftras-blue-border mb-6 uppercase text-xs tracking-widest">Historique des Réponses</h4>
+                          <div className="space-y-4">
+                            {loi.admin_response.slice().reverse().map((resp: any, idx: number) => (
+                              <div key={idx} className="bg-white p-4 rounded-xl border border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm gap-4">
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-1 w-full">
+                                  <div>
+                                    <p className="text-gray-400 text-[10px] uppercase font-bold">Quantité</p>
+                                    <p className="font-medium">{resp.proposed_quantity}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-400 text-[10px] uppercase font-bold">Prix</p>
+                                    <p className="font-medium">{resp.price}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-400 text-[10px] uppercase font-bold">Incoterm</p>
+                                    <p className="font-medium">{resp.incoterm} - {resp.location}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-gray-400 text-[10px] uppercase font-bold">Délai</p>
+                                    <p className="font-medium">{resp.delivery_time}</p>
+                                  </div>
+                                </div>
+                                <div className="text-right w-full sm:w-auto border-t sm:border-t-0 pt-2 sm:pt-0">
+                                  <p className="text-[10px] text-gray-400">{new Date(resp.updated_at).toLocaleString()}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ))}
+          </div>
+        ) : (
+          /* User Management */
+          <div className="space-y-6">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-aftras-blue-border">{t('admin_page.tabs.users')} ({profiles.length})</h2>
+              <button 
+                onClick={() => setIsUserModalOpen(true)}
+                className="bg-aftras-orange text-white px-6 py-3 rounded-xl font-bold hover:bg-opacity-90 transition-all flex items-center shadow-lg shadow-orange-600/20"
+              >
+                <UserPlus className="w-5 h-5 mr-2" /> {t('admin_page.users.add_btn')}
+              </button>
             </div>
-          ))}
-        </div>
+
+            <div className="grid grid-cols-1 gap-4">
+              {profiles.map((profile) => (
+                <div key={profile.id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <div className="flex items-center space-x-4">
+                    <div className={`p-3 rounded-xl ${profile.role === 'admin' ? 'bg-red-50 text-red-600' : profile.role === 'community_manager' ? 'bg-blue-50 text-blue-600' : 'bg-gray-50 text-gray-600'}`}>
+                      {profile.role === 'admin' ? <Shield className="w-6 h-6" /> : profile.role === 'community_manager' ? <Briefcase className="w-6 h-6" /> : <Package className="w-6 h-6" />}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900">{profile.company_name || profile.email}</h3>
+                      <p className="text-sm text-gray-500">{profile.email}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-4 w-full md:w-auto">
+                    <select 
+                      value={profile.role}
+                      onChange={(e) => handleRoleUpdate(profile.id, e.target.value)}
+                      className="p-2 border rounded-lg text-sm bg-gray-50 outline-none focus:ring-2 focus:ring-aftras-blue-text flex-grow md:flex-grow-0"
+                    >
+                      <option value="company">Entreprise</option>
+                      <option value="community_manager">Community Manager</option>
+                      <option value="admin">Administrateur</option>
+                    </select>
+
+                    {deletingProfileId === profile.id ? (
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleDeleteProfile(profile.id)}
+                          className="px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-full hover:bg-red-700"
+                        >
+                          {t('common.delete')}
+                        </button>
+                        <button
+                          onClick={() => setDeletingProfileId(null)}
+                          className="px-3 py-1 bg-gray-200 text-gray-600 text-xs font-bold rounded-full hover:bg-gray-300"
+                        >
+                          {t('common.cancel')}
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setDeletingProfileId(profile.id)}
+                        className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                        title={t('common.delete')}
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* User Creation Modal */}
+        <AnimatePresence>
+          {isUserModalOpen && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh] my-auto"
+              >
+                <div className="bg-aftras-blue-text p-6 text-white flex justify-between items-center flex-shrink-0">
+                  <h3 className="text-xl font-bold">{t('admin_page.users.add_btn')}</h3>
+                  <button onClick={() => setIsUserModalOpen(false)}><X className="w-6 h-6" /></button>
+                </div>
+                <form onSubmit={handleCreateUser} className="p-8 space-y-6 overflow-y-auto">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Email</label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input 
+                        required
+                        type="email" 
+                        value={newUserForm.email}
+                        onChange={(e) => setNewUserForm({...newUserForm, email: e.target.value})}
+                        className="w-full pl-10 pr-4 py-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text"
+                        placeholder="email@aftras.ci"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Mot de passe</label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input 
+                        required
+                        type="password" 
+                        value={newUserForm.password}
+                        onChange={(e) => setNewUserForm({...newUserForm, password: e.target.value})}
+                        className="w-full pl-10 pr-4 py-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text"
+                        placeholder="••••••••"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">Rôle</label>
+                    <select 
+                      value={newUserForm.role}
+                      onChange={(e) => setNewUserForm({...newUserForm, role: e.target.value as any})}
+                      className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text"
+                    >
+                      <option value="company">Entreprise</option>
+                      <option value="community_manager">Community Manager</option>
+                      <option value="admin">Administrateur</option>
+                    </select>
+                  </div>
+                  {newUserForm.role === 'company' && (
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">Nom de l'entreprise</label>
+                      <input 
+                        type="text" 
+                        value={newUserForm.company_name}
+                        onChange={(e) => setNewUserForm({...newUserForm, company_name: e.target.value})}
+                        className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text"
+                        placeholder="Nom de l'entreprise"
+                      />
+                    </div>
+                  )}
+                  <div className="bg-blue-50 p-4 rounded-xl text-xs text-blue-700 leading-relaxed">
+                    <p className="font-bold mb-1">Note importante :</p>
+                    La création d'un compte via ce formulaire crée un nouvel utilisateur dans le système d'authentification. L'administrateur actuel restera connecté.
+                  </div>
+                  <button type="submit" className="w-full bg-aftras-orange text-white py-4 rounded-xl font-bold hover:bg-opacity-90 transition-all shadow-lg shadow-orange-600/20">
+                    {t('admin_page.users.add_btn')}
+                  </button>
+                </form>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

@@ -1,18 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { Mail, Lock, LogIn, AlertCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { loginSchema } from '../schemas';
 import { z } from 'zod';
+import { useAuth } from '../context/AuthContext';
 
 export const Login = () => {
   const { t } = useTranslation();
+  const { user, profile, loading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!authLoading && user && profile) {
+      if (profile.role === 'admin') navigate('/admin');
+      else if (profile.role === 'community_manager') navigate('/community-manager');
+      else navigate('/dashboard');
+    }
+  }, [user, profile, authLoading, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +49,8 @@ export const Login = () => {
 
       if (profile?.role === 'admin') {
         navigate('/admin');
+      } else if (profile?.role === 'community_manager') {
+        navigate('/community-manager');
       } else {
         navigate('/dashboard');
       }
