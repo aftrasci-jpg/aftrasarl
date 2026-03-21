@@ -37,27 +37,13 @@ export const AdminLogin = () => {
       });
       if (authError) throw authError;
 
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', (await supabase.auth.getUser()).data.user?.id)
-        .single();
-
-      if (profileError) throw profileError;
-
-      if (profile?.role === 'admin') {
-        navigate('/admin');
-      } else {
-        setError(t('admin_page.access_denied'));
-        await supabase.auth.signOut();
-      }
+      // Redirection is handled by useEffect above
     } catch (err: any) {
       if (err instanceof z.ZodError) {
         setError(err.issues[0].message);
       } else {
         setError(err.message || t('login_page.error'));
       }
-    } finally {
       setLoading(false);
     }
   };

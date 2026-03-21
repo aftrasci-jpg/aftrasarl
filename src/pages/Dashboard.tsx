@@ -7,6 +7,7 @@ import { Plus, ChevronDown, ChevronUp, Clock, FileText, CheckCircle2, AlertCircl
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { Modal } from '../components/Modal';
 
 export const Dashboard = () => {
   const { t } = useTranslation();
@@ -15,6 +16,7 @@ export const Dashboard = () => {
   const [expandedLoiId, setExpandedLoiId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loiToDelete, setLoiToDelete] = useState<string | null>(null);
 
   const STATUS_LABELS: Record<string, string> = {
     searching: t('dashboard.status.searching'),
@@ -35,7 +37,10 @@ export const Dashboard = () => {
           .order('created_at', { ascending: false });
 
         if (fetchError) throw fetchError;
-        setLois(data as LOI[]);
+        
+        // Filter out LOIs hidden by company
+        const filteredLois = (data as LOI[]).filter(loi => !loi.additional_info?.includes('[COMPANY_HIDDEN]'));
+        setLois(filteredLois);
         setError(null);
       } catch (err: any) {
         console.error("LOI fetch error:", err);
@@ -69,26 +74,35 @@ export const Dashboard = () => {
     setExpandedLoiId(expandedLoiId === id ? null : id);
   };
 
-  const deleteLoi = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent expanding the card when clicking delete
-    
-    if (!window.confirm(t('dashboard.loi_card.delete_confirm'))) {
-      return;
-    }
+  const handleDeleteConfirm = async () => {
+    if (!loiToDelete) return;
 
     try {
+      const loi = lois.find(l => l.id === loiToDelete);
+      if (!loi) return;
+
+      // Soft delete for company: hide it from company view but keep it for admin records
+      const updatedInfo = (loi.additional_info || '') + ' [COMPANY_HIDDEN]';
+      
       const { error: deleteError } = await supabase
         .from('lois')
-        .delete()
-        .eq('id', id);
+        .update({ additional_info: updatedInfo })
+        .eq('id', loiToDelete);
 
       if (deleteError) throw deleteError;
 
-      setLois(prev => prev.filter(l => l.id !== id));
+      setLois(prev => prev.filter(l => l.id !== loiToDelete));
+      setLoiToDelete(null);
     } catch (err: any) {
       console.error("Error deleting LOI:", err);
-      alert(t('common.error'));
+      setError(t('common.error'));
+      setLoiToDelete(null);
     }
+  };
+
+  const deleteLoi = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setLoiToDelete(id);
   };
 
   const getLoiImage = (loi: LOI) => {
@@ -233,7 +247,7 @@ export const Dashboard = () => {
                           <div className="sm:col-span-2">
                             <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">{t('loi_form.sections.additional')}</p>
                             <p className="text-gray-700 text-xs md:text-sm leading-relaxed">
-                              {loi.additional_info?.split('[IMAGE_URL]:')[0].trim() || t('dashboard.loi_card.no_additional')}
+                              {loi.additional_info?.split('[IMAGE_URL]:')[0].replace('[ADMIN_HIDDEN]', '').replace('[COMPANY_HIDDEN]', '').trim() || t('dashboard.loi_card.no_additional')}
                             </p>
                           </div>
                         </div>
@@ -345,6 +359,17 @@ export const Dashboard = () => {
           )}
         </div>
       </div>
+
+      <Modal
+        isOpen={!!loiToDelete}
+        onClose={() => setLoiToDelete(null)}
+        onConfirm={handleDeleteConfirm}
+        title={t('dashboard.loi_card.delete_confirm')}
+        message={t('dashboard.loi_card.delete_desc')}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
+        type="danger"
+      />
     </div>
   );
 };

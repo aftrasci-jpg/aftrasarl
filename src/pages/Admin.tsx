@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { SEO } from '../components/SEO';
 import { productSchema } from '../schemas';
 import { z } from 'zod';
+import { Modal } from '../components/Modal';
 
 export const Admin = () => {
   const { t } = useTranslation();
@@ -17,19 +18,26 @@ export const Admin = () => {
   const [lois, setLois] = useState<LOI[]>([]);
   const [profiles, setProfiles] = useState<any[]>([]);
   const [expandedLoiId, setExpandedLoiId] = useState<string | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [deletingProfileId, setDeletingProfileId] = useState<string | null>(null);
+  const [loiToDelete, setLoiToDelete] = useState<string | null>(null);
+  const [profileToDelete, setProfileToDelete] = useState<string | null>(null);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const adminClientRef = React.useRef<any>(null);
 
   // Create a temporary client for user creation to avoid signing out the admin
   const getAdminAuthClient = () => {
+    if (adminClientRef.current) return adminClientRef.current;
+
     const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL || '';
     const supabaseAnonKey = (import.meta as any).env.VITE_SUPABASE_ANON_KEY || '';
-    return createClient(supabaseUrl, supabaseAnonKey, {
-      auth: { persistSession: false }
+    adminClientRef.current = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: { 
+        persistSession: false,
+        storageKey: 'sb-admin-auth-token' // Use a different storage key to avoid warnings
+      }
     });
+    return adminClientRef.current;
   };
 
   const [newUserForm, setNewUserForm] = useState({
@@ -68,7 +76,9 @@ export const Admin = () => {
         console.error("Admin LOI fetch error:", fetchError);
         setError(t('common.error'));
       } else {
-        setLois(data as LOI[]);
+        // Filter out LOIs hidden by admin
+        const filteredLois = (data as LOI[]).filter(loi => !loi.additional_info?.includes('[ADMIN_HIDDEN]'));
+        setLois(filteredLois);
         setError(null);
       }
     };
@@ -153,48 +163,58 @@ export const Admin = () => {
     }
   };
 
-  const handleDeleteLoi = async (id: string) => {
+  const handleDeleteLoi = async () => {
+    if (!loiToDelete) return;
     try {
+      const loi = lois.find(l => l.id === loiToDelete);
+      if (!loi) return;
+
+      // Soft delete for admin: hide it from admin view but keep it for the company
+      const updatedInfo = (loi.additional_info || '') + ' [ADMIN_HIDDEN]';
+      
       const { error: deleteError } = await supabase
         .from('lois')
-        .delete()
-        .eq('id', id);
+        .update({ additional_info: updatedInfo })
+        .eq('id', loiToDelete);
 
       if (deleteError) throw deleteError;
       
-      setLois(prev => prev.filter(loi => loi.id !== id));
-      setDeletingId(null);
+      setLois(prev => prev.filter(loi => loi.id !== loiToDelete));
+      setLoiToDelete(null);
     } catch (error) {
       console.error("Delete LOI error:", error);
       setError(t('common.error'));
+      setLoiToDelete(null);
     }
   };
 
-  const handleDeleteProfile = async (id: string) => {
+  const handleDeleteProfile = async () => {
+    if (!profileToDelete) return;
     // Prevent self-deletion
-    if (user?.id === id) {
+    if (user?.id === profileToDelete) {
       setError(t('admin_page.users.cannotDeleteSelf'));
+      setProfileToDelete(null);
       return;
     }
 
     try {
       setError(null);
       // Use RPC to delete from auth.users (which cascades to profiles)
-      const { error: rpcError } = await supabase.rpc('delete_user', { target_user_id: id });
+      const { error: rpcError } = await supabase.rpc('delete_user', { target_user_id: profileToDelete });
 
       if (rpcError) {
         // Fallback to direct profile deletion if RPC fails
         const { error: deleteError } = await supabase
           .from('profiles')
           .delete()
-          .eq('id', id);
+          .eq('id', profileToDelete);
         
         if (deleteError) throw deleteError;
       }
       
       // Update local state immediately
-      setProfiles(prev => prev.filter(p => p.id !== id));
-      setDeletingProfileId(null);
+      setProfiles(prev => prev.filter(p => p.id !== profileToDelete));
+      setProfileToDelete(null);
       setSuccess(t('admin_page.users.deleteSuccess'));
       setTimeout(() => setSuccess(null), 3000);
 
@@ -208,7 +228,7 @@ export const Admin = () => {
     } catch (error: any) {
       console.error("Delete profile error:", error);
       setError(error.message || t('admin_page.users.deleteError'));
-      setDeletingProfileId(null);
+      setProfileToDelete(null);
     }
   };
 
@@ -357,44 +377,26 @@ export const Admin = () => {
                       </div>
                     )}
                     <div>
-                      <h3 className="text-base md:text-lg font-bold text-gray-900 leading-tight">{loi.company_name}</h3>
-                      <p className="text-xs md:text-sm text-gray-500">{loi.product} • {loi.quantity}</p>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-aftras-blue-text/10 text-aftras-blue-text border border-aftras-blue-text/20">
+                          {loi.company_name}
+                        </span>
+                      </div>
+                      <h3 className="text-base md:text-lg font-bold text-gray-900 leading-tight">{loi.product}</h3>
+                      <p className="text-xs md:text-sm text-gray-500">{loi.quantity} • {new Date(loi.created_at).toLocaleDateString()}</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2 mt-4 md:mt-0">
-                    {deletingId === loi.id ? (
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteLoi(loi.id);
-                          }}
-                          className="px-3 py-1 bg-red-600 text-white text-[10px] md:text-xs font-bold rounded-full hover:bg-red-700 transition-colors"
-                        >
-                          {t('common.delete')}
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDeletingId(null);
-                          }}
-                          className="px-3 py-1 bg-gray-200 text-gray-600 text-[10px] md:text-xs font-bold rounded-full hover:bg-gray-300 transition-colors"
-                        >
-                          {t('common.cancel')}
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setDeletingId(loi.id);
-                        }}
-                        className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                        title={t('common.delete')}
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    )}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setLoiToDelete(loi.id);
+                      }}
+                      className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                      title={t('common.delete')}
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
                     <span className={`px-3 md:px-4 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider ${STATUS_COLORS[loi.status]}`}>
                       {STATUS_LABELS[loi.status]}
                     </span>
@@ -414,6 +416,7 @@ export const Admin = () => {
                         <div>
                           <h4 className="font-bold text-aftras-blue-border mb-4 uppercase text-[10px] md:text-xs tracking-widest">{t('admin_page.lois.details_title')}</h4>
                           <div className="grid grid-cols-2 gap-3 md:gap-4 text-xs md:text-sm">
+                            <p className="text-gray-500">Entreprise:</p><p className="font-bold text-aftras-blue-text">{loi.company_name}</p>
                             <p className="text-gray-500">{t('loi_form.form.budget_label')}:</p><p className="font-medium">{loi.budget || 'N/A'}</p>
                             <p className="text-gray-500">{t('loi_form.form.incoterm_label')}:</p><p className="font-medium">{loi.incoterm || 'N/A'}</p>
                             <p className="text-gray-500">{t('loi_form.form.port_label')}:</p><p className="font-medium">{loi.port || 'N/A'}</p>
@@ -422,7 +425,7 @@ export const Admin = () => {
                           <div className="mt-4">
                             <p className="text-gray-500 text-xs md:text-sm mb-1">{t('loi_form.sections.additional')}:</p>
                             <p className="text-gray-700 text-xs md:text-sm italic">
-                              {loi.additional_info?.split('[IMAGE_URL]:')[0].trim() || 'Aucune.'}
+                              {loi.additional_info?.split('[IMAGE_URL]:')[0].replace('[ADMIN_HIDDEN]', '').replace('[COMPANY_HIDDEN]', '').trim() || 'Aucune.'}
                             </p>
                           </div>
                         </div>
@@ -561,30 +564,13 @@ export const Admin = () => {
                     </div>
 
                     {user?.id !== profile.id && (
-                      deletingProfileId === profile.id ? (
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => handleDeleteProfile(profile.id)}
-                            className="px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-full hover:bg-red-700"
-                          >
-                            {t('common.delete')}
-                          </button>
-                          <button
-                            onClick={() => setDeletingProfileId(null)}
-                            className="px-3 py-1 bg-gray-200 text-gray-600 text-xs font-bold rounded-full hover:bg-gray-300"
-                          >
-                            {t('common.cancel')}
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => setDeletingProfileId(profile.id)}
-                          className="p-2 text-gray-400 hover:text-red-600 transition-colors"
-                          title={t('common.delete')}
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                      )
+                      <button
+                        onClick={() => setProfileToDelete(profile.id)}
+                        className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                        title={t('common.delete')}
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
                     )}
                   </div>
                 </div>
@@ -672,6 +658,28 @@ export const Admin = () => {
             </div>
           )}
         </AnimatePresence>
+
+        <Modal
+          isOpen={!!loiToDelete}
+          onClose={() => setLoiToDelete(null)}
+          onConfirm={handleDeleteLoi}
+          title={t('dashboard.loi_card.delete_confirm')}
+          message={t('dashboard.loi_card.delete_desc')}
+          confirmText={t('common.delete')}
+          cancelText={t('common.cancel')}
+          type="danger"
+        />
+
+        <Modal
+          isOpen={!!profileToDelete}
+          onClose={() => setProfileToDelete(null)}
+          onConfirm={handleDeleteProfile}
+          title={t('admin_page.users.confirm_delete')}
+          message={t('admin_page.users.deleteConfirm')}
+          confirmText={t('common.delete')}
+          cancelText={t('common.cancel')}
+          type="danger"
+        />
       </div>
     </div>
   );

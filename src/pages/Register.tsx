@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
-import { Building2, User, Mail, Lock, Globe, Phone, MapPin, Briefcase } from 'lucide-react';
+import { Building2, User, Mail, Lock, Globe, Phone, MapPin, Briefcase, CheckCircle2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { registerSchema } from '../schemas';
 import { z } from 'zod';
+import { motion } from 'framer-motion';
 
 export const Register = () => {
   const { t } = useTranslation();
@@ -23,6 +24,7 @@ export const Register = () => {
   
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -67,7 +69,8 @@ export const Register = () => {
 
       if (profileError) throw profileError;
 
-      navigate('/dashboard');
+      setSuccess(true);
+      window.scrollTo(0, 0);
     } catch (err: any) {
       console.error(err);
       if (err instanceof z.ZodError) {
@@ -104,7 +107,35 @@ export const Register = () => {
         </div>
 
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
-          <form onSubmit={handleRegister} className="p-6 md:p-10 space-y-8 md:space-y-10">
+          {success ? (
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-10 text-center space-y-6"
+            >
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle2 className="w-12 h-12 text-green-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900">{t('register_page.success_title')}</h2>
+              <div className="space-y-4 max-w-md mx-auto">
+                <p className="text-gray-600">{t('register_page.success_desc')}</p>
+                <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                  <p className="text-sm text-blue-800 font-medium">
+                    {t('register_page.success_instruction')}
+                  </p>
+                </div>
+              </div>
+              <div className="pt-6">
+                <Link 
+                  to="/login" 
+                  className="inline-flex items-center justify-center bg-aftras-blue-text text-white px-8 py-3 rounded-xl font-bold hover:bg-opacity-90 transition-all"
+                >
+                  {t('register_page.login')}
+                </Link>
+              </div>
+            </motion.div>
+          ) : (
+            <form onSubmit={handleRegister} className="p-6 md:p-10 space-y-8 md:space-y-10">
             {error && (
               <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm border border-red-100">
                 {error}
@@ -266,6 +297,7 @@ export const Register = () => {
               )}
             </button>
           </form>
+          )}
         </div>
 
         <p className="text-center mt-8 text-gray-600">

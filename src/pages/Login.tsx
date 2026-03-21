@@ -36,31 +36,21 @@ export const Login = () => {
         email,
         password,
       });
-      if (authError) throw authError;
-
-      // Fetch profile to determine role
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', (await supabase.auth.getUser()).data.user?.id)
-        .single();
-
-      if (profileError) throw profileError;
-
-      if (profile?.role === 'admin') {
-        navigate('/admin');
-      } else if (profile?.role === 'community_manager') {
-        navigate('/community-manager');
-      } else {
-        navigate('/dashboard');
+      if (authError) {
+        if (authError.message.includes('Email not confirmed')) {
+          setError(t('login_page.error_unconfirmed'));
+        } else {
+          throw authError;
+        }
       }
+
+      // Redirection is handled by useEffect above
     } catch (err: any) {
       if (err instanceof z.ZodError) {
         setError(err.issues[0].message);
       } else {
         setError(err.message || t('login_page.error'));
       }
-    } finally {
       setLoading(false);
     }
   };

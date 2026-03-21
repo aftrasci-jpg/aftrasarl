@@ -231,6 +231,7 @@
     "title": "Welcome back!",
     "subtitle": "Login to your business account",
     "error": "Incorrect email or password.",
+    "error_unconfirmed": "Your email has not yet been validated. Please check your inbox and click on the confirmation link.",
     "no_account": "No account yet?",
     "create_account": "Create a business account",
     "form": {
@@ -321,7 +322,10 @@
       "confirm_password": "Confirm Password *",
       "submit": "Create my business account"
     },
-    "has_account": "Already have an account?",
+    "success_title": "Account successfully created!",
+    "success_desc": "Your business account has been created. A confirmation email has been sent to the address provided.",
+    "success_instruction": "Please check your inbox and click on the validation link to activate your account before you can log in.",
+    "has_account": "Already have an account ?",
     "login": "Login"
   },
   "forgot_password_page": {
@@ -362,7 +366,8 @@
       "quantity": "Quantity",
       "not_specified": "Not specified",
       "no_additional": "No additional information.",
-      "delete_confirm": "Are you sure you want to delete this LOI? This action is irreversible."
+      "delete_confirm": "Delete LOI",
+      "delete_desc": "Are you sure you want to delete this LOI? This action is irreversible."
     },
     "admin_response": {
       "title": "AFTRAS CI Response",

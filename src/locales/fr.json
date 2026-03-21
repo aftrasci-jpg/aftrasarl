@@ -231,6 +231,7 @@
     "title": "Bon retour !",
     "subtitle": "Connectez-vous à votre compte entreprise",
     "error": "Email ou mot de passe incorrect.",
+    "error_unconfirmed": "Votre email n'a pas encore été validé. Veuillez vérifier votre boîte de réception et cliquer sur le lien de confirmation.",
     "no_account": "Pas encore de compte ?",
     "create_account": "Créer un compte entreprise",
     "form": {
@@ -321,6 +322,9 @@
       "confirm_password": "Confirmer le mot de passe *",
       "submit": "Créer mon compte entreprise"
     },
+    "success_title": "Compte créé avec succès !",
+    "success_desc": "Votre compte entreprise a été créé. Un email de confirmation a été envoyé à l'adresse indiquée.",
+    "success_instruction": "Veuillez consulter votre boîte de réception et cliquer sur le lien de validation pour activer votre compte avant de pouvoir vous connecter.",
     "has_account": "Vous avez déjà un compte ?",
     "login": "Se connecter"
   },
@@ -362,7 +366,8 @@
       "quantity": "Quantité",
       "not_specified": "Non spécifié",
       "no_additional": "Aucune information supplémentaire.",
-      "delete_confirm": "Êtes-vous sûr de vouloir supprimer cette LOI ? Cette action est irréversible."
+      "delete_confirm": "Supprimer la LOI",
+      "delete_desc": "Êtes-vous sûr de vouloir supprimer cette LOI ? Cette action est irréversible."
     },
     "admin_response": {
       "title": "Réponse d'AFTRAS CI",

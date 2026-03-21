@@ -73,7 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = async (userId: string, retryCount = 0) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -81,13 +81,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('id', userId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        // If profile not found, retry up to 3 times (useful for triggers)
+        if (error.code === 'PGRST116' && retryCount < 3) {
+          console.warn(`Profile not found for ${userId}, retry ${retryCount + 1}...`);
+          setTimeout(() => fetchProfile(userId, retryCount + 1), 1000);
+          return;
+        }
+        throw error;
+      }
       setProfile(data as UserProfile);
     } catch (error) {
       console.error("Profile fetch error:", error);
       setProfile(null);
     } finally {
-      setLoading(false);
+      if (retryCount >= 3 || !profile) {
+        setLoading(false);
+      }
     }
   };
 
