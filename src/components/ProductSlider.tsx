@@ -61,12 +61,15 @@ export const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
                 className="flex-1 min-w-0"
               >
                 <div className="bg-white rounded-xl shadow-lg border border-aftras-orange/30 overflow-hidden h-full flex flex-col transition-transform hover:-translate-y-2">
-                  <div className="relative h-40 md:h-48 overflow-hidden">
+                  <div className="relative h-40 md:h-48 overflow-hidden bg-gray-100">
                     <img 
                       src={product.image_url} 
                       alt={productName}
                       className="w-full h-full object-cover"
                       referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=800';
+                      }}
                     />
                     <div className="absolute top-2 right-2 bg-aftras-orange text-white text-[9px] md:text-[10px] font-bold px-2 py-1 rounded-full uppercase">
                       {t('catalog_page.featured_badge')}

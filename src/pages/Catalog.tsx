@@ -144,12 +144,15 @@ export const Catalog = () => {
                     
                     return (
                       <div key={product.id} className="bg-white rounded-2xl shadow-sm border border-aftras-orange overflow-hidden group hover:shadow-xl transition-all">
-                        <div className="h-56 overflow-hidden relative">
+                        <div className="h-56 overflow-hidden relative bg-gray-100">
                           <img 
                             src={product.image_url} 
                             alt={productName}
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             referrerPolicy="no-referrer"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=800';
+                            }}
                           />
                           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-aftras-blue-text uppercase tracking-widest">
                             {t(`catalog_page.category_list.${product.category}`)}

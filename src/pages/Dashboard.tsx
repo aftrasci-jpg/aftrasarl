@@ -181,12 +181,15 @@ export const Dashboard = () => {
                 >
                   <div className="flex items-center space-x-4">
                     {getLoiImage(loi) ? (
-                      <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl overflow-hidden border border-gray-100 flex-shrink-0">
+                      <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl overflow-hidden border border-gray-100 flex-shrink-0 bg-gray-50">
                         <img 
                           src={getLoiImage(loi)!} 
                           alt={loi.product} 
                           className="w-full h-full object-cover"
                           referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=800';
+                          }}
                         />
                       </div>
                     ) : (
