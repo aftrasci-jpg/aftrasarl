@@ -3,12 +3,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Product } from '../types';
 
-export const HeroSlider = () => {
-  const { t } = useTranslation();
+interface HeroSliderProps {
+  products?: Product[];
+}
+
+export const HeroSlider = ({ products }: HeroSliderProps) => {
+  const { t, i18n } = useTranslation();
   const [current, setCurrent] = useState(0);
 
-  const slides = [
+  const defaultSlides = [
     {
       image: 'https://images.unsplash.com/photo-1494412574743-01947f04824d?auto=format&fit=crop&q=80&w=1920',
       title: t('home.hero.0.title'),
@@ -31,6 +36,17 @@ export const HeroSlider = () => {
       link: '/register'
     }
   ];
+
+  const slides = products && products.length > 0 
+    ? products.map(p => ({
+        image: p.image_url,
+        title: i18n.language === 'en' && p.name_en ? p.name_en : p.name,
+        subtitle: i18n.language === 'en' && p.description_en ? p.description_en : (p.description || t('catalog_page.default_desc')),
+        cta: t('catalog_page.request_loi'),
+        link: '/loi',
+        state: { product: i18n.language === 'en' && p.name_en ? p.name_en : p.name, product_image: p.image_url }
+      }))
+    : defaultSlides;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -85,6 +101,7 @@ export const HeroSlider = () => {
             >
               <Link 
                 to={slides[current].link}
+                state={(slides[current] as any).state}
                 className="inline-block w-full md:w-auto text-center bg-aftras-orange hover:bg-opacity-90 text-white px-8 py-4 rounded-xl font-bold text-base md:text-lg transition-all transform hover:scale-105 shadow-lg shadow-aftras-orange/20"
               >
                 {slides[current].cta}

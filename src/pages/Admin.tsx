@@ -248,7 +248,8 @@ export const Admin = () => {
         password: newUserForm.password,
         options: {
           data: {
-            role: newUserForm.role
+            role: newUserForm.role,
+            company_name: newUserForm.company_name || 'AFTRAS Staff'
           }
         }
       });

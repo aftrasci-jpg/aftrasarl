@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { SEO } from '../components/SEO';
 import { supabase } from '../supabase';
 import { Product, PRODUCT_CATEGORIES } from '../types';
-import { Search, Filter, ShoppingCart } from 'lucide-react';
+import { Search, Filter, ShoppingCart, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ProductSlider } from '../components/ProductSlider';
+import { HeroSlider } from '../components/HeroSlider';
 import { useTranslation } from 'react-i18next';
 
 export const Catalog = () => {
@@ -74,12 +75,15 @@ export const Catalog = () => {
         title="Catalogue Produits | AFTRAS CI"
         description="Consultez notre catalogue de produits disponibles pour le négoce international : matières premières, produits manufacturés et solutions de sourcing sur mesure."
       />
+      <HeroSlider products={featuredProducts} />
       {/* Featured Slider Section */}
       {featuredProducts.length > 0 && (
-        <section className="py-12 bg-blue-50/50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-            <h2 className="text-2xl font-bold text-aftras-blue-border">{t('catalog_page.featured')}</h2>
-            <p className="text-gray-600">{t('catalog_page.featured_desc')}</p>
+        <section className="py-12 md:py-20 overflow-hidden bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 md:mb-12 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold text-aftras-blue-border mb-2">{t('catalog_page.featured')}</h2>
+              <p className="text-gray-600 text-sm md:text-base">{t('catalog_page.featured_desc')}</p>
+            </div>
           </div>
           <ProductSlider products={featuredProducts} />
         </section>
