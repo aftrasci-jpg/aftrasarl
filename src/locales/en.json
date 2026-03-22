@@ -290,8 +290,9 @@
     "security": "Security",
     "fields": {
       "company_name": "Company Name *",
+      "business_registry_number": "Business Registry Number *",
       "country": "Country *",
-      "address": "Full Address *",
+      "city": "City *",
       "website": "Website (Optional)",
       "rep_name": "Full Name *",
       "position": "Position / Job Title *",
@@ -310,8 +311,9 @@
     },
     "form": {
       "company_name": "Company Name *",
+      "business_registry_number": "Business Registry Number *",
       "country": "Country *",
-      "address": "Full Address *",
+      "city": "City *",
       "website": "Website (Optional)",
       "rep_name": "Full Name *",
       "position": "Position / Job Title *",
@@ -390,10 +392,39 @@
     "access_denied": "Access denied. Reserved for administrators.",
     "tabs": {
       "lois": "LOI Management",
-      "users": "User Management"
+      "companies": "Companies",
+      "users": "Staff Management"
+    },
+    "lois": {
+      "search_placeholder": "Search by company name..."
+    },
+    "companies": {
+      "add_btn": "Add Company",
+      "info_title": "Company Information",
+      "rep_title": "Representative",
+      "stats_title": "Statistics",
+      "name": "Company Name",
+      "registry": "Business Registry Number",
+      "location": "Location",
+      "rep_name": "Full Name",
+      "position": "Position",
+      "email": "Professional Email",
+      "phone": "Phone / WhatsApp",
+      "lois_sent": "LOIs Sent",
+      "joined_on": "Joined on"
+    },
+    "staff": {
+      "add_btn": "Add Staff Member",
+      "admin": "Administrator",
+      "cm": "Community Manager"
     },
     "users": {
       "add_btn": "Add User",
+      "email": "Email",
+      "password": "Password",
+      "role": "Role",
+      "note_title": "Important Note:",
+      "note_desc": "Creating an account via this form creates a new user in the authentication system. The current administrator will remain logged in.",
       "confirm_delete": "Delete this user?",
       "deleteConfirm": "Are you sure you want to delete this user? This action will also delete their access account.",
       "deleteSuccess": "User deleted successfully.",
@@ -420,6 +451,8 @@
         "add_title": "Add a product",
         "edit_title": "Edit product",
         "name": "Product Name",
+        "name_fr": "Product Name (FR)",
+        "name_en": "Product Name (EN)",
         "category": "Category",
         "image_url": "Image URL",
         "image_url_placeholder": "https://example.com/image.jpg",
@@ -427,6 +460,8 @@
         "image_required": "An image is required to publish the product.",
         "upload_error": "Error uploading image.",
         "description": "Description",
+        "description_fr": "Description (FR)",
+        "description_en": "Description (EN)",
         "featured": "Featured Product (Slider)",
         "submit": "Save product"
       }
@@ -437,7 +472,7 @@
     "empty": "No notifications",
     "mark_all_read": "Mark all as read",
     "loi_created": {
-      "title": "New LOI received",
+      "title": "New LOI from {{company}}",
       "message": "Company {{company}} sent a new LOI for {{product}}."
     },
     "loi_updated": {

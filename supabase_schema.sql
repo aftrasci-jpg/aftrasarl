@@ -1,4 +1,4 @@
--- Supabase SQL Schema for AFTRAS CI
+-- Supabase SQL Schema for AFTRAS CI (Secure & Idempotent Version)
 
 -- 1. Users Profile Table (linked to auth.users)
 CREATE TABLE IF NOT EXISTS public.profiles (
@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   role TEXT DEFAULT 'company' CHECK (role IN ('admin', 'company', 'community_manager')),
   company_name TEXT,
   country TEXT,
-  address TEXT,
+  city TEXT,
+  business_registry_number TEXT,
   website TEXT,
   representative_name TEXT,
   position TEXT,
@@ -19,8 +20,10 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 CREATE TABLE IF NOT EXISTS public.products (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
+  name_en TEXT,
   category TEXT NOT NULL,
   description TEXT,
+  description_en TEXT,
   image_url TEXT NOT NULL,
   is_featured BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ DEFAULT NOW()
@@ -56,61 +59,9 @@ CREATE TABLE IF NOT EXISTS public.notifications (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Enable RLS for Notifications
-ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
-
--- Notifications Policies
-CREATE POLICY "Users can view their own notifications"
-  ON public.notifications FOR SELECT
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can update their own notifications (mark as read)"
-  ON public.notifications FOR UPDATE
-  USING (auth.uid() = user_id);
-
-CREATE POLICY "Anyone can create notifications (for the system to handle)"
-  ON public.notifications FOR INSERT
-  WITH CHECK (true);
-
-CREATE POLICY "Users can delete their own notifications"
-  ON public.notifications FOR DELETE
-  USING (auth.uid() = user_id);
-
--- 6. Storage Buckets
--- Note: Buckets can also be created via the Supabase UI.
--- This SQL creates the 'products' bucket and sets up RLS policies.
-
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('products', 'products', true)
-ON CONFLICT (id) DO NOTHING;
-
--- Storage Policies for 'products' bucket
-CREATE POLICY "Public Access"
-ON storage.objects FOR SELECT
-USING ( bucket_id = 'products' );
-
-CREATE POLICY "Admins and CMs can upload product images"
-ON storage.objects FOR INSERT
-WITH CHECK (
-  bucket_id = 'products' AND
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'community_manager'))
-);
-
-CREATE POLICY "Admins and CMs can update product images"
-ON storage.objects FOR UPDATE
-USING (
-  bucket_id = 'products' AND
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'community_manager'))
-);
-
-CREATE POLICY "Admins and CMs can delete product images"
-ON storage.objects FOR DELETE
-USING (
-  bucket_id = 'products' AND
-  EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'community_manager'))
-);
-
--- 5. Row Level Security (RLS)
+-- ==========================================
+-- SECURITY & POLICIES (Idempotent)
+-- ==========================================
 
 -- Helper functions
 CREATE OR REPLACE FUNCTION public.is_admin()
@@ -141,43 +92,122 @@ BEGIN
 END;
 $$;
 
--- Profiles
+-- Enable RLS
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Public profiles are viewable by everyone." ON public.profiles FOR SELECT USING (true);
+ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.lois ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+
+-- 1. Profiles Policies
+DROP POLICY IF EXISTS "Public profiles are viewable by everyone." ON public.profiles;
+DROP POLICY IF EXISTS "Profiles are viewable by owner or admin." ON public.profiles;
+CREATE POLICY "Profiles are viewable by owner or admin." 
+  ON public.profiles FOR SELECT 
+  USING (auth.uid() = id OR public.is_admin());
+
+DROP POLICY IF EXISTS "Users can update their own profile." ON public.profiles;
 CREATE POLICY "Users can update their own profile." ON public.profiles FOR UPDATE USING (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Users can insert their own profile." ON public.profiles;
 CREATE POLICY "Users can insert their own profile." ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Admins can update any profile." ON public.profiles;
 CREATE POLICY "Admins can update any profile." ON public.profiles FOR UPDATE USING (public.is_admin());
+
+DROP POLICY IF EXISTS "Admins can delete any profile." ON public.profiles;
 CREATE POLICY "Admins can delete any profile." ON public.profiles FOR DELETE USING (public.is_admin());
 
--- Products
-ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+-- 2. Products Policies
+DROP POLICY IF EXISTS "Products are viewable by everyone." ON public.products;
 CREATE POLICY "Products are viewable by everyone." ON public.products FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Only admins and CMs can modify products." ON public.products;
 CREATE POLICY "Only admins and CMs can modify products." ON public.products FOR ALL USING (
   EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'community_manager'))
 );
 
--- LOIs
-ALTER TABLE public.lois ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can view their own LOIs." ON public.lois FOR SELECT USING (auth.uid() = company_id OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
-CREATE POLICY "Users can insert their own LOIs." ON public.lois FOR INSERT WITH CHECK (auth.uid() = company_id);
-CREATE POLICY "Users can update their own LOIs (limited)." ON public.lois FOR UPDATE USING (auth.uid() = company_id OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
-CREATE POLICY "Only admins can delete LOIs." ON public.lois FOR DELETE USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
+-- 3. LOIs Policies
+DROP POLICY IF EXISTS "Users can view their own LOIs." ON public.lois;
+CREATE POLICY "Users can view their own LOIs." ON public.lois FOR SELECT USING (
+  auth.uid() = company_id OR public.is_admin() OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'community_manager')
+);
 
--- 6. Functions & Triggers (to automatically create profile on signup)
+DROP POLICY IF EXISTS "Users can insert their own LOIs." ON public.lois;
+CREATE POLICY "Users can insert their own LOIs." ON public.lois FOR INSERT WITH CHECK (auth.uid() = company_id);
+
+DROP POLICY IF EXISTS "Users can update their own LOIs (limited)." ON public.lois;
+DROP POLICY IF EXISTS "Users can update their own LOIs if not finalized." ON public.lois;
+CREATE POLICY "Users can update their own LOIs if not finalized."
+  ON public.lois FOR UPDATE
+  USING (
+    (auth.uid() = company_id AND status = 'searching') OR 
+    public.is_admin()
+  );
+
+DROP POLICY IF EXISTS "Only admins can delete LOIs." ON public.lois;
+CREATE POLICY "Only admins can delete LOIs." ON public.lois FOR DELETE USING (public.is_admin());
+
+-- 4. Notifications Policies
+DROP POLICY IF EXISTS "Users can view their own notifications" ON public.notifications;
+CREATE POLICY "Users can view their own notifications"
+  ON public.notifications FOR SELECT
+  USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can update their own notifications (mark as read)" ON public.notifications;
+CREATE POLICY "Users can update their own notifications (mark as read)"
+  ON public.notifications FOR UPDATE
+  USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Anyone can create notifications (for the system to handle)" ON public.notifications;
+DROP POLICY IF EXISTS "Users can only create notifications for admins or themselves" ON public.notifications;
+CREATE POLICY "Users can only create notifications for admins or themselves"
+  ON public.notifications FOR INSERT
+  WITH CHECK (
+    auth.uid() = user_id OR 
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = user_id AND role = 'admin')
+  );
+
+DROP POLICY IF EXISTS "Users can delete their own notifications" ON public.notifications;
+CREATE POLICY "Users can delete their own notifications"
+  ON public.notifications FOR DELETE
+  USING (auth.uid() = user_id);
+
+-- 5. Storage Buckets & Policies
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('products', 'products', true)
+ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "Public Access" ON storage.objects;
+CREATE POLICY "Public Access" ON storage.objects FOR SELECT USING ( bucket_id = 'products' );
+
+DROP POLICY IF EXISTS "Admins and CMs can upload product images" ON storage.objects;
+CREATE POLICY "Admins and CMs can upload product images" ON storage.objects FOR INSERT WITH CHECK (
+  bucket_id = 'products' AND EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('admin', 'community_manager'))
+);
+
+-- 6. Functions & Triggers
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, role, company_name)
+  INSERT INTO public.profiles (id, email, role, company_name, country, city, business_registry_number, website, representative_name, position, phone)
   VALUES (
     new.id, 
     new.email, 
     COALESCE(new.raw_user_meta_data->>'role', 'company'),
-    new.raw_user_meta_data->>'company_name'
+    new.raw_user_meta_data->>'company_name',
+    new.raw_user_meta_data->>'country',
+    new.raw_user_meta_data->>'city',
+    new.raw_user_meta_data->>'business_registry_number',
+    new.raw_user_meta_data->>'website',
+    new.raw_user_meta_data->>'representative_name',
+    new.raw_user_meta_data->>'position',
+    new.raw_user_meta_data->>'phone'
   );
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();

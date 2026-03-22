@@ -9,6 +9,8 @@ export const registerSchema = z.object({
   email: z.string().email('Email invalide'),
   password: z.string().min(6, 'Le mot de passe doit contenir au moins 6 caractères'),
   companyName: z.string().min(2, "Le nom de l'entreprise est requis"),
+  businessRegistryNumber: z.string().min(2, "Le numéro de registre de commerce est requis"),
+  city: z.string().min(2, "La ville est requise"),
   phone: z.string().min(8, 'Numéro de téléphone invalide'),
 });
 
@@ -22,7 +24,9 @@ export const loiSchema = z.object({
 
 export const productSchema = z.object({
   name: z.string().min(2, 'Le nom du produit est requis'),
+  name_en: z.string().optional(),
   description: z.string().min(10, 'La description doit contenir au moins 10 caractères'),
+  description_en: z.string().optional(),
   category: z.string().min(1, 'La catégorie est requise'),
   image_url: z.string().url('URL de l\'image invalide'),
   is_featured: z.boolean().default(false),

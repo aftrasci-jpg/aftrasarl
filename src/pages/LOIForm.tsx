@@ -10,7 +10,7 @@ import { z } from 'zod';
 import { Product } from '../types';
 
 export const LOIForm = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
@@ -56,9 +56,10 @@ export const LOIForm = () => {
   const handleProductChange = (val: string) => {
     setFormData({ ...formData, product: val, product_image: '' });
     if (val.trim()) {
-      const filtered = allProducts.filter(p => 
-        p.name.toLowerCase().includes(val.toLowerCase())
-      );
+      const filtered = allProducts.filter(p => {
+        const name = i18n.language === 'en' && p.name_en ? p.name_en : p.name;
+        return name.toLowerCase().includes(val.toLowerCase());
+      });
       setFilteredProducts(filtered);
       setShowSuggestions(true);
     } else {
@@ -68,9 +69,10 @@ export const LOIForm = () => {
   };
 
   const selectProduct = (p: Product) => {
+    const productName = i18n.language === 'en' && p.name_en ? p.name_en : p.name;
     setFormData({ 
       ...formData, 
-      product: p.name, 
+      product: productName, 
       product_image: p.image_url 
     });
     setShowSuggestions(false);
@@ -142,7 +144,7 @@ export const LOIForm = () => {
       if (admins && admins.length > 0) {
         const notifications = admins.map(admin => ({
           user_id: admin.id,
-          title: t('notifications.loi_created.title'),
+          title: t('notifications.loi_created.title', { company: profile.company_name }),
           message: t('notifications.loi_created.message', { 
             company: profile.company_name, 
             product: formData.product 
@@ -262,27 +264,30 @@ export const LOIForm = () => {
                             {t('catalog_page.suggestions')}
                           </p>
                         </div>
-                        {filteredProducts.map(p => (
-                          <button
-                            key={p.id}
-                            type="button"
-                            onClick={() => selectProduct(p)}
-                            className="w-full flex items-center gap-3 p-3 hover:bg-blue-50 transition-colors border-b border-gray-50 last:border-0"
-                          >
-                            <img 
-                              src={p.image_url} 
-                              alt={p.name} 
-                              className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
-                              referrerPolicy="no-referrer"
-                            />
-                            <div className="text-left">
-                              <p className="font-bold text-aftras-blue-border text-sm">{p.name}</p>
-                              <p className="text-[10px] text-gray-400 uppercase tracking-wider">
-                                {t(`catalog_page.category_list.${p.category}`)}
-                              </p>
-                            </div>
-                          </button>
-                        ))}
+                        {filteredProducts.map(p => {
+                          const productName = i18n.language === 'en' && p.name_en ? p.name_en : p.name;
+                          return (
+                            <button
+                              key={p.id}
+                              type="button"
+                              onClick={() => selectProduct(p)}
+                              className="w-full flex items-center gap-3 p-3 hover:bg-blue-50 transition-colors border-b border-gray-50 last:border-0"
+                            >
+                              <img 
+                                src={p.image_url} 
+                                alt={productName} 
+                                className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                                referrerPolicy="no-referrer"
+                              />
+                              <div className="text-left">
+                                <p className="font-bold text-aftras-blue-border text-sm">{productName}</p>
+                                <p className="text-[10px] text-gray-400 uppercase tracking-wider">
+                                  {t(`catalog_page.category_list.${p.category}`)}
+                                </p>
+                              </div>
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
 

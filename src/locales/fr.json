@@ -290,8 +290,9 @@
     "security": "Sécurité",
     "fields": {
       "company_name": "Nom de l'entreprise *",
+      "business_registry_number": "Numéro de registre de commerce *",
       "country": "Pays *",
-      "address": "Adresse complète *",
+      "city": "Ville *",
       "website": "Site Web (Optionnel)",
       "rep_name": "Nom complet *",
       "position": "Fonction / Poste *",
@@ -310,8 +311,9 @@
     },
     "form": {
       "company_name": "Nom de l'entreprise *",
+      "business_registry_number": "Numéro de registre de commerce *",
       "country": "Pays *",
-      "address": "Adresse complète *",
+      "city": "Ville *",
       "website": "Site Web (Optionnel)",
       "rep_name": "Nom complet *",
       "position": "Fonction / Poste *",
@@ -390,10 +392,39 @@
     "access_denied": "Accès refusé. Réservé aux administrateurs.",
     "tabs": {
       "lois": "Gestion des LOI",
-      "users": "Gestion des Utilisateurs"
+      "companies": "Entreprises",
+      "users": "Gestion de l'Équipe"
+    },
+    "lois": {
+      "search_placeholder": "Rechercher par nom d'entreprise..."
+    },
+    "companies": {
+      "add_btn": "Ajouter une entreprise",
+      "info_title": "Informations Entreprise",
+      "rep_title": "Représentant",
+      "stats_title": "Statistiques",
+      "name": "Nom de l'entreprise",
+      "registry": "N° Registre de Commerce",
+      "location": "Localisation",
+      "rep_name": "Nom complet",
+      "position": "Fonction",
+      "email": "Email professionnel",
+      "phone": "Téléphone / WhatsApp",
+      "lois_sent": "LOIs envoyées",
+      "joined_on": "Inscrit le"
+    },
+    "staff": {
+      "add_btn": "Ajouter un membre",
+      "admin": "Administrateur",
+      "cm": "Community Manager"
     },
     "users": {
       "add_btn": "Ajouter un utilisateur",
+      "email": "Email",
+      "password": "Mot de passe",
+      "role": "Rôle",
+      "note_title": "Note importante :",
+      "note_desc": "La création d'un compte via ce formulaire crée un nouvel utilisateur dans le système d'authentification. L'administrateur actuel restera connecté.",
       "confirm_delete": "Supprimer cet utilisateur ?",
       "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action supprimera également son compte d'accès.",
       "deleteSuccess": "Utilisateur supprimé avec succès.",
@@ -420,6 +451,8 @@
         "add_title": "Ajouter un produit",
         "edit_title": "Modifier le produit",
         "name": "Nom du produit",
+        "name_fr": "Nom du produit (FR)",
+        "name_en": "Nom du produit (EN)",
         "category": "Catégorie",
         "image_url": "URL de l'image",
         "image_url_placeholder": "https://exemple.com/image.jpg",
@@ -427,6 +460,8 @@
         "image_required": "Une image est requise pour publier le produit.",
         "upload_error": "Erreur lors du téléversement de l'image.",
         "description": "Description",
+        "description_fr": "Description (FR)",
+        "description_en": "Description (EN)",
         "featured": "Produit Vedette (Slider)",
         "submit": "Enregistrer le produit"
       }
@@ -437,7 +472,7 @@
     "empty": "Aucune notification",
     "mark_all_read": "Tout marquer comme lu",
     "loi_created": {
-      "title": "Nouvelle LOI reçue",
+      "title": "Nouvelle LOI de {{company}}",
       "message": "L'entreprise {{company}} a envoyé une nouvelle LOI pour {{product}}."
     },
     "loi_updated": {

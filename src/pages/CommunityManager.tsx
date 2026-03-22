@@ -25,14 +25,18 @@ export const CommunityManager = () => {
 
   const [productForm, setProductForm] = useState<{
     name: string;
+    name_en: string;
     category: ProductCategory;
     description: string;
+    description_en: string;
     image_url: string;
     is_featured: boolean;
   }>({
     name: '',
+    name_en: '',
     category: PRODUCT_CATEGORIES[0],
     description: '',
+    description_en: '',
     image_url: '',
     is_featured: false
   });
@@ -89,7 +93,7 @@ export const CommunityManager = () => {
       }
       setIsProductModalOpen(false);
       setEditingProduct(null);
-      setProductForm({ name: '', category: PRODUCT_CATEGORIES[0], description: '', image_url: '', is_featured: false });
+      setProductForm({ name: '', name_en: '', category: PRODUCT_CATEGORIES[0], description: '', description_en: '', image_url: '', is_featured: false });
     } catch (err) {
       if (err instanceof z.ZodError) {
         setError(err.issues[0].message);
@@ -164,7 +168,7 @@ export const CommunityManager = () => {
           <button 
             onClick={() => {
               setEditingProduct(null);
-              setProductForm({ name: '', category: PRODUCT_CATEGORIES[0], description: '', image_url: '', is_featured: false });
+              setProductForm({ name: '', name_en: '', category: PRODUCT_CATEGORIES[0], description: '', description_en: '', image_url: '', is_featured: false });
               setIsProductModalOpen(true);
             }}
             className="w-full md:w-auto bg-aftras-orange text-white px-6 py-3 rounded-xl font-bold hover:bg-opacity-90 transition-all flex items-center justify-center"
@@ -194,8 +198,10 @@ export const CommunityManager = () => {
                     setEditingProduct(product);
                     setProductForm({
                       name: product.name,
+                      name_en: product.name_en || '',
                       category: product.category as ProductCategory,
                       description: product.description || '',
+                      description_en: product.description_en || '',
                       image_url: product.image_url,
                       is_featured: product.is_featured
                     });
@@ -238,7 +244,7 @@ export const CommunityManager = () => {
                   )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">{t('cm_page.products.modal.name')}</label>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">{t('cm_page.products.modal.name_fr')}</label>
                       <input 
                         required
                         type="text" 
@@ -248,17 +254,27 @@ export const CommunityManager = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">{t('cm_page.products.modal.category')}</label>
-                      <select 
-                        value={productForm.category}
-                        onChange={(e) => setProductForm({...productForm, category: e.target.value as ProductCategory})}
+                      <label className="block text-sm font-bold text-gray-700 mb-2">{t('cm_page.products.modal.name_en')}</label>
+                      <input 
+                        type="text" 
+                        value={productForm.name_en}
+                        onChange={(e) => setProductForm({...productForm, name_en: e.target.value})}
                         className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text"
-                      >
-                        {CATEGORIES.map(cat => (
-                          <option key={cat.id} value={cat.id}>{cat.label}</option>
-                        ))}
-                      </select>
+                        placeholder="Product name in English"
+                      />
                     </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">{t('cm_page.products.modal.category')}</label>
+                    <select 
+                      value={productForm.category}
+                      onChange={(e) => setProductForm({...productForm, category: e.target.value as ProductCategory})}
+                      className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text"
+                    >
+                      {CATEGORIES.map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.label}</option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-gray-700 mb-2">{t('cm_page.products.modal.image_url')}</label>
@@ -312,14 +328,26 @@ export const CommunityManager = () => {
                       </div>
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">{t('cm_page.products.modal.description')}</label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">{t('cm_page.products.modal.description_fr')}</label>
                       <textarea 
                         rows={3}
                         value={productForm.description}
                         onChange={(e) => setProductForm({...productForm, description: e.target.value})}
                         className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text"
                       />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">{t('cm_page.products.modal.description_en')}</label>
+                      <textarea 
+                        rows={3}
+                        value={productForm.description_en}
+                        onChange={(e) => setProductForm({...productForm, description_en: e.target.value})}
+                        className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text"
+                        placeholder="Product description in English"
+                      />
+                    </div>
                   </div>
                   <div className="flex items-center">
                     <input 

@@ -10,7 +10,7 @@ interface ProductSliderProps {
 }
 
 export const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [startIndex, setStartIndex] = useState(0);
   const [visibleCount, setVisibleCount] = useState(5);
 
@@ -48,46 +48,50 @@ export const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
     <div className="relative group px-4 md:px-12">
       <div className="flex gap-4 md:gap-6 overflow-hidden">
         <AnimatePresence mode="popLayout">
-          {visibleProducts.map((product, idx) => (
-            <motion.div
-              key={`${product.id}-${idx}`}
-              layout
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              className="flex-1 min-w-0"
-            >
-              <div className="bg-white rounded-xl shadow-lg border border-aftras-orange/30 overflow-hidden h-full flex flex-col transition-transform hover:-translate-y-2">
-                <div className="relative h-40 md:h-48 overflow-hidden">
-                  <img 
-                    src={product.image_url} 
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                    referrerPolicy="no-referrer"
-                  />
-                  <div className="absolute top-2 right-2 bg-aftras-orange text-white text-[9px] md:text-[10px] font-bold px-2 py-1 rounded-full uppercase">
-                    {t('catalog_page.featured_badge')}
+          {visibleProducts.map((product, idx) => {
+            const productName = i18n.language === 'en' && product.name_en ? product.name_en : product.name;
+            
+            return (
+              <motion.div
+                key={`${product.id}-${idx}`}
+                layout
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -50 }}
+                className="flex-1 min-w-0"
+              >
+                <div className="bg-white rounded-xl shadow-lg border border-aftras-orange/30 overflow-hidden h-full flex flex-col transition-transform hover:-translate-y-2">
+                  <div className="relative h-40 md:h-48 overflow-hidden">
+                    <img 
+                      src={product.image_url} 
+                      alt={productName}
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute top-2 right-2 bg-aftras-orange text-white text-[9px] md:text-[10px] font-bold px-2 py-1 rounded-full uppercase">
+                      {t('catalog_page.featured_badge')}
+                    </div>
+                  </div>
+                  <div className="p-3 md:p-4 flex-grow">
+                    <span className="text-[10px] md:text-xs font-semibold text-aftras-blue-text uppercase tracking-wider">
+                      {t(`catalog_page.category_list.${product.category}`)}
+                    </span>
+                    <h3 className="text-base md:text-lg font-bold text-gray-900 mt-1 line-clamp-1">{productName}</h3>
+                  </div>
+                  <div className="p-3 md:p-4 pt-0">
+                    <Link 
+                      to="/loi" 
+                      state={{ product: productName, product_image: product.image_url }}
+                      className="w-full flex items-center justify-center bg-aftras-orange text-white py-2 rounded-lg text-xs md:text-sm font-bold hover:bg-opacity-90 transition-colors"
+                    >
+                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      {t('catalog_page.request_loi')}
+                    </Link>
                   </div>
                 </div>
-                <div className="p-3 md:p-4 flex-grow">
-                  <span className="text-[10px] md:text-xs font-semibold text-aftras-blue-text uppercase tracking-wider">
-                    {t(`catalog_page.category_list.${product.category}`)}
-                  </span>
-                  <h3 className="text-base md:text-lg font-bold text-gray-900 mt-1 line-clamp-1">{product.name}</h3>
-                </div>
-                <div className="p-3 md:p-4 pt-0">
-                  <Link 
-                    to="/loi" 
-                    state={{ product: product.name, product_image: product.image_url }}
-                    className="w-full flex items-center justify-center bg-aftras-orange text-white py-2 rounded-lg text-xs md:text-sm font-bold hover:bg-opacity-90 transition-colors"
-                  >
-                    <ShoppingCart className="w-4 h-4 mr-2" />
-                    {t('catalog_page.request_loi')}
-                  </Link>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </AnimatePresence>
       </div>
 

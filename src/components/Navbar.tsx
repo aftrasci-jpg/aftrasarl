@@ -43,30 +43,30 @@ export const Navbar = () => {
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-20">
+        <div className="flex justify-between h-16 md:h-20">
           <div className="flex items-center">
             {showBackButton && (
               <button 
                 onClick={() => navigate(-1)}
-                className="mr-2 p-2 rounded-full hover:bg-gray-100 transition-colors text-aftras-blue-text"
+                className="mr-1 md:mr-2 p-1.5 md:p-2 rounded-full hover:bg-gray-100 transition-colors text-aftras-blue-text"
                 aria-label="Retour"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-4 h-4 md:w-5 md:h-5" />
               </button>
             )}
             <Link to="/" className="flex-shrink-0 flex items-center">
               <img 
                 src="https://res.cloudinary.com/dnpgvhq2t/image/upload/v1773972011/logaft_djawlr.jpg" 
                 alt="Logo" 
-                className="h-12 w-auto object-contain mr-3"
+                className="h-8 w-auto sm:h-10 md:h-12 object-contain mr-2 md:mr-3"
                 referrerPolicy="no-referrer"
               />
               <div className="flex flex-col">
                 <div className="flex items-center">
-                  <span className="text-2xl font-bold text-aftras-blue-text">AFTRAS</span>
-                  <span className="text-2xl font-bold text-aftras-orange ml-1">CI</span>
+                  <span className="text-lg sm:text-xl md:text-2xl font-bold text-aftras-blue-text">AFTRAS</span>
+                  <span className="text-lg sm:text-xl md:text-2xl font-bold text-aftras-orange ml-1">CI</span>
                 </div>
-                <span className="text-[8px] sm:text-[10px] md:text-xs font-medium text-gray-500 -mt-0.5 md:-mt-1 tracking-wider uppercase whitespace-nowrap">
+                <span className="text-[6px] sm:text-[8px] md:text-xs font-medium text-gray-500 -mt-0.5 md:-mt-1 tracking-wider uppercase whitespace-nowrap">
                   {t('common.slogan')}
                 </span>
               </div>

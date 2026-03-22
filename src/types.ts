@@ -5,8 +5,9 @@ export interface UserProfile {
   email: string;
   role: UserRole;
   company_name: string;
+  business_registry_number: string;
   country: string;
-  address: string;
+  city: string;
   website?: string;
   representative_name: string;
   position: string;
@@ -17,8 +18,10 @@ export interface UserProfile {
 export interface Product {
   id: string;
   name: string;
+  name_en?: string;
   category: string;
   description?: string;
+  description_en?: string;
   image_url: string;
   is_featured: boolean;
   created_at: string;

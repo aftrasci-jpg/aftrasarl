@@ -11,8 +11,9 @@ export const Register = () => {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
     companyName: '',
+    businessRegistryNumber: '',
     country: '',
-    address: '',
+    city: '',
     website: '',
     representativeName: '',
     position: '',
@@ -42,6 +43,8 @@ export const Register = () => {
         email: formData.email,
         password: formData.password,
         companyName: formData.companyName,
+        businessRegistryNumber: formData.businessRegistryNumber,
+        city: formData.city,
         phone: formData.phone,
       });
 
@@ -57,9 +60,12 @@ export const Register = () => {
       const { error: profileError } = await supabase
         .from('profiles')
         .update({
+          email: formData.email,
+          role: 'company',
           company_name: formData.companyName,
+          business_registry_number: formData.businessRegistryNumber,
           country: formData.country,
-          address: formData.address,
+          city: formData.city,
           website: formData.website,
           representative_name: formData.representativeName,
           position: formData.position,
@@ -159,6 +165,16 @@ export const Register = () => {
                   />
                 </div>
                 <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">{t('register_page.form.business_registry_number')}</label>
+                  <input
+                    required
+                    type="text"
+                    value={formData.businessRegistryNumber}
+                    onChange={(e) => setFormData({...formData, businessRegistryNumber: e.target.value})}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-aftras-blue-text outline-none"
+                  />
+                </div>
+                <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">{t('register_page.form.country')}</label>
                   <input
                     required
@@ -168,15 +184,15 @@ export const Register = () => {
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-aftras-blue-text outline-none"
                   />
                 </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-bold text-gray-700 mb-2">{t('register_page.form.address')}</label>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">{t('register_page.form.city')}</label>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
                       required
                       type="text"
-                      value={formData.address}
-                      onChange={(e) => setFormData({...formData, address: e.target.value})}
+                      value={formData.city}
+                      onChange={(e) => setFormData({...formData, city: e.target.value})}
                       className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-aftras-blue-text outline-none"
                     />
                   </div>
