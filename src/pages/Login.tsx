@@ -139,27 +139,6 @@ export const Login = () => {
           </button>
         </form>
 
-        <div className="mt-8 pt-8 border-t border-gray-100">
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 text-center">{t('login_page.demo.title')}</p>
-          <div className="grid grid-cols-2 gap-4">
-            <button 
-              onClick={() => { setEmail('admin@demo.com'); setPassword('password123'); }}
-              className="text-xs bg-blue-50 text-aftras-blue-text py-2 px-4 rounded-lg font-bold hover:bg-blue-100 transition-colors"
-            >
-              {t('login_page.demo.admin_btn')}
-            </button>
-            <button 
-              onClick={() => { setEmail('user@demo.com'); setPassword('password123'); }}
-              className="text-xs bg-orange-50 text-aftras-orange py-2 px-4 rounded-lg font-bold hover:bg-orange-100 transition-colors"
-            >
-              {t('login_page.demo.client_btn')}
-            </button>
-          </div>
-          <p className="text-[10px] text-gray-400 mt-2 text-center italic">
-            {t('login_page.demo.note')}
-          </p>
-        </div>
-
         <p className="text-center mt-8 text-gray-600 text-sm">
           {t('login_page.no_account')}{' '}
           <Link to="/register" className="text-aftras-blue-text font-bold hover:underline">
