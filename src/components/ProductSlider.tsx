@@ -16,7 +16,7 @@ export const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 640) setVisibleCount(1);
+      if (window.innerWidth < 480) setVisibleCount(1);
       else if (window.innerWidth < 768) setVisibleCount(2);
       else if (window.innerWidth < 1024) setVisibleCount(3);
       else if (window.innerWidth < 1280) setVisibleCount(4);
@@ -51,7 +51,9 @@ export const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
       <div className="flex gap-3 md:gap-6 overflow-hidden">
         <AnimatePresence mode="popLayout" initial={false}>
           {visibleProducts.map((product, idx) => {
-            const productName = i18n.language === 'en' && product.name_en ? product.name_en : product.name;
+            const productName = i18n.language === 'en' 
+              ? (product.name_en || t(`products.${product.name}`, { defaultValue: product.name }))
+              : product.name;
             
             return (
               <motion.div

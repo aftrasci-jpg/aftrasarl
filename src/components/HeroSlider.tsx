@@ -38,14 +38,21 @@ export const HeroSlider = ({ products }: HeroSliderProps) => {
   ];
 
   const slides = products && products.length > 0 
-    ? products.map(p => ({
-        image: p.image_url,
-        title: i18n.language === 'en' && p.name_en ? p.name_en : p.name,
-        subtitle: i18n.language === 'en' && p.description_en ? p.description_en : (p.description || t('catalog_page.default_desc')),
-        cta: t('catalog_page.request_loi'),
-        link: '/loi',
-        state: { product: i18n.language === 'en' && p.name_en ? p.name_en : p.name, product_image: p.image_url }
-      }))
+    ? products.map(p => {
+        const productName = i18n.language === 'en' 
+          ? (p.name_en || t(`products.${p.name}`, { defaultValue: p.name }))
+          : p.name;
+        const productDesc = i18n.language === 'en' && p.description_en ? p.description_en : (p.description || t('catalog_page.default_desc'));
+        
+        return {
+          image: p.image_url,
+          title: productName,
+          subtitle: productDesc,
+          cta: t('catalog_page.request_loi'),
+          link: '/loi',
+          state: { product: productName, product_image: p.image_url }
+        };
+      })
     : defaultSlides;
 
   useEffect(() => {
@@ -59,7 +66,7 @@ export const HeroSlider = ({ products }: HeroSliderProps) => {
   const prev = () => setCurrent((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
 
   return (
-    <div className="relative h-[450px] md:h-[600px] overflow-hidden bg-blue-900">
+    <div className="relative h-[350px] sm:h-[450px] md:h-[600px] overflow-hidden bg-blue-900">
       <AnimatePresence mode="wait">
         <motion.div
           key={current}
@@ -81,7 +88,7 @@ export const HeroSlider = ({ products }: HeroSliderProps) => {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-3xl md:text-6xl font-bold mb-4 max-w-3xl leading-tight"
+              className="text-2xl sm:text-3xl md:text-6xl font-bold mb-4 max-w-3xl leading-tight"
             >
               {slides[current].title}
             </motion.h1>
@@ -89,7 +96,7 @@ export const HeroSlider = ({ products }: HeroSliderProps) => {
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.4 }}
-              className="text-lg md:text-2xl mb-8 text-blue-100 max-w-2xl"
+              className="text-sm sm:text-lg md:text-2xl mb-8 text-blue-100 max-w-2xl"
             >
               {slides[current].subtitle}
             </motion.p>
@@ -102,7 +109,7 @@ export const HeroSlider = ({ products }: HeroSliderProps) => {
               <Link 
                 to={slides[current].link}
                 state={(slides[current] as any).state}
-                className="inline-block w-full md:w-auto text-center bg-aftras-orange hover:bg-opacity-90 text-white px-8 py-4 rounded-xl font-bold text-base md:text-lg transition-all transform hover:scale-105 shadow-lg shadow-aftras-orange/20"
+                className="inline-block w-full md:w-auto text-center bg-aftras-orange hover:bg-opacity-90 text-white px-6 py-3 md:px-8 md:py-4 rounded-xl font-bold text-sm md:text-lg transition-all transform hover:scale-105 shadow-lg shadow-aftras-orange/20"
               >
                 {slides[current].cta}
               </Link>

@@ -57,8 +57,10 @@ export const LOIForm = () => {
     setFormData({ ...formData, product: val, product_image: '' });
     if (val.trim()) {
       const filtered = allProducts.filter(p => {
-        const name = i18n.language === 'en' && p.name_en ? p.name_en : p.name;
-        return name.toLowerCase().includes(val.toLowerCase());
+        const productName = i18n.language === 'en' 
+          ? (p.name_en || t(`products.${p.name}`, { defaultValue: p.name }))
+          : p.name;
+        return productName.toLowerCase().includes(val.toLowerCase());
       });
       setFilteredProducts(filtered);
       setShowSuggestions(true);
@@ -69,7 +71,9 @@ export const LOIForm = () => {
   };
 
   const selectProduct = (p: Product) => {
-    const productName = i18n.language === 'en' && p.name_en ? p.name_en : p.name;
+    const productName = i18n.language === 'en' 
+      ? (p.name_en || t(`products.${p.name}`, { defaultValue: p.name }))
+      : p.name;
     setFormData({ 
       ...formData, 
       product: productName, 
@@ -265,7 +269,9 @@ export const LOIForm = () => {
                           </p>
                         </div>
                         {filteredProducts.map(p => {
-                          const productName = i18n.language === 'en' && p.name_en ? p.name_en : p.name;
+                          const productName = i18n.language === 'en' 
+                            ? (p.name_en || t(`products.${p.name}`, { defaultValue: p.name }))
+                            : p.name;
                           return (
                             <button
                               key={p.id}

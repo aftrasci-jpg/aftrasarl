@@ -179,12 +179,12 @@ export const Dashboard = () => {
                   onClick={() => toggleExpand(loi.id)}
                   className="p-4 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center cursor-pointer hover:bg-gray-50 transition-colors gap-4"
                 >
-                  <div className="flex items-center space-x-4">
+                      <div className="flex items-center space-x-4">
                     {getLoiImage(loi) ? (
                       <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl overflow-hidden border border-gray-100 flex-shrink-0 bg-gray-50">
                         <img 
                           src={getLoiImage(loi)!} 
-                          alt={loi.product} 
+                          alt={t(`products.${loi.product}`, { defaultValue: loi.product })} 
                           className="w-full h-full object-cover"
                           referrerPolicy="no-referrer"
                           onError={(e) => {
@@ -198,7 +198,9 @@ export const Dashboard = () => {
                       </div>
                     )}
                     <div>
-                      <h3 className="text-base md:text-lg font-bold text-gray-900 line-clamp-1">{loi.product}</h3>
+                      <h3 className="text-base md:text-lg font-bold text-gray-900 line-clamp-1">
+                        {t(`products.${loi.product}`, { defaultValue: loi.product })}
+                      </h3>
                       <p className="text-xs md:text-sm text-gray-500">{t('dashboard.loi_card.quantity')}: {loi.quantity} • {new Date(loi.created_at).toLocaleDateString()}</p>
                     </div>
                   </div>

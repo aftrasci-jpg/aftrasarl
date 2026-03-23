@@ -46,7 +46,13 @@ export const Admin = () => {
     email: '',
     password: '',
     role: 'community_manager' as 'admin' | 'company' | 'community_manager',
-    company_name: ''
+    company_name: '',
+    country: '',
+    city: '',
+    business_registry_number: '',
+    representative_name: '',
+    position: '',
+    phone: ''
   });
 
   const STATUS_LABELS: Record<string, string> = {
@@ -249,7 +255,13 @@ export const Admin = () => {
         options: {
           data: {
             role: newUserForm.role,
-            company_name: newUserForm.company_name || 'AFTRAS Staff'
+            company_name: newUserForm.role === 'company' ? newUserForm.company_name : (newUserForm.company_name || 'AFTRAS Staff'),
+            country: newUserForm.country,
+            city: newUserForm.city,
+            business_registry_number: newUserForm.business_registry_number,
+            representative_name: newUserForm.representative_name,
+            position: newUserForm.position,
+            phone: newUserForm.phone
           }
         }
       });
@@ -265,7 +277,14 @@ export const Admin = () => {
           .from('profiles')
           .update({ 
             email: newUserForm.email,
-            role: newUserForm.role
+            role: newUserForm.role,
+            company_name: newUserForm.role === 'company' ? newUserForm.company_name : (newUserForm.company_name || 'AFTRAS Staff'),
+            country: newUserForm.country,
+            city: newUserForm.city,
+            business_registry_number: newUserForm.business_registry_number,
+            representative_name: newUserForm.representative_name,
+            position: newUserForm.position,
+            phone: newUserForm.phone
           })
           .eq('id', authData.user.id);
         
@@ -278,7 +297,18 @@ export const Admin = () => {
         }
         
         setIsUserModalOpen(false);
-        setNewUserForm({ email: '', password: '', role: 'company', company_name: '' });
+        setNewUserForm({ 
+          email: '', 
+          password: '', 
+          role: 'community_manager', 
+          company_name: '',
+          country: '',
+          city: '',
+          business_registry_number: '',
+          representative_name: '',
+          position: '',
+          phone: ''
+        });
         
         // Refresh profiles list manually
         const { data: profilesData } = await supabase
@@ -780,8 +810,94 @@ export const Admin = () => {
                     >
                       <option value="community_manager">{t('admin_page.staff.cm')}</option>
                       <option value="admin">{t('admin_page.staff.admin')}</option>
+                      <option value="company">{t('admin_page.staff.company') || 'Entreprise'}</option>
                     </select>
                   </div>
+
+                  {newUserForm.role === 'company' && (
+                    <div className="space-y-4 pt-4 border-t border-gray-100">
+                      <h4 className="font-bold text-aftras-blue-text text-sm uppercase tracking-wider">Informations Entreprise</h4>
+                      
+                      <div>
+                        <label className="block text-xs font-bold text-gray-500 mb-1">Nom de l'entreprise</label>
+                        <input 
+                          required
+                          type="text" 
+                          value={newUserForm.company_name}
+                          onChange={(e) => setNewUserForm({...newUserForm, company_name: e.target.value})}
+                          className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text text-sm"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold text-gray-500 mb-1">Pays</label>
+                          <input 
+                            required
+                            type="text" 
+                            value={newUserForm.country}
+                            onChange={(e) => setNewUserForm({...newUserForm, country: e.target.value})}
+                            className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-gray-500 mb-1">Ville</label>
+                          <input 
+                            required
+                            type="text" 
+                            value={newUserForm.city}
+                            onChange={(e) => setNewUserForm({...newUserForm, city: e.target.value})}
+                            className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text text-sm"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-gray-500 mb-1">N° Registre de Commerce</label>
+                        <input 
+                          required
+                          type="text" 
+                          value={newUserForm.business_registry_number}
+                          onChange={(e) => setNewUserForm({...newUserForm, business_registry_number: e.target.value})}
+                          className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text text-sm"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-bold text-gray-500 mb-1">Nom du Représentant</label>
+                          <input 
+                            required
+                            type="text" 
+                            value={newUserForm.representative_name}
+                            onChange={(e) => setNewUserForm({...newUserForm, representative_name: e.target.value})}
+                            className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-gray-500 mb-1">Fonction</label>
+                          <input 
+                            required
+                            type="text" 
+                            value={newUserForm.position}
+                            onChange={(e) => setNewUserForm({...newUserForm, position: e.target.value})}
+                            className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text text-sm"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-gray-500 mb-1">Téléphone / WhatsApp</label>
+                        <input 
+                          required
+                          type="text" 
+                          value={newUserForm.phone}
+                          onChange={(e) => setNewUserForm({...newUserForm, phone: e.target.value})}
+                          className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text text-sm"
+                        />
+                      </div>
+                    </div>
+                  )}
                   <div className="bg-blue-50 p-4 rounded-xl text-xs text-blue-700 leading-relaxed">
                     <p className="font-bold mb-1">{t('admin_page.users.note_title')}</p>
                     {t('admin_page.users.note_desc')}

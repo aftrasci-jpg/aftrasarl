@@ -189,20 +189,40 @@ CREATE POLICY "Admins and CMs can upload product images" ON storage.objects FOR 
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, role, company_name, country, city, business_registry_number, website, representative_name, position, phone)
+  INSERT INTO public.profiles (
+    id, 
+    email, 
+    role, 
+    company_name, 
+    country, 
+    city, 
+    business_registry_number, 
+    representative_name, 
+    position, 
+    phone
+  )
   VALUES (
     new.id, 
     new.email, 
     COALESCE(new.raw_user_meta_data->>'role', 'company'),
-    new.raw_user_meta_data->>'company_name',
-    new.raw_user_meta_data->>'country',
-    new.raw_user_meta_data->>'city',
-    new.raw_user_meta_data->>'business_registry_number',
-    new.raw_user_meta_data->>'website',
-    new.raw_user_meta_data->>'representative_name',
-    new.raw_user_meta_data->>'position',
-    new.raw_user_meta_data->>'phone'
-  );
+    COALESCE(new.raw_user_meta_data->>'company_name', 'N/A'),
+    COALESCE(new.raw_user_meta_data->>'country', 'N/A'),
+    COALESCE(new.raw_user_meta_data->>'city', 'N/A'),
+    COALESCE(new.raw_user_meta_data->>'business_registry_number', 'N/A'),
+    COALESCE(new.raw_user_meta_data->>'representative_name', 'N/A'),
+    COALESCE(new.raw_user_meta_data->>'position', 'N/A'),
+    COALESCE(new.raw_user_meta_data->>'phone', 'N/A')
+  )
+  ON CONFLICT (id) DO UPDATE SET
+    email = EXCLUDED.email,
+    role = EXCLUDED.role,
+    company_name = EXCLUDED.company_name,
+    country = EXCLUDED.country,
+    city = EXCLUDED.city,
+    business_registry_number = EXCLUDED.business_registry_number,
+    representative_name = EXCLUDED.representative_name,
+    position = EXCLUDED.position,
+    phone = EXCLUDED.phone;
   RETURN new;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;

@@ -75,6 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchProfile = async (userId: string, retryCount = 0) => {
     try {
+      setLoading(true);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -91,13 +92,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw error;
       }
       setProfile(data as UserProfile);
+      setLoading(false);
     } catch (error) {
       console.error("Profile fetch error:", error);
       setProfile(null);
-    } finally {
-      if (retryCount >= 3 || !profile) {
-        setLoading(false);
-      }
+      setLoading(false);
     }
   };
 

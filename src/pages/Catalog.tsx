@@ -60,8 +60,10 @@ export const Catalog = () => {
     }
     if (searchTerm) {
       filtered = filtered.filter(p => {
-        const name = i18n.language === 'en' && p.name_en ? p.name_en : p.name;
-        return name.toLowerCase().includes(searchTerm.toLowerCase());
+        const productName = i18n.language === 'en' 
+          ? (p.name_en || t(`products.${p.name}`, { defaultValue: p.name }))
+          : p.name;
+        return productName.toLowerCase().includes(searchTerm.toLowerCase());
       });
     }
     setFilteredProducts(filtered);
@@ -75,14 +77,16 @@ export const Catalog = () => {
         title="Catalogue Produits | AFTRAS CI"
         description="Consultez notre catalogue de produits disponibles pour le négoce international : matières premières, produits manufacturés et solutions de sourcing sur mesure."
       />
-      <HeroSlider products={featuredProducts} />
+      <HeroSlider />
       {/* Featured Slider Section */}
       {featuredProducts.length > 0 && (
-        <section className="py-12 md:py-20 overflow-hidden bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 md:mb-12 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-aftras-blue-border mb-2">{t('catalog_page.featured')}</h2>
-              <p className="text-gray-600 text-sm md:text-base">{t('catalog_page.featured_desc')}</p>
+        <section className="py-12 md:py-20 overflow-hidden bg-white border-b border-gray-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 md:mb-12">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold text-aftras-blue-border mb-2">{t('catalog_page.featured')}</h2>
+                <p className="text-gray-600 text-sm md:text-base">{t('catalog_page.featured_desc')}</p>
+              </div>
             </div>
           </div>
           <ProductSlider products={featuredProducts} />
@@ -143,7 +147,9 @@ export const Catalog = () => {
               ) : filteredProducts.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {filteredProducts.map(product => {
-                    const productName = i18n.language === 'en' && product.name_en ? product.name_en : product.name;
+                    const productName = i18n.language === 'en' 
+                      ? (product.name_en || t(`products.${product.name}`, { defaultValue: product.name }))
+                      : product.name;
                     const productDesc = i18n.language === 'en' && product.description_en ? product.description_en : (product.description || t('catalog_page.default_desc'));
                     
                     return (

@@ -293,7 +293,6 @@
       "business_registry_number": "Numéro de registre de commerce *",
       "country": "Pays *",
       "city": "Ville *",
-      "website": "Site Web (Optionnel)",
       "rep_name": "Nom complet *",
       "position": "Fonction / Poste *",
       "phone": "Téléphone / WhatsApp *"
@@ -314,7 +313,6 @@
       "business_registry_number": "Numéro de registre de commerce *",
       "country": "Pays *",
       "city": "Ville *",
-      "website": "Site Web (Optionnel)",
       "rep_name": "Nom complet *",
       "position": "Fonction / Poste *",
       "email": "Email professionnel *",
@@ -479,5 +477,27 @@
       "title": "Mise à jour de votre LOI",
       "message": "L'administration a répondu à votre demande pour {{product}}."
     }
+  },
+  "products": {
+    "Ananas": "Ananas",
+    "Mangue": "Mangue",
+    "Ail": "Ail",
+    "Tomate": "Tomate",
+    "Orange": "Orange",
+    "Blé": "Blé",
+    "Cannelle": "Cannelle",
+    "Curcuma": "Curcuma",
+    "Piment rouge": "Piment rouge",
+    "Soja": "Soja",
+    "Pomme de terre": "Pomme de terre",
+    "Mil": "Mil",
+    "Niébé": "Niébé",
+    "Maïs": "Maïs",
+    "Café": "Café",
+    "Caoutchouc": "Caoutchouc",
+    "Noix de cajou": "Noix de cajou",
+    "Amandes de cajou": "Amandes de cajou",
+    "Cacao": "Cacao",
+    "Oignon": "Oignon"
   }
 }

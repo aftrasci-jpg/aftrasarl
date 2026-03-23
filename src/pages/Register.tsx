@@ -14,7 +14,6 @@ export const Register = () => {
     businessRegistryNumber: '',
     country: '',
     city: '',
-    website: '',
     representativeName: '',
     position: '',
     email: '',
@@ -51,30 +50,24 @@ export const Register = () => {
       const { data: { user }, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
+        options: {
+          data: {
+            role: 'company',
+            company_name: formData.companyName,
+            country: formData.country,
+            city: formData.city,
+            business_registry_number: formData.businessRegistryNumber,
+            representative_name: formData.representativeName,
+            position: formData.position,
+            phone: formData.phone,
+          }
+        }
       });
       
       if (authError) throw authError;
       if (!user) throw new Error('Signup failed');
 
-      // Profile is created by trigger, but we update the extra fields
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          email: formData.email,
-          role: 'company',
-          company_name: formData.companyName,
-          business_registry_number: formData.businessRegistryNumber,
-          country: formData.country,
-          city: formData.city,
-          website: formData.website,
-          representative_name: formData.representativeName,
-          position: formData.position,
-          phone: formData.phone,
-        })
-        .eq('id', user.id);
-
-      if (profileError) throw profileError;
-
+      // Profile is created by trigger with all data from options.data
       setSuccess(true);
       window.scrollTo(0, 0);
     } catch (err: any) {
@@ -194,19 +187,6 @@ export const Register = () => {
                       value={formData.city}
                       onChange={(e) => setFormData({...formData, city: e.target.value})}
                       className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-aftras-blue-text outline-none"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">{t('register_page.form.website')}</label>
-                  <div className="relative">
-                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                    <input
-                      type="url"
-                      value={formData.website}
-                      onChange={(e) => setFormData({...formData, website: e.target.value})}
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-aftras-blue-text outline-none"
-                      placeholder="https://..."
                     />
                   </div>
                 </div>
