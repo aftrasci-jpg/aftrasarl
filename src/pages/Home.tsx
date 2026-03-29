@@ -123,9 +123,12 @@ export const Home = () => {
             </div>
             <div className="relative mt-8 lg:mt-0">
               <img 
-                src="https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&q=80&w=800" 
+                src="https://picsum.photos/seed/logistics/800/600" 
                 alt="Logistics" 
                 className="rounded-3xl shadow-2xl w-full"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/fallback/800/600';
+                }}
               />
               <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-xl hidden md:block">
                 <div className="flex items-center space-x-4">
@@ -175,21 +178,30 @@ export const Home = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-4">
                     <img 
-                      src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaad5b?auto=format&fit=crop&q=80&w=400" 
+                      src="https://picsum.photos/seed/industrial/400/300" 
                       alt="Industrial" 
                       className="rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/fallback/400/300';
+                      }}
                     />
                     <img 
-                      src="https://images.unsplash.com/photo-1494412574743-0192490282a9?auto=format&fit=crop&q=80&w=400" 
+                      src="https://picsum.photos/seed/materials/400/300" 
                       alt="Raw materials" 
                       className="rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/fallback/400/300';
+                      }}
                     />
                   </div>
                   <div className="space-y-4 pt-8">
                     <img 
-                      src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=400" 
+                      src="https://picsum.photos/seed/equipment/400/300" 
                       alt="Equipment" 
                       className="rounded-2xl shadow-lg transform hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/fallback/400/300';
+                      }}
                     />
                     <div className="bg-aftras-orange p-6 rounded-2xl shadow-lg flex flex-col justify-center items-center text-center">
                       <Globe className="w-12 h-12 text-white mb-4" />

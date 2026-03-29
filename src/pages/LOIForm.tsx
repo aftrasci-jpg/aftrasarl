@@ -57,7 +57,7 @@ export const LOIForm = () => {
     setFormData({ ...formData, product: val, product_image: '' });
     if (val.trim()) {
       const filtered = allProducts.filter(p => {
-        const productName = i18n.language === 'en' 
+        const productName = i18n.language.startsWith('en') 
           ? (p.name_en || t(`products.${p.name}`, { defaultValue: p.name }))
           : p.name;
         return productName.toLowerCase().includes(val.toLowerCase());
@@ -71,7 +71,7 @@ export const LOIForm = () => {
   };
 
   const selectProduct = (p: Product) => {
-    const productName = i18n.language === 'en' 
+    const productName = i18n.language.startsWith('en') 
       ? (p.name_en || t(`products.${p.name}`, { defaultValue: p.name }))
       : p.name;
     setFormData({ 
@@ -151,7 +151,7 @@ export const LOIForm = () => {
           title: t('notifications.loi_created.title', { company: profile.company_name }),
           message: t('notifications.loi_created.message', { 
             company: profile.company_name, 
-            product: formData.product 
+            product: t(`products.${formData.product}`, { defaultValue: formData.product }) 
           }),
           type: 'loi_created',
           link: '/admin'
@@ -269,7 +269,7 @@ export const LOIForm = () => {
                           </p>
                         </div>
                         {filteredProducts.map(p => {
-                          const productName = i18n.language === 'en' 
+                          const productName = i18n.language.startsWith('en') 
                             ? (p.name_en || t(`products.${p.name}`, { defaultValue: p.name }))
                             : p.name;
                           return (

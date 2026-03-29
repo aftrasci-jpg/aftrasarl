@@ -15,21 +15,21 @@ export const HeroSlider = ({ products }: HeroSliderProps) => {
 
   const defaultSlides = [
     {
-      image: 'https://images.unsplash.com/photo-1494412574743-01947f04824d?auto=format&fit=crop&q=80&w=1920',
+      image: 'https://picsum.photos/seed/logistics/1920/1080',
       title: t('home.hero.0.title'),
       subtitle: t('home.hero.0.subtitle'),
       cta: t('home.hero.0.cta'),
       link: '/catalog'
     },
     {
-      image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1920',
+      image: 'https://picsum.photos/seed/business/1920/1080',
       title: t('home.hero.1.title'),
       subtitle: t('home.hero.1.subtitle'),
       cta: t('home.hero.1.cta'),
       link: '/services'
     },
     {
-      image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=1920',
+      image: 'https://picsum.photos/seed/industrial/1920/1080',
       title: t('home.hero.2.title'),
       subtitle: t('home.hero.2.subtitle'),
       cta: t('home.hero.2.cta'),
@@ -39,10 +39,10 @@ export const HeroSlider = ({ products }: HeroSliderProps) => {
 
   const slides = products && products.length > 0 
     ? products.map(p => {
-        const productName = i18n.language === 'en' 
+        const productName = i18n.language.startsWith('en') 
           ? (p.name_en || t(`products.${p.name}`, { defaultValue: p.name }))
           : p.name;
-        const productDesc = i18n.language === 'en' && p.description_en ? p.description_en : (p.description || t('catalog_page.default_desc'));
+        const productDesc = i18n.language.startsWith('en') && p.description_en ? p.description_en : (p.description || t('catalog_page.default_desc'));
         
         return {
           image: p.image_url,

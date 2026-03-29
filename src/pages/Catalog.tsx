@@ -60,7 +60,7 @@ export const Catalog = () => {
     }
     if (searchTerm) {
       filtered = filtered.filter(p => {
-        const productName = i18n.language === 'en' 
+        const productName = i18n.language.startsWith('en') 
           ? (p.name_en || t(`products.${p.name}`, { defaultValue: p.name }))
           : p.name;
         return productName.toLowerCase().includes(searchTerm.toLowerCase());
@@ -77,9 +77,9 @@ export const Catalog = () => {
         title="Catalogue Produits | AFTRAS CI"
         description="Consultez notre catalogue de produits disponibles pour le négoce international : matières premières, produits manufacturés et solutions de sourcing sur mesure."
       />
-      <HeroSlider />
-      {/* Featured Slider Section */}
-      {featuredProducts.length > 0 && (
+      <HeroSlider products={featuredProducts} />
+      {/* Featured Slider Section - Removed to avoid duplication as HeroSlider now shows them */}
+      {/* {featuredProducts.length > 0 && (
         <section className="py-12 md:py-20 overflow-hidden bg-white border-b border-gray-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8 md:mb-12">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
@@ -91,7 +91,7 @@ export const Catalog = () => {
           </div>
           <ProductSlider products={featuredProducts} />
         </section>
-      )}
+      )} */}
 
       {/* Main Catalog */}
       <section className="py-16">
@@ -147,10 +147,10 @@ export const Catalog = () => {
               ) : filteredProducts.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {filteredProducts.map(product => {
-                    const productName = i18n.language === 'en' 
+                    const productName = i18n.language.startsWith('en') 
                       ? (product.name_en || t(`products.${product.name}`, { defaultValue: product.name }))
                       : product.name;
-                    const productDesc = i18n.language === 'en' && product.description_en ? product.description_en : (product.description || t('catalog_page.default_desc'));
+                    const productDesc = i18n.language.startsWith('en') && product.description_en ? product.description_en : (product.description || t('catalog_page.default_desc'));
                     
                     return (
                       <div key={product.id} className="bg-white rounded-2xl shadow-sm border border-aftras-orange overflow-hidden group hover:shadow-xl transition-all">
@@ -161,7 +161,7 @@ export const Catalog = () => {
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             referrerPolicy="no-referrer"
                             onError={(e) => {
-                              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=800';
+                              (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/fallback/800/600';
                             }}
                           />
                           <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold text-aftras-blue-text uppercase tracking-widest">

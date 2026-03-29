@@ -188,7 +188,7 @@ export const Dashboard = () => {
                           className="w-full h-full object-cover"
                           referrerPolicy="no-referrer"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=800';
+                            (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/fallback/800/600';
                           }}
                         />
                       </div>

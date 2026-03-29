@@ -17,7 +17,7 @@ export const About = () => {
       <section className="relative py-16 md:py-24 bg-aftras-blue-text text-white overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <img 
-            src="https://images.unsplash.com/photo-1454165833767-027ffea9e778?auto=format&fit=crop&q=80&w=1920" 
+            src="https://picsum.photos/seed/office/1920/1080" 
             alt="Office" 
             className="w-full h-full object-cover"
           />
@@ -30,7 +30,7 @@ export const About = () => {
           >
             <div className="relative px-6 py-3 md:px-12 md:py-6 rounded-full overflow-hidden shadow-2xl border border-white/30 backdrop-blur-md">
               {/* Background Image for the Badge */}
-              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800')] bg-cover bg-center opacity-80 group-hover:scale-110 transition-transform duration-700" />
+              <div className="absolute inset-0 bg-[url('https://picsum.photos/seed/business/800/600')] bg-cover bg-center opacity-80 group-hover:scale-110 transition-transform duration-700" />
               <div className="absolute inset-0 bg-gradient-to-r from-aftras-blue-text/80 to-aftras-blue-border/80" />
               
               <h1 className="relative z-10 text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight whitespace-normal text-center leading-tight">
@@ -74,8 +74,8 @@ export const About = () => {
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <img src="https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&q=80&w=400" alt="Team" className="rounded-2xl shadow-lg w-full" />
-              <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&q=80&w=400" alt="Meeting" className="rounded-2xl shadow-lg mt-8 w-full" />
+              <img src="https://picsum.photos/seed/team/400/400" alt="Team" className="rounded-2xl shadow-lg w-full" />
+              <img src="https://picsum.photos/seed/meeting/400/400" alt="Meeting" className="rounded-2xl shadow-lg mt-8 w-full" />
             </div>
           </div>
         </div>

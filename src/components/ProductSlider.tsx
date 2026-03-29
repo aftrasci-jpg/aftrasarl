@@ -51,7 +51,7 @@ export const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
       <div className="flex gap-3 md:gap-6 overflow-hidden">
         <AnimatePresence mode="popLayout" initial={false}>
           {visibleProducts.map((product, idx) => {
-            const productName = i18n.language === 'en' 
+            const productName = i18n.language.startsWith('en') 
               ? (product.name_en || t(`products.${product.name}`, { defaultValue: product.name }))
               : product.name;
             
@@ -73,7 +73,7 @@ export const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
                       className="w-full h-full object-cover"
                       referrerPolicy="no-referrer"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=800';
+                        (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/fallback/800/600';
                       }}
                     />
                     <div className="absolute top-2 right-2 bg-aftras-orange text-white text-[8px] md:text-[10px] font-bold px-2 py-1 rounded-full uppercase">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabase';
 import { Building2, User, Mail, Lock, Globe, Phone, MapPin, Briefcase, CheckCircle2 } from 'lucide-react';
@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 
 export const Register = () => {
   const { t } = useTranslation();
+  
   const [formData, setFormData] = useState({
     companyName: '',
     businessRegistryNumber: '',

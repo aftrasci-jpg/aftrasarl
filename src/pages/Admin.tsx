@@ -14,9 +14,36 @@ import { Modal } from '../components/Modal';
 export const Admin = () => {
   const { t } = useTranslation();
   const { isAdmin, user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'lois' | 'companies' | 'users'>('lois');
+  const [activeTab, setActiveTab] = useState<'lois' | 'companies' | 'users' | 'products'>('lois');
+  
+  const CATEGORIES = PRODUCT_CATEGORIES.map(cat => ({
+    id: cat,
+    label: t(`catalog_page.category_list.${cat}`)
+  }));
+
   const [lois, setLois] = useState<LOI[]>([]);
   const [profiles, setProfiles] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [productForm, setProductForm] = useState<{
+    name: string;
+    name_en: string;
+    category: ProductCategory;
+    description: string;
+    description_en: string;
+    image_url: string;
+    is_featured: boolean;
+  }>({
+    name: '',
+    name_en: '',
+    category: PRODUCT_CATEGORIES[0],
+    description: '',
+    description_en: '',
+    image_url: '',
+    is_featured: false
+  });
   const [expandedLoiId, setExpandedLoiId] = useState<string | null>(null);
   const [loiSearchTerm, setLoiSearchTerm] = useState('');
   const [loiToDelete, setLoiToDelete] = useState<string | null>(null);
@@ -106,14 +133,31 @@ export const Admin = () => {
       }
     };
 
+    const fetchProducts = async () => {
+      const { data, error: fetchError } = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (fetchError) {
+        console.error("Admin products fetch error:", fetchError);
+      } else {
+        setProducts(data as Product[]);
+      }
+    };
+
+    fetchLois();
     fetchProfiles();
+    fetchProducts();
 
     const loisSub = supabase.channel('admin_lois').on('postgres_changes', { event: '*', schema: 'public', table: 'lois' }, fetchLois).subscribe();
     const profilesSub = supabase.channel('admin_profiles').on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, fetchProfiles).subscribe();
+    const productsSub = supabase.channel('admin_products').on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, fetchProducts).subscribe();
 
     return () => {
       loisSub.unsubscribe();
       profilesSub.unsubscribe();
+      productsSub.unsubscribe();
     };
   }, [isAdmin]);
 
@@ -160,7 +204,9 @@ export const Admin = () => {
       await supabase.from('notifications').insert({
         user_id: loi.company_id,
         title: t('notifications.loi_updated.title'),
-        message: t('notifications.loi_updated.message', { product: loi.product }),
+        message: t('notifications.loi_updated.message', { 
+          product: t(`products.${loi.product}`, { defaultValue: loi.product }) 
+        }),
         type: 'loi_updated',
         link: '/dashboard'
       });
@@ -323,6 +369,89 @@ export const Admin = () => {
     }
   };
 
+  const handleProductSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    try {
+      productSchema.parse(productForm);
+
+      if (!productForm.image_url) {
+        setError(t('cm_page.products.modal.image_required'));
+        return;
+      }
+
+      if (editingProduct) {
+        const { error: saveError } = await supabase
+          .from('products')
+          .update(productForm)
+          .eq('id', editingProduct.id);
+        if (saveError) throw saveError;
+      } else {
+        const { error: saveError } = await supabase
+          .from('products')
+          .insert([productForm]);
+        if (saveError) throw saveError;
+      }
+      const isEditing = !!editingProduct;
+      setIsProductModalOpen(false);
+      setEditingProduct(null);
+      setProductForm({ name: '', name_en: '', category: PRODUCT_CATEGORIES[0], description: '', description_en: '', image_url: '', is_featured: false });
+      setSuccess(isEditing ? "Produit mis à jour" : "Produit créé");
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        setError(err.issues[0].message);
+      } else {
+        console.error("Product save error:", err);
+        setError(t('common.error'));
+      }
+    }
+  };
+
+  const handleDeleteProduct = async (id: string) => {
+    try {
+      const { error: deleteError } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', id);
+      if (deleteError) throw deleteError;
+      setSuccess("Produit supprimé");
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (error) {
+      console.error("Product delete error:", error);
+      setError(t('common.error'));
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('products')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('products')
+        .getPublicUrl(filePath);
+
+      setProductForm({ ...productForm, image_url: publicUrl });
+    } catch (error: any) {
+      console.error('Image upload error:', error);
+      setError(t('cm_page.products.modal.upload_error'));
+    } finally {
+      setUploading(false);
+    }
+  };
+
   if (!isAdmin) return <div className="p-20 text-center">{t('admin_page.access_denied')}</div>;
 
   return (
@@ -353,6 +482,12 @@ export const Admin = () => {
               className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center whitespace-nowrap ${activeTab === 'users' ? 'bg-aftras-blue-text text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
             >
               <Users className="w-4 h-4 mr-2 flex-shrink-0" /> {t('admin_page.tabs.users')}
+            </button>
+            <button 
+              onClick={() => setActiveTab('products')}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center whitespace-nowrap ${activeTab === 'products' ? 'bg-aftras-blue-text text-white shadow-md' : 'text-gray-500 hover:bg-gray-50'}`}
+            >
+              <Package className="w-4 h-4 mr-2 flex-shrink-0" /> {t('cm_page.products.title')}
             </button>
           </div>
         </div>
@@ -418,7 +553,7 @@ export const Admin = () => {
                       <div className="w-12 h-12 md:w-16 md:h-16 rounded-xl overflow-hidden border border-gray-100 flex-shrink-0">
                         <img 
                           src={getLoiImage(loi)!} 
-                          alt={loi.product} 
+                          alt={t(`products.${loi.product}`, { defaultValue: loi.product })} 
                           className="w-full h-full object-cover"
                           referrerPolicy="no-referrer"
                         />
@@ -434,7 +569,9 @@ export const Admin = () => {
                           {loi.company_name}
                         </span>
                       </div>
-                      <h3 className="text-base md:text-lg font-bold text-gray-900 leading-tight">{loi.product}</h3>
+                      <h3 className="text-base md:text-lg font-bold text-gray-900 leading-tight">
+                        {t(`products.${loi.product}`, { defaultValue: loi.product })}
+                      </h3>
                       <p className="text-xs md:text-sm text-gray-500">{loi.quantity} • {new Date(loi.created_at).toLocaleDateString()}</p>
                     </div>
                   </div>
@@ -529,6 +666,14 @@ export const Admin = () => {
                                 />
                               </div>
                             </div>
+                            {responseForm.status === 'finalized' && (
+                              <div className="p-4 bg-green-50 rounded-xl border border-green-100">
+                                <p className="text-sm text-green-700 font-bold mb-1">Dossier Finalisé</p>
+                                <p className="text-xs text-green-600 italic">
+                                  Cette demande est maintenant marquée comme finalisée.
+                                </p>
+                              </div>
+                            )}
                             <button 
                               onClick={() => handleLoiResponse(loi)}
                               className="w-full bg-aftras-orange text-white py-3 rounded-xl font-bold text-sm hover:bg-opacity-90 transition-all flex items-center justify-center"
@@ -756,6 +901,78 @@ export const Admin = () => {
           </div>
         )}
 
+        {activeTab === 'products' && (
+          /* Product Management */
+          <div className="space-y-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 space-y-4 md:space-y-0">
+              <h2 className="text-xl font-bold text-aftras-blue-border">{t('cm_page.products.title')} ({products.length})</h2>
+              <button 
+                onClick={() => {
+                  setEditingProduct(null);
+                  setProductForm({ name: '', name_en: '', category: PRODUCT_CATEGORIES[0], description: '', description_en: '', image_url: '', is_featured: false });
+                  setIsProductModalOpen(true);
+                }}
+                className="w-full md:w-auto bg-aftras-orange text-white px-6 py-3 rounded-xl font-bold hover:bg-opacity-90 transition-all flex items-center justify-center shadow-lg shadow-orange-600/20"
+              >
+                <Plus className="w-5 h-5 mr-2" /> {t('cm_page.products.add_btn')}
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {products.map((product) => (
+                <div key={product.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
+                  <div className="h-40 overflow-hidden relative">
+                    <img 
+                      src={product.image_url} 
+                      alt={product.name} 
+                      className="w-full h-full object-cover" 
+                      referrerPolicy="no-referrer" 
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/fallback/800/600';
+                      }}
+                    />
+                    {product.is_featured && (
+                      <div className="absolute top-2 right-2 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded-full">{t('catalog_page.featured_badge')}</div>
+                    )}
+                  </div>
+                  <div className="p-4 flex-grow">
+                    <p className="text-xs font-bold text-aftras-blue-text uppercase mb-1">
+                      {t(`catalog_page.category_list.${product.category}`)}
+                    </p>
+                    <h3 className="font-bold text-gray-900">{product.name}</h3>
+                  </div>
+                  <div className="p-4 border-t border-gray-50 flex justify-end space-x-2">
+                    <button 
+                      onClick={() => {
+                        setEditingProduct(product);
+                        setProductForm({
+                          name: product.name,
+                          name_en: product.name_en || '',
+                          category: product.category as ProductCategory,
+                          description: product.description || '',
+                          description_en: product.description_en || '',
+                          image_url: product.image_url,
+                          is_featured: product.is_featured
+                        });
+                        setIsProductModalOpen(true);
+                      }}
+                      className="p-2 text-aftras-blue-text hover:bg-blue-50 rounded-lg transition-colors"
+                    >
+                      <Edit className="w-5 h-5" />
+                    </button>
+                    <button 
+                      onClick={() => handleDeleteProduct(product.id)}
+                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* User Creation Modal */}
         <AnimatePresence>
           {isUserModalOpen && (
@@ -904,6 +1121,153 @@ export const Admin = () => {
                   </div>
                   <button type="submit" className="w-full bg-aftras-orange text-white py-4 rounded-xl font-bold hover:bg-opacity-90 transition-all shadow-lg shadow-orange-600/20">
                     {newUserForm.role === 'company' ? t('admin_page.companies.add_btn') : t('admin_page.staff.add_btn')}
+                  </button>
+                </form>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Product Management Modal */}
+        <AnimatePresence>
+          {isProductModalOpen && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm overflow-y-auto">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh] my-auto"
+              >
+                <div className="bg-aftras-blue-text p-6 text-white flex justify-between items-center flex-shrink-0">
+                  <h3 className="text-xl font-bold">{editingProduct ? t('cm_page.products.modal.edit_title') : t('cm_page.products.modal.add_title')}</h3>
+                  <button onClick={() => setIsProductModalOpen(false)}><X className="w-6 h-6" /></button>
+                </div>
+                <form onSubmit={handleProductSubmit} className="p-6 md:p-8 space-y-6 overflow-y-auto">
+                  {error && (
+                    <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 flex items-center text-sm">
+                      <AlertCircle className="w-4 h-4 mr-2 flex-shrink-0" />
+                      {error}
+                    </div>
+                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">{t('cm_page.products.modal.name_fr')}</label>
+                      <input 
+                        required
+                        type="text" 
+                        value={productForm.name}
+                        onChange={(e) => setProductForm({...productForm, name: e.target.value})}
+                        className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">{t('cm_page.products.modal.name_en')}</label>
+                      <input 
+                        type="text" 
+                        value={productForm.name_en}
+                        onChange={(e) => setProductForm({...productForm, name_en: e.target.value})}
+                        className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text"
+                        placeholder="Product name in English"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">{t('cm_page.products.modal.category')}</label>
+                    <select 
+                      value={productForm.category}
+                      onChange={(e) => setProductForm({...productForm, category: e.target.value as ProductCategory})}
+                      className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text"
+                    >
+                      {CATEGORIES.map(cat => (
+                        <option key={cat.id} value={cat.id}>{cat.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">{t('cm_page.products.modal.image_url')}</label>
+                    <div className="space-y-4">
+                      {productForm.image_url && (
+                        <div className="relative w-full h-40 rounded-xl overflow-hidden border">
+                          <img src={productForm.image_url} alt="Preview" className="w-full h-full object-cover" />
+                          <button 
+                            type="button"
+                            onClick={() => setProductForm({...productForm, image_url: ''})}
+                            className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full hover:bg-red-700"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center justify-center w-full">
+                        <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all">
+                          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                            {uploading ? (
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-aftras-blue-text" />
+                            ) : (
+                              <>
+                                <Upload className="w-8 h-8 mb-3 text-gray-400" />
+                                <p className="mb-2 text-sm text-gray-500 font-bold">{t('cm_page.products.modal.upload_label')}</p>
+                                <p className="text-xs text-gray-400">PNG, JPG, GIF (Max. 5MB)</p>
+                              </>
+                            )}
+                          </div>
+                          <input 
+                            type="file" 
+                            className="hidden" 
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            disabled={uploading}
+                          />
+                        </label>
+                      </div>
+
+                      <div className="relative">
+                        <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+                        <input 
+                          required
+                          type="url" 
+                          value={productForm.image_url}
+                          onChange={(e) => setProductForm({...productForm, image_url: e.target.value})}
+                          className="w-full pl-10 p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text"
+                          placeholder={t('cm_page.products.modal.image_url_placeholder')}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">{t('cm_page.products.modal.description_fr')}</label>
+                      <textarea 
+                        rows={3}
+                        value={productForm.description}
+                        onChange={(e) => setProductForm({...productForm, description: e.target.value})}
+                        className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">{t('cm_page.products.modal.description_en')}</label>
+                      <textarea 
+                        rows={3}
+                        value={productForm.description_en}
+                        onChange={(e) => setProductForm({...productForm, description_en: e.target.value})}
+                        className="w-full p-3 border rounded-xl outline-none focus:ring-2 focus:ring-aftras-blue-text"
+                        placeholder="Product description in English"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <input 
+                      type="checkbox" 
+                      id="isFeatured"
+                      checked={productForm.is_featured}
+                      onChange={(e) => setProductForm({...productForm, is_featured: e.target.checked})}
+                      className="w-5 h-5 text-aftras-blue-text rounded border-gray-300 focus:ring-aftras-blue-text"
+                    />
+                    <label htmlFor="isFeatured" className="ml-3 text-sm font-bold text-gray-700">{t('cm_page.products.modal.featured')}</label>
+                  </div>
+                  <button type="submit" className="w-full bg-aftras-orange text-white py-4 rounded-xl font-bold hover:bg-opacity-90 transition-all shadow-lg shadow-orange-600/20">
+                    {t('cm_page.products.modal.submit')}
                   </button>
                 </form>
               </motion.div>

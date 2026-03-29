@@ -91,8 +91,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         throw error;
       }
-      setProfile(data as UserProfile);
-      setLoading(false);
+      if (data) {
+        setProfile(data as UserProfile);
+        setLoading(false);
+      } else {
+        setLoading(false);
+      }
     } catch (error) {
       console.error("Profile fetch error:", error);
       setProfile(null);

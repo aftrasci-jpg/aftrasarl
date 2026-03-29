@@ -56,7 +56,7 @@ export const Services = () => {
       <section className="relative py-16 md:py-24 bg-aftras-blue-text text-white overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <img 
-            src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=1920" 
+            src="https://picsum.photos/seed/logistics/1920/1080" 
             alt="Logistics" 
             className="w-full h-full object-cover"
           />

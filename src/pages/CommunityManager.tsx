@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../supabase';
 import { Product, PRODUCT_CATEGORIES, ProductCategory } from '../types';
-import { Plus, Trash2, Edit, X, Image as ImageIcon, Upload, AlertCircle } from 'lucide-react';
+import { Plus, Trash2, Edit, X, Image as ImageIcon, Upload, AlertCircle, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { SEO } from '../components/SEO';
@@ -10,13 +10,14 @@ import { productSchema } from '../schemas';
 import { z } from 'zod';
 
 export const CommunityManager = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { isCommunityManager } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const CATEGORIES = PRODUCT_CATEGORIES.map(cat => ({
     id: cat,
@@ -91,9 +92,12 @@ export const CommunityManager = () => {
           .insert([productForm]);
         if (saveError) throw saveError;
       }
+      const isEditing = !!editingProduct;
       setIsProductModalOpen(false);
       setEditingProduct(null);
       setProductForm({ name: '', name_en: '', category: PRODUCT_CATEGORIES[0], description: '', description_en: '', image_url: '', is_featured: false });
+      setSuccess(isEditing ? "Produit mis à jour" : "Produit créé");
+      setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       if (err instanceof z.ZodError) {
         setError(err.issues[0].message);
@@ -181,7 +185,15 @@ export const CommunityManager = () => {
           {products.map((product) => (
             <div key={product.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden flex flex-col">
               <div className="h-40 overflow-hidden relative">
-                <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                <img 
+                  src={product.image_url} 
+                  alt={i18n.language.startsWith('en') ? (product.name_en || t(`products.${product.name}`, { defaultValue: product.name })) : product.name} 
+                  className="w-full h-full object-cover" 
+                  referrerPolicy="no-referrer" 
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/fallback/800/600';
+                  }}
+                />
                 {product.is_featured && (
                   <div className="absolute top-2 right-2 bg-orange-500 text-white text-[10px] font-bold px-2 py-1 rounded-full">{t('catalog_page.featured_badge')}</div>
                 )}
@@ -190,7 +202,11 @@ export const CommunityManager = () => {
                 <p className="text-xs font-bold text-aftras-blue-text uppercase mb-1">
                   {t(`catalog_page.category_list.${product.category}`)}
                 </p>
-                <h3 className="font-bold text-gray-900">{product.name}</h3>
+                <h3 className="font-bold text-gray-900">
+                  {i18n.language.startsWith('en') 
+                    ? (product.name_en || t(`products.${product.name}`, { defaultValue: product.name }))
+                    : product.name}
+                </h3>
               </div>
               <div className="p-4 border-t border-gray-50 flex justify-end space-x-2">
                 <button 
@@ -240,6 +256,12 @@ export const CommunityManager = () => {
                     <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 flex items-center text-sm">
                       <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0" />
                       {error}
+                    </div>
+                  )}
+                  {success && (
+                    <div className="bg-green-50 text-green-600 p-4 rounded-xl border border-green-100 flex items-center text-sm">
+                      <CheckCircle className="w-5 h-5 mr-2 flex-shrink-0" />
+                      {success}
                     </div>
                   )}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">

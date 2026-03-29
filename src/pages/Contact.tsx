@@ -27,7 +27,7 @@ export const Contact = () => {
     {
       region: t('footer.contacts.asia.region'),
       name: 'Mr. Quevin ZOH',
-      whatsapp: '+91 96259 16929',
+      whatsapp: '+91 9870212497',
       email: 'zohquevin77@gmail.com',
       icon: Globe
     },

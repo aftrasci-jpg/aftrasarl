@@ -99,8 +99,8 @@ export const Footer = () => {
               <div>
                 <p className="text-aftras-orange font-bold text-xs uppercase tracking-wider mb-1">{t('contact_page.regions.asia')}</p>
                 <p className="text-white text-sm font-medium">Mr. Quevin ZOH</p>
-                <a href="https://wa.me/919625916929" className="text-blue-200 text-xs hover:text-aftras-orange transition-colors flex items-center mt-1">
-                  <Phone className="w-3 h-3 mr-2" /> {t('contact_page.form.whatsapp_label')} +91 96259 16929
+                <a href="https://wa.me/919870212497" className="text-blue-200 text-xs hover:text-aftras-orange transition-colors flex items-center mt-1">
+                  <Phone className="w-3 h-3 mr-2" /> {t('contact_page.form.whatsapp_label')} +91 9870212497
                 </a>
                 <a href="mailto:zohquevin77@gmail.com" className="text-blue-300 text-[10px] hover:text-aftras-orange transition-colors flex items-center mt-1">
                   <Mail className="w-3 h-3 mr-2" /> zohquevin77@gmail.com
